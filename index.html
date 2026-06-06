@@ -208,7 +208,11 @@ body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;}
 .loading-overlay.hidden{display:none;}
 .spinner{width:32px;height:32px;border:3px solid var(--border2);border-top-color:var(--acc);border-radius:50%;animation:spin 0.8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
-.loading-text{font-size:13px;color:var(--text3);}
+@keyframes logoPulse{from{transform:scale(1);opacity:0.8;}to{transform:scale(1.08);opacity:1;}}
+@keyframes prBounce{0%{transform:scale(0.3);opacity:0;}70%{transform:scale(1.2);}100%{transform:scale(1);opacity:1;}}
+@keyframes prSlide{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.loading-text{font-size:13px;color:var(--text3);margin-top:10px;animation:fadeMsg 2s ease-in-out infinite;}
+@keyframes fadeMsg{0%,100%{opacity:0.4;}50%{opacity:1;}}
 input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
 select{-webkit-appearance:none;}
 </style>
@@ -217,8 +221,32 @@ select{-webkit-appearance:none;}
 
 <!-- LOADING -->
 <div class="loading-overlay" id="loading-overlay">
-  <div class="spinner"></div>
-  <div class="loading-text">Loading Ascend...</div>
+  <div style="text-align:center;">
+    <svg width="80" height="80" viewBox="0 0 110 110" style="animation:logoPulse 1s ease-in-out infinite alternate;">
+      <rect x="0" y="0" width="110" height="110" rx="24" fill="#1A0608"/>
+      <polygon points="55,18 78,72 55,60 32,72" fill="#C1121F"/>
+      <polygon points="55,34 70,72 55,64 40,72" fill="#3D0608"/>
+    </svg>
+    <div style="font-size:24px;font-weight:800;letter-spacing:-0.03em;color:#C1121F;font-style:italic;margin-top:16px;">Ascend</div>
+    <div class="loading-text" id="loading-msg">Loading...</div>
+  </div>
+</div>
+
+<!-- PR CELEBRATION OVERLAY -->
+<div id="pr-overlay" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.92);flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;">
+  <canvas id="confetti-canvas" style="position:fixed;inset:0;pointer-events:none;z-index:998;"></canvas>
+  <div style="position:relative;z-index:1000;">
+    <div style="font-size:64px;margin-bottom:8px;animation:prBounce 0.6s ease-out;">🏆</div>
+    <div style="font-size:32px;font-weight:800;color:#C1121F;letter-spacing:-0.02em;margin-bottom:8px;animation:prSlide 0.4s ease-out;">NEW PR!</div>
+    <div style="font-size:18px;font-weight:700;color:#F0F0EE;margin-bottom:6px;" id="pr-exercise-name"></div>
+    <div style="font-size:14px;color:#888880;margin-bottom:24px;" id="pr-message"></div>
+    <div style="background:#1A1A1A;border:0.5px solid #333;border-radius:12px;padding:16px 32px;margin-bottom:24px;display:inline-block;">
+      <div style="font-size:11px;color:#444440;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">New weight</div>
+      <div style="font-size:40px;font-weight:800;color:#C1121F;letter-spacing:-0.02em;" id="pr-weight"></div>
+    </div>
+    <br>
+    <button onclick="closePR()" style="background:#C1121F;color:#fff;border:none;border-radius:10px;padding:14px 40px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:0.04em;">Let's go! 💪</button>
+  </div>
 </div>
 
 <!-- LOGIN -->
@@ -508,8 +536,35 @@ const RANKS=[
   {min:500,title:'Superman',universe:'DC',emoji:'🔴',sub:'Last son of Krypton. First in the gym. Every single day.'},
 ];
 
-const TAUNTS=['Last week you hit <strong>{w}kg</strong>. Same again? Disappointing.','Your last set was <strong>{w}kg</strong>. The bar has been waiting all week.','<strong>{w}kg</strong> last time. Add 2.5kg. That\'s literally it.','Still at <strong>{w}kg</strong>? Even the warm-up plates are embarrassed.','Progressive overload. Look it up. Last week: <strong>{w}kg</strong>.'];
-const PR_TAUNTS=['NEW PR. The iron gods are pleased.','Weight went up. Character developed.','That\'s a PR. About time, honestly.','Look who decided to try harder today.'];
+const TAUNTS=[
+  'Last week you hit <strong>{w}kg</strong>. Same again? Disappointing.',
+  'Your last set was <strong>{w}kg</strong>. The bar has been waiting all week.',
+  '<strong>{w}kg</strong> last time. Add 2.5kg. That\'s literally it.',
+  'Still at <strong>{w}kg</strong>? Even the warm-up plates are embarrassed.',
+  'Progressive overload. Look it up. Last week: <strong>{w}kg</strong>.',
+  '<strong>{w}kg</strong> again? The dumbbells are filing a complaint.',
+  'Same <strong>{w}kg</strong> as last week. Bold choice. Wrong choice.',
+  'Your grandma heard you\'re still at <strong>{w}kg</strong>. She\'s concerned.',
+  'The bar at <strong>{w}kg</strong> is so bored it\'s started yawning.',
+  '<strong>{w}kg</strong>? Even the beginner next to you added weight.',
+  'Last week: <strong>{w}kg</strong>. This week: <strong>{w}kg</strong>. Next week: retirement?',
+  'The gym CCTV has footage of you lifting <strong>{w}kg</strong> every single week.',
+  '<strong>{w}kg</strong>. Again. The plates have memorised your routine at this point.',
+  'Still <strong>{w}kg</strong>? Thor would be ashamed. Batman too.',
+  'You\'ve been at <strong>{w}kg</strong> so long the bar thinks it\'s your home.',
+];
+const PR_TAUNTS=[
+  'NEW PR. The iron gods are pleased.',
+  'Weight went up. Character developed.',
+  'That\'s a PR. About time, honestly.',
+  'Look who decided to try harder today.',
+  'PR achieved. Spider-Man is watching. Proudly.',
+  'The bar finally respects you.',
+  'New PR! Ryan 1 — Gravity 0.',
+  'GAINS DETECTED. Crew has been notified.',
+  'PR! Even Batman is impressed. That\'s rare.',
+  'You just made the gym a little more scared of you.',
+];
 
 // ── STATE ──
 let currentUser = null;
@@ -675,6 +730,82 @@ function showApp(){
 }
 function hideLoading(){ document.getElementById('loading-overlay').classList.add('hidden'); }
 
+const LOADING_MSGS = [
+  'Warming up the iron...',
+  'Chalking up...',
+  'Loading your gains...',
+  'Checking your PR history...',
+  'Flexing the database...',
+  'Peter Parker is getting ready...',
+  'The bar is loaded. Are you?',
+  'Summoning the crew...',
+];
+(function rotateLoadingMsg(){
+  const el = document.getElementById('loading-msg');
+  if(!el) return;
+  let i = 0;
+  el.textContent = LOADING_MSGS[0];
+  setInterval(()=>{ i=(i+1)%LOADING_MSGS.length; if(el)el.textContent=LOADING_MSGS[i]; }, 1200);
+})();
+
+// PR Celebration
+function showPRCelebration(exName, weight){
+  const overlay = document.getElementById('pr-overlay');
+  const canvas = document.getElementById('confetti-canvas');
+  document.getElementById('pr-exercise-name').textContent = exName;
+  document.getElementById('pr-weight').textContent = weight + 'kg';
+  const msg = PR_TAUNTS[Math.floor(Math.random()*PR_TAUNTS.length)];
+  document.getElementById('pr-message').textContent = msg;
+  overlay.style.display = 'flex';
+  launchConfetti(canvas);
+}
+window.closePR = () => {
+  document.getElementById('pr-overlay').style.display = 'none';
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+};
+function launchConfetti(canvas){
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const ctx = canvas.getContext('2d');
+  const pieces = [];
+  const colors = ['#C1121F','#FF4500','#FFD700','#FF6B6B','#FFF','#FF8C00','#DC143C'];
+  for(let i=0;i<140;i++){
+    pieces.push({
+      x: Math.random()*canvas.width,
+      y: -20 - Math.random()*100,
+      w: 8+Math.random()*8,
+      h: 4+Math.random()*4,
+      color: colors[Math.floor(Math.random()*colors.length)],
+      rot: Math.random()*360,
+      rotSpeed: (Math.random()-0.5)*8,
+      speedX: (Math.random()-0.5)*4,
+      speedY: 3+Math.random()*5,
+      opacity: 1,
+    });
+  }
+  let frame;
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    let alive=false;
+    pieces.forEach(p=>{
+      p.x+=p.speedX; p.y+=p.speedY; p.rot+=p.rotSpeed;
+      if(p.y<canvas.height+20){ alive=true; p.opacity=Math.max(0,1-(p.y/(canvas.height*0.9))); }
+      ctx.save();
+      ctx.globalAlpha=p.opacity;
+      ctx.translate(p.x,p.y);
+      ctx.rotate(p.rot*Math.PI/180);
+      ctx.fillStyle=p.color;
+      ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+      ctx.restore();
+    });
+    if(alive) frame=requestAnimationFrame(draw);
+  }
+  draw();
+  setTimeout(()=>{ cancelAnimationFrame(frame); },4000);
+}
+
 // ── SPLITS ──
 function getPresetOrCustomSplit(){
   return {...PRESET_SPLITS,...S.customSplits}[S.split] || PRESET_SPLITS.bro;
@@ -802,14 +933,20 @@ window.logWorkout=async()=>{
   try{
     const ref=await addDoc(collection(db,'logs'),entry);
     S.logs.unshift({id:ref.id,...entry});
+    let prEx=null, prWeight=0;
     S.currentEx.forEach(ex=>{
       const v=ex.activeVariant||ex.variants[0];
       const maxW=Math.max(...ex.sets.map(s=>s.weight));
-      if(maxW>0){S.lastWeights[ex.name+'|'+v]=maxW;S.lastVariants[ex.name]=v;}
+      const prevW=S.lastWeights[ex.name+'|'+v]||0;
+      if(maxW>0){
+        if(maxW>prevW){ prEx=ex.name+' ('+v+')'; prWeight=maxW; }
+        S.lastWeights[ex.name+'|'+v]=maxW;S.lastVariants[ex.name]=v;
+      }
     });
     S.currentEx=[];
     await saveUserData();
-    showToast('Workout logged. Beast.');
+    if(prEx){ showPRCelebration(prEx, prWeight); }
+    else { showToast('Workout logged. Beast.'); }
     renderLog();
   }catch(e){showToast('Error saving. Check connection.');}
 };
