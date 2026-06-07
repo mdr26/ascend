@@ -204,7 +204,7 @@ body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;}
 .toast.show{opacity:1;}
 .empty{text-align:center;padding:40px 20px;color:var(--text3);font-size:13px;line-height:1.6;}
 .divider{border:none;border-top:0.5px solid var(--border);margin:16px 0;}
-.loading-overlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:500;flex-direction:column;gap:12px;}
+.loading-overlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:1100;flex-direction:column;gap:12px;}
 .loading-overlay.hidden{display:none;}
 .spinner{width:32px;height:32px;border:3px solid var(--border2);border-top-color:var(--acc);border-radius:50%;animation:spin 0.8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
@@ -250,7 +250,7 @@ select{-webkit-appearance:none;}
 </div>
 
 <!-- LOGIN -->
-<div id="login-screen">
+<div id="login-screen" class="hidden">
   <div class="login-logo">
     <svg width="80" height="80" viewBox="0 0 110 110">
       <rect x="0" y="0" width="110" height="110" rx="24" fill="#1A0608"/>
@@ -700,6 +700,7 @@ async function saveUserData(){
 
 // ── SCREEN MANAGEMENT ──
 function showLoginScreen(){
+  hideLoading();
   document.getElementById('login-screen').classList.remove('hidden');
   document.getElementById('invite-screen').classList.add('hidden');
   document.getElementById('app').style.display = 'none';
