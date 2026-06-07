@@ -204,15 +204,17 @@ body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;}
 .toast.show{opacity:1;}
 .empty{text-align:center;padding:40px 20px;color:var(--text3);font-size:13px;line-height:1.6;}
 .divider{border:none;border-top:0.5px solid var(--border);margin:16px 0;}
-.loading-overlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:1100;flex-direction:column;gap:12px;}
+.loading-overlay{position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:1100;flex-direction:column;}
 .loading-overlay.hidden{display:none;}
-.spinner{width:32px;height:32px;border:3px solid var(--border2);border-top-color:var(--acc);border-radius:50%;animation:spin 0.8s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
-@keyframes logoPulse{from{transform:scale(1);opacity:0.8;}to{transform:scale(1.08);opacity:1;}}
+.cin-scanline{position:absolute;left:0;right:0;height:2px;background:rgba(193,18,31,0.35);animation:scanline 2s linear infinite;pointer-events:none;}
+@keyframes scanline{0%{top:-4px;}100%{top:100%;}}
+@keyframes cinFadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+@keyframes cinFadeOut{from{opacity:1;}to{opacity:0;}}
+@keyframes logoPulse{from{transform:scale(1);opacity:0.85;}to{transform:scale(1.06);opacity:1;}}
 @keyframes prBounce{0%{transform:scale(0.3);opacity:0;}70%{transform:scale(1.2);}100%{transform:scale(1);opacity:1;}}
 @keyframes prSlide{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
-.loading-text{font-size:13px;color:var(--text3);margin-top:10px;animation:fadeMsg 2s ease-in-out infinite;}
 @keyframes fadeMsg{0%,100%{opacity:0.4;}50%{opacity:1;}}
+.cin-line{opacity:0;animation:cinFadeIn 0.7s ease-out forwards;}
 input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
 select{-webkit-appearance:none;}
 </style>
@@ -221,15 +223,8 @@ select{-webkit-appearance:none;}
 
 <!-- LOADING -->
 <div class="loading-overlay" id="loading-overlay">
-  <div style="text-align:center;">
-    <svg width="80" height="80" viewBox="0 0 110 110" style="animation:logoPulse 1s ease-in-out infinite alternate;">
-      <rect x="0" y="0" width="110" height="110" rx="24" fill="#1A0608"/>
-      <polygon points="55,18 78,72 55,60 32,72" fill="#C1121F"/>
-      <polygon points="55,34 70,72 55,64 40,72" fill="#3D0608"/>
-    </svg>
-    <div style="font-size:24px;font-weight:800;letter-spacing:-0.03em;color:#C1121F;font-style:italic;margin-top:16px;">Ascend</div>
-    <div class="loading-text" id="loading-msg">Loading...</div>
-  </div>
+  <div class="cin-scanline"></div>
+  <div id="cin-stage" style="text-align:center;position:relative;z-index:1;"></div>
 </div>
 
 <!-- PR CELEBRATION OVERLAY -->
@@ -731,22 +726,39 @@ function showApp(){
 }
 function hideLoading(){ document.getElementById('loading-overlay').classList.add('hidden'); }
 
-const LOADING_MSGS = [
-  'Warming up the iron...',
-  'Chalking up...',
-  'Loading your gains...',
-  'Checking your PR history...',
-  'Flexing the database...',
-  'Peter Parker is getting ready...',
-  'The bar is loaded. Are you?',
-  'Summoning the crew...',
-];
-(function rotateLoadingMsg(){
-  const el = document.getElementById('loading-msg');
-  if(!el) return;
-  let i = 0;
-  el.textContent = LOADING_MSGS[0];
-  setInterval(()=>{ i=(i+1)%LOADING_MSGS.length; if(el)el.textContent=LOADING_MSGS[i]; }, 1200);
+(function cinematicLoader(){
+  const stage = document.getElementById('cin-stage');
+  if(!stage) return;
+  const sequences = [
+    [
+      {text:'In a world', size:'13px', color:'#C1121F', weight:'700', spacing:'0.18em', delay:0},
+      {text:'where gains are earned, not given', size:'10px', color:'#555', weight:'400', spacing:'0.1em', delay:600},
+      {text:'ASCEND', size:'32px', color:'#C1121F', weight:'800', spacing:'0.08em', delay:1300},
+      {text:'Track. Compete. Rank up.', size:'10px', color:'#444', weight:'400', spacing:'0.12em', delay:2000},
+    ],
+    [
+      {text:'Every rep.', size:'13px', color:'#C1121F', weight:'700', spacing:'0.18em', delay:0},
+      {text:'Every set.', size:'13px', color:'#555', weight:'400', spacing:'0.18em', delay:500},
+      {text:'Every PR.', size:'13px', color:'#C1121F', weight:'700', spacing:'0.18em', delay:1000},
+      {text:'ASCEND', size:'32px', color:'#C1121F', weight:'800', spacing:'0.08em', delay:1600},
+    ],
+    [
+      {text:'Peter Parker logged in.', size:'11px', color:'#555', weight:'400', spacing:'0.1em', delay:0},
+      {text:'Loading your glory...', size:'11px', color:'#555', weight:'400', spacing:'0.1em', delay:700},
+      {text:'ASCEND', size:'32px', color:'#C1121F', weight:'800', spacing:'0.08em', delay:1400},
+      {text:'The bar is waiting.', size:'10px', color:'#444', weight:'400', spacing:'0.12em', delay:2100},
+    ],
+  ];
+  let si = Math.floor(Math.random()*sequences.length);
+  const seq = sequences[si];
+  stage.innerHTML = '';
+  seq.forEach((line, i) => {
+    const div = document.createElement('div');
+    div.className = 'cin-line';
+    div.style.cssText = `font-size:${line.size};color:${line.color};font-weight:${line.weight};letter-spacing:${line.spacing};text-transform:uppercase;margin-bottom:10px;animation-delay:${line.delay}ms;`;
+    div.textContent = line.text;
+    stage.appendChild(div);
+  });
 })();
 
 // PR Celebration
