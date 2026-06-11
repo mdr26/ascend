@@ -424,6 +424,15 @@ textarea{-webkit-appearance:none;resize:none;}
 <div class="overlay" id="split-modal"><div class="sheet"><div class="handle"></div><div class="mtitle" id="split-modal-title">My split</div><div id="existing-splits"></div><div id="split-builder"><input class="minput" id="cs-name" placeholder="Split name (e.g. My Weekly Plan)"><div style="font-size:11px;color:var(--text3);margin-bottom:8px;margin-top:-4px;">Days — one per line</div><textarea class="minput" id="cs-days" rows="7" style="line-height:1.6;font-size:13px;" placeholder="Monday - Chest&#10;Tuesday - Back&#10;Wednesday - Rest&#10;Thursday - Legs&#10;Friday - Shoulders&#10;Saturday - Arms&#10;Sunday - Rest"></textarea><button class="mbtn" id="save-split-btn">Save split</button><button class="mcancel" id="cancel-split-btn">Cancel</button></div></div></div>
 <div class="overlay" id="custom-ex-modal"><div class="sheet"><div class="handle"></div><div class="mtitle">Custom exercise</div><input class="minput" id="cex-name" placeholder="Exercise name"><input class="minput" id="cex-variants" placeholder="Variants: Barbell, Dumbbell, Cable"><button class="mbtn" id="save-cex-btn">Add exercise</button><button class="mcancel" id="cancel-cex-btn">Cancel</button></div></div>
 <div class="overlay" id="ss-modal"><div class="sheet"><div class="handle"></div><div class="mtitle">Add superset</div><div style="font-size:12px;color:var(--text3);margin-bottom:14px;">Choose 2 exercises to superset together</div><div class="cat-tabs" id="ss-cat-tabs"><div class="ctab active" data-cat="Chest">Chest</div><div class="ctab" data-cat="Back">Back</div><div class="ctab" data-cat="Legs">Legs</div><div class="ctab" data-cat="Shoulders">Shoulders</div><div class="ctab" data-cat="Arms">Arms</div></div><div style="margin-bottom:10px;"><div style="font-size:11px;color:var(--text3);margin-bottom:6px;">Exercise A</div><select class="minput" id="ss-ex-a" style="padding:10px 12px;margin-bottom:0;"></select></div><div style="margin-bottom:14px;"><div style="font-size:11px;color:var(--text3);margin-bottom:6px;">Exercise B</div><select class="minput" id="ss-ex-b" style="padding:10px 12px;margin-bottom:0;"></select></div><button class="mbtn" id="save-ss-btn">Add superset</button><button class="mcancel" id="cancel-ss-btn">Cancel</button></div></div>
+<div class="overlay" id="edit-session-modal">
+  <div class="sheet">
+    <div class="handle"></div>
+    <div class="mtitle">Edit session</div>
+    <div id="edit-session-content" style="max-height:55vh;overflow-y:auto;margin-bottom:12px;"></div>
+    <button class="mbtn" id="save-edit-btn">Save changes</button>
+    <button class="mcancel" id="cancel-edit-btn">Cancel — discard changes</button>
+  </div>
+</div>
 <canvas id="confetti-canvas"></canvas>
 <div id="pr-overlay"><div style="position:relative;z-index:1000;"><div style="font-size:64px;margin-bottom:8px;animation:prBounce 0.5s ease-out;">🏆</div><div style="font-size:32px;font-weight:800;color:#C1121F;letter-spacing:-0.02em;margin-bottom:6px;animation:prSlide 0.4s ease-out 0.2s both;">NEW PR!</div><div style="font-size:18px;font-weight:700;color:#F0F0EE;margin-bottom:4px;animation:prSlide 0.4s ease-out 0.3s both;" id="pr-ex-name"></div><div style="font-size:13px;color:#666;margin-bottom:24px;font-style:italic;animation:prSlide 0.4s ease-out 0.4s both;" id="pr-msg"></div><div style="background:#0d0d0d;border:0.5px solid #222;border-radius:12px;padding:16px 32px;margin-bottom:24px;display:inline-block;animation:prSlide 0.4s ease-out 0.5s both;"><div style="font-size:10px;color:#333;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:4px;">New weight</div><div style="font-size:42px;font-weight:800;color:#C1121F;" id="pr-weight-val"></div></div><br><button id="close-pr-btn" style="background:#C1121F;color:#fff;border:none;border-radius:10px;padding:14px 44px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;text-transform:uppercase;animation:prSlide 0.4s ease-out 0.6s both;">Let's go! 💪</button></div></div>
 <div class="toast" id="toast"></div>
@@ -983,10 +992,51 @@ function openEditSession(id){
   const session=S.logs.find(l=>l.id===id);
   if(!session)return;
   editingSessionId=id;
-  S.currentEx=JSON.parse(JSON.stringify(session.exercises||[]));
-  document.querySelectorAll(".nbtn").forEach(b=>b.classList.toggle("active",b.dataset.screen==="log"));
-  showScreen("log");renderExList();
-  showToast("Edit mode — make changes and tap Log Workout");
+  const editEx=JSON.parse(JSON.stringify(session.exercises||[]));
+  // build edit modal content
+  const content=document.getElementById("edit-session-content");
+  // render exercises in modal
+  content.innerHTML="<div style='font-size:13px;color:var(--text2);margin-bottom:12px;line-height:1.5;'>Editing: <strong style='color:var(--text);'>"+session.day+"</strong> · "+session.date+"</div>";
+  // simple sets editor per exercise
+  editEx.forEach((ex,idx)=>{
+    const name=ex.type==="superset"?(ex.exA.name+" + "+ex.exB.name):ex.name;
+    const sets=ex.type==="superset"?[...ex.exA.sets,...ex.exB.sets]:ex.sets||[];
+    const setsHTML=sets.map((s,si)=>"<div style='display:grid;grid-template-columns:24px 1fr 1fr;gap:6px;align-items:center;margin-bottom:5px;'><span style='font-size:11px;color:var(--text3);text-align:center;font-weight:700;'>"+(si+1)+"</span><input type='number' inputmode='numeric' value='"+s.reps+"' data-eidx='"+idx+"' data-esi='"+si+"' data-efield='reps' placeholder='Reps' style='background:var(--bg4);border:0.5px solid var(--border2);border-radius:6px;color:var(--text);font-size:14px;font-weight:600;padding:7px;text-align:center;font-family:inherit;width:100%;'><input type='number' inputmode='decimal' value='"+s.weight+"' data-eidx='"+idx+"' data-esi='"+si+"' data-efield='weight' placeholder='Kg' style='background:var(--bg4);border:0.5px solid var(--border2);border-radius:6px;color:var(--text);font-size:14px;font-weight:600;padding:7px;text-align:center;font-family:inherit;width:100%;'></div>").join("");
+    content.innerHTML+="<div style='background:var(--bg3);border:0.5px solid var(--border2);border-radius:10px;padding:12px 14px;margin-bottom:8px;'><div style='font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px;'>"+name+"</div><div style='display:grid;grid-template-columns:24px 1fr 1fr;gap:6px;font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;'><span>#</span><span>Reps</span><span>Kg</span></div>"+setsHTML+"</div>";
+  });
+  // wire input changes to editEx
+  openModal("edit-session-modal");
+  setTimeout(()=>{
+    const modal=document.getElementById("edit-session-content");
+    modal.querySelectorAll("input").forEach(inp=>{
+      inp.onchange=()=>{
+        const idx=+inp.dataset.eidx,si=+inp.dataset.esi,field=inp.dataset.efield;
+        const ex=editEx[idx];
+        if(ex.type==="superset"){
+          const allSets=[...ex.exA.sets,...ex.exB.sets];
+          if(allSets[si])allSets[si][field]=parseFloat(inp.value)||0;
+        } else {
+          if(ex.sets[si])ex.sets[si][field]=parseFloat(inp.value)||0;
+        }
+      };
+    });
+    // save button
+    document.getElementById("save-edit-btn").onclick=async()=>{
+      try{
+        await updateDoc(doc(db,"logs",editingSessionId),{exercises:editEx,updatedAt:serverTimestamp()});
+        const idx=S.logs.findIndex(l=>l.id===editingSessionId);
+        if(idx>-1)S.logs[idx].exercises=editEx;
+        editingSessionId=null;
+        closeModal("edit-session-modal");
+        showToast("Session updated!");
+        renderProgress();
+      }catch(e){showToast("Error saving: "+e.message);}
+    };
+    document.getElementById("cancel-edit-btn").onclick=()=>{
+      editingSessionId=null;
+      closeModal("edit-session-modal");
+    };
+  },50);
 }
 
 // HEATMAP
