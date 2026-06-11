@@ -565,7 +565,11 @@ async function loadData(){
     const q=query(collection(db,"logs"),where("uid","==",cUser.uid),orderBy("createdAt","desc"));
     const lSnap=await getDocs(q);
     S.logs=lSnap.docs.map(d=>({id:d.id,...d.data()}));
-  }catch(e){console.error("Load error:",e);}
+    console.log("Loaded",S.logs.length,"logs from Firebase");
+  }catch(e){
+    console.error("Load error:",e);
+    showToast("Failed to load data: "+e.message);
+  }
 }
 
 async function saveData(){
@@ -577,7 +581,11 @@ async function saveData(){
     },{merge:true});
     const uniqueDays=new Set(S.logs.filter(l=>l.type==="lift").map(l=>l.date)).size;
     await updateDoc(doc(db,"users",cUser.uid),{sessions:uniqueDays});
-  }catch(e){console.error("Save error:",e);showToast("Save failed — check connection");}
+    console.log("Data saved successfully, uniqueDays:",uniqueDays);
+  }catch(e){
+    console.error("Save error:",e);
+    showToast("Save failed: "+e.message);
+  }
 }
 
 function hideLoading(){document.getElementById("loading-screen").style.display="none";}
@@ -802,7 +810,10 @@ async function logWorkout(){
     await saveData();
     if(prEx)showPR(prEx,prWeight);else showToast("Workout logged. Beast.");
     renderLog();
-  }catch(e){console.error(e);showToast("Error saving. Check connection.");}
+  }catch(e){
+    console.error("logWorkout error:",e);
+    showToast("Save failed — "+e.message);
+  }
 }
 
 // ABS
