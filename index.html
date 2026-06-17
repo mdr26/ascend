@@ -525,6 +525,7 @@ import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRe
 import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, getDocs, onSnapshot, addDoc, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
 
 const FB_CONFIG = {apiKey:"AIzaSyDxTql_KmAjZCSlZ3aopA5jGRimHflb4gY",authDomain:"ascend-cc72d.firebaseapp.com",projectId:"ascend-cc72d",storageBucket:"ascend-cc72d.firebasestorage.app",messagingSenderId:"83800140517",appId:"1:83800140517:web:8eaa702fe15c7d1c9cc20c"};
+// Note: authDomain must match the domain where auth redirect returns to
 const ADMIN_UID = "XGweLsPofXT7AOtf1RxQ9U0usZy1";
 const fbApp = initializeApp(FB_CONFIG);
 const auth = getAuth(fbApp);
@@ -618,16 +619,26 @@ const CIN=[
   const seq=CIN[Math.floor(Math.random()*CIN.length)];
   seq.forEach(l=>{const d=document.createElement("div");d.className="cin-line";d.style.cssText="font-size:"+l.s+";color:"+l.c+";font-weight:"+l.w+";letter-spacing:0.14em;text-transform:uppercase;margin-bottom:14px;animation-delay:"+l.d+"ms;";d.textContent=l.t;stage.appendChild(d);});
 })();
-// Handle redirect result from Google Sign-In (iOS Safari)
+// Handle redirect result FIRST before auth state listener fires
+let redirectHandled=false;
 getRedirectResult(auth).then(result=>{
+  redirectHandled=true;
   if(result&&result.user){
-    console.log("Redirect sign-in successful");
+    console.log("Redirect sign-in successful:",result.user.email);
+    // onAuthStateChanged will fire next and handle the rest
   }
 }).catch(e=>{
-  console.error("Redirect result error:",e);
+  redirectHandled=true;
+  console.error("Redirect result error:",e.code,e.message);
+  // Only show login if not a network error
+  if(e.code!=="auth/null-user"){
+    hideLoading();
+    showLogin();
+    showToast("Sign-in failed. Try again.");
+  }
 });
 
-setTimeout(()=>{if(document.getElementById("loading-screen").style.display!=="none")showLogin();},6000);
+setTimeout(()=>{if(document.getElementById("loading-screen").style.display!=="none")showLogin();},8000);
 
 // AUTH
 onAuthStateChanged(auth,async user=>{
@@ -1418,17 +1429,24 @@ document.getElementById("google-btn").onclick=async()=>{
   try{
     const provider=new GoogleAuthProvider();
     provider.setCustomParameters({prompt:"select_account"});
-    // Use redirect on iOS Safari, popup on others
-    const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
-    const isSafari=/^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-    if(isIOS||isSafari){
-      await signInWithRedirect(auth,provider);
-    } else {
+    // Always try popup first - works on desktop and Android Chrome
+    // iOS Safari will catch the error and fall back
+    try {
       await signInWithPopup(auth,provider);
+    } catch(popupErr) {
+      console.log("Popup failed, trying redirect:",popupErr.code);
+      if(popupErr.code==="auth/popup-blocked"||
+         popupErr.code==="auth/popup-closed-by-user"||
+         popupErr.code==="auth/cancelled-popup-request"||
+         popupErr.code==="auth/internal-error"){
+        await signInWithRedirect(auth,provider);
+      } else {
+        throw popupErr;
+      }
     }
   }catch(e){
-    console.error("Sign-in error:",e);
-    showToast("Sign-in failed: "+e.message);
+    console.error("Sign-in error:",e.code,e.message);
+    showToast("Sign-in failed: "+e.code);
   }
 };
 
