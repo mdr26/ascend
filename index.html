@@ -521,7 +521,7 @@ textarea{-webkit-appearance:none;resize:none;}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut as fbSignOut } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut as fbSignOut } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, getDocs, onSnapshot, addDoc, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
 
 const FB_CONFIG = {apiKey:"AIzaSyDxTql_KmAjZCSlZ3aopA5jGRimHflb4gY",authDomain:"ascend-cc72d.firebaseapp.com",projectId:"ascend-cc72d",storageBucket:"ascend-cc72d.firebasestorage.app",messagingSenderId:"83800140517",appId:"1:83800140517:web:8eaa702fe15c7d1c9cc20c"};
@@ -618,6 +618,15 @@ const CIN=[
   const seq=CIN[Math.floor(Math.random()*CIN.length)];
   seq.forEach(l=>{const d=document.createElement("div");d.className="cin-line";d.style.cssText="font-size:"+l.s+";color:"+l.c+";font-weight:"+l.w+";letter-spacing:0.14em;text-transform:uppercase;margin-bottom:14px;animation-delay:"+l.d+"ms;";d.textContent=l.t;stage.appendChild(d);});
 })();
+// Handle redirect result from Google Sign-In (iOS Safari)
+getRedirectResult(auth).then(result=>{
+  if(result&&result.user){
+    console.log("Redirect sign-in successful");
+  }
+}).catch(e=>{
+  console.error("Redirect result error:",e);
+});
+
 setTimeout(()=>{if(document.getElementById("loading-screen").style.display!=="none")showLogin();},6000);
 
 // AUTH
@@ -1405,7 +1414,23 @@ function showPR(exName,weight){
 
 
 // WIRE UP ALL BUTTONS
-document.getElementById("google-btn").onclick=async()=>{try{await signInWithPopup(auth,new GoogleAuthProvider());}catch(e){showToast("Sign-in failed. Try again.");}};
+document.getElementById("google-btn").onclick=async()=>{
+  try{
+    const provider=new GoogleAuthProvider();
+    provider.setCustomParameters({prompt:"select_account"});
+    // Use redirect on iOS Safari, popup on others
+    const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
+    const isSafari=/^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    if(isIOS||isSafari){
+      await signInWithRedirect(auth,provider);
+    } else {
+      await signInWithPopup(auth,provider);
+    }
+  }catch(e){
+    console.error("Sign-in error:",e);
+    showToast("Sign-in failed: "+e.message);
+  }
+};
 
 document.getElementById("invite-btn").onclick=async()=>{
   const code=document.getElementById("invite-input").value.trim().toUpperCase();
