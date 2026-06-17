@@ -61,6 +61,9 @@ textarea{-webkit-appearance:none;resize:none;}
 .wday.today .wn,.wday.trained .wn{color:var(--acc);}
 .wday .wdot{width:4px;height:4px;border-radius:50%;}
 .wday.trained .wdot{background:var(--acc);}
+.wday.skipped{border-color:#2a2a2a;background:rgba(42,42,42,0.3);}
+.wday.skipped .wdot{background:#2a2a2a;}
+.wday.skipped .wn{color:#333;}
 .split-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
 .split-name-txt{font-size:16px;font-weight:800;color:var(--text);}
 .split-change{font-size:12px;color:var(--acc);cursor:pointer;font-weight:600;}
@@ -255,6 +258,78 @@ textarea{-webkit-appearance:none;resize:none;}
     <button id="invite-logout" style="background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:inherit;margin-top:16px;display:block;width:100%;text-align:center;">Sign out</button>
   </div>
 </div>
+<!-- ONBOARDING -->
+<div id="onboarding-screen" style="display:none;position:fixed;inset:0;background:#000;z-index:9000;max-width:430px;margin:0 auto;flex-direction:column;">
+  <div style="flex:1;overflow:hidden;position:relative;">
+    <div id="ob-slides" style="display:flex;transition:transform 0.35s ease;height:100%;">
+
+      <!-- Slide 1 -->
+      <div style="min-width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;text-align:center;">
+        <svg width="80" height="80" viewBox="0 0 110 110" style="margin-bottom:24px;"><rect x="0" y="0" width="110" height="110" rx="24" fill="#1A0608"/><polygon points="55,18 78,72 55,60 32,72" fill="#C1121F"/><polygon points="55,34 70,72 55,64 40,72" fill="#3D0608"/></svg>
+        <div style="font-size:32px;font-weight:800;color:#C1121F;font-style:italic;letter-spacing:-0.03em;margin-bottom:12px;">Ascend</div>
+        <div style="font-size:16px;font-weight:700;color:#F0F0EE;margin-bottom:12px;">Your gym. Your ranks. Your crew.</div>
+        <div style="font-size:13px;color:#555;line-height:1.7;">Track every workout, compete with friends, and climb from Peter Parker all the way to Superman.</div>
+      </div>
+
+      <!-- Slide 2 -->
+      <div style="min-width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;text-align:center;">
+        <div style="font-size:56px;margin-bottom:20px;">📅</div>
+        <div style="font-size:20px;font-weight:800;color:#F0F0EE;margin-bottom:12px;">Set up your split</div>
+        <div style="font-size:13px;color:#555;line-height:1.7;margin-bottom:20px;">Create your weekly training plan once. The app automatically detects today's workout and loads it for you — no manual selection needed.</div>
+        <div style="background:#141414;border:0.5px solid #2a2a2a;border-radius:12px;padding:14px;width:100%;text-align:left;">
+          <div style="font-size:11px;color:#C1121F;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">Example split</div>
+          <div style="font-size:12px;color:#888;line-height:2;">Monday - Chest<br>Tuesday - Back<br>Wednesday - Legs<br>Thursday - Shoulders<br>Friday - Arms<br>Sunday - Rest</div>
+        </div>
+      </div>
+
+      <!-- Slide 3 -->
+      <div style="min-width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;text-align:center;">
+        <div style="font-size:56px;margin-bottom:20px;">⚡</div>
+        <div style="font-size:20px;font-weight:800;color:#F0F0EE;margin-bottom:12px;">Log your workout</div>
+        <div style="font-size:13px;color:#555;line-height:1.7;margin-bottom:16px;">Your previous week's workout loads automatically with weight suggestions. Just adjust and tap Log set for each set.</div>
+        <div style="display:flex;flex-direction:column;gap:8px;width:100%;">
+          <div style="background:#141414;border:0.5px solid #2a2a2a;border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;">
+            <div style="width:8px;height:8px;border-radius:50%;background:#C1121F;flex-shrink:0;"></div>
+            <div style="font-size:12px;color:#888;">App remembers your last weights</div>
+          </div>
+          <div style="background:#141414;border:0.5px solid #2a2a2a;border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;">
+            <div style="width:8px;height:8px;border-radius:50%;background:#C1121F;flex-shrink:0;"></div>
+            <div style="font-size:12px;color:#888;">Suggests weight increase each week</div>
+          </div>
+          <div style="background:#141414;border:0.5px solid #2a2a2a;border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;">
+            <div style="width:8px;height:8px;border-radius:50%;background:#C1121F;flex-shrink:0;"></div>
+            <div style="font-size:12px;color:#888;">PR = confetti explosion 🎉</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 4 -->
+      <div style="min-width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;text-align:center;">
+        <div style="font-size:56px;margin-bottom:20px;">👑</div>
+        <div style="font-size:20px;font-weight:800;color:#F0F0EE;margin-bottom:12px;">Crew & ranks</div>
+        <div style="font-size:13px;color:#555;line-height:1.7;margin-bottom:16px;">Invite friends with a code. Compete on the leaderboard. Climb the ranks from Peter Parker to Superman based on your training days.</div>
+        <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:20px;">
+          <span style="background:#141414;border:0.5px solid #2a2a2a;border-radius:99px;padding:5px 12px;font-size:11px;color:#888;">🧪 Peter Parker</span>
+          <span style="background:#141414;border:0.5px solid #C1121F;border-radius:99px;padding:5px 12px;font-size:11px;color:#C1121F;">🔴 Superman</span>
+        </div>
+        <button onclick="finishOnboarding()" style="width:100%;background:#C1121F;color:#fff;border:none;border-radius:10px;padding:15px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;">Get started 💪</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Dots + Next -->
+  <div style="padding:20px 32px 40px;display:flex;align-items:center;justify-content:space-between;">
+    <div style="display:flex;gap:6px;" id="ob-dots">
+      <div style="width:6px;height:6px;border-radius:50%;background:#C1121F;" class="ob-dot"></div>
+      <div style="width:6px;height:6px;border-radius:50%;background:#2a2a2a;" class="ob-dot"></div>
+      <div style="width:6px;height:6px;border-radius:50%;background:#2a2a2a;" class="ob-dot"></div>
+      <div style="width:6px;height:6px;border-radius:50%;background:#2a2a2a;" class="ob-dot"></div>
+    </div>
+    <button id="ob-next-btn" onclick="obNext()" style="background:none;border:0.5px solid #2a2a2a;border-radius:8px;color:#888;font-size:13px;font-weight:700;padding:10px 20px;cursor:pointer;font-family:inherit;">Next →</button>
+  </div>
+</div>
+
 <div id="app">
   <div class="topbar">
     <div class="topbar-left">
@@ -268,6 +343,7 @@ textarea{-webkit-appearance:none;resize:none;}
   </div>
   <div class="main">
     <div class="screen active" id="screen-log">
+      <div id="getting-started-card" style="display:none;background:#0d0d0d;border:0.5px solid rgba(193,18,31,0.3);border-radius:14px;padding:14px;margin-bottom:12px;"></div>
       <div class="slabel">This week</div>
       <div class="week-strip" id="week-strip"></div>
       <div class="card" style="margin-bottom:14px;">
@@ -284,8 +360,11 @@ textarea{-webkit-appearance:none;resize:none;}
           <button class="dup-btn dup-new" id="dup-new-btn">New session</button>
         </div>
       </div>
+      <div id="rest-day-card" style="display:none;"></div>
       <div id="taunt-area"></div>
+      <div id="ex-list-wrap">
       <div id="ex-list"></div>
+      </div>
       <div class="card">
         <div class="card-title">Add exercise</div>
         <div class="cat-tabs" id="cat-tabs">
@@ -298,7 +377,10 @@ textarea{-webkit-appearance:none;resize:none;}
         <div class="add-ex-row"><select id="ex-select"></select><button id="add-ex-btn">Add</button></div>
         <button class="add-ss-btn" id="add-ss-btn">⚡ Add superset</button>
       </div>
-      <button class="logbtn" id="log-workout-btn">⚡ Log Workout</button>
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <button class="logbtn" id="log-workout-btn" style="margin-top:0;flex:1;">⚡ Log Workout</button>
+        <button id="skip-day-btn" style="background:none;border:0.5px solid #2a2a2a;border-radius:10px;padding:15px 14px;font-size:12px;font-weight:700;color:#555;cursor:pointer;font-family:inherit;white-space:nowrap;">Skip day</button>
+      </div>
     </div>
     <div class="screen" id="screen-cardio">
       <div class="slabel">Interval timer</div>
@@ -600,6 +682,39 @@ async function saveData(){
 function hideLoading(){document.getElementById("loading-screen").style.display="none";}
 function showLogin(){hideLoading();document.getElementById("login-screen").style.display="flex";document.getElementById("invite-screen").style.display="none";document.getElementById("app").style.display="none";}
 function showInvite(){hideLoading();document.getElementById("login-screen").style.display="none";document.getElementById("invite-screen").style.display="flex";document.getElementById("app").style.display="none";}
+// ONBOARDING
+let obSlide=0;
+function obNext(){
+  const total=4;
+  obSlide=Math.min(obSlide+1,total-1);
+  document.getElementById("ob-slides").style.transform="translateX(-"+obSlide*100+"%)";
+  document.querySelectorAll(".ob-dot").forEach((d,i)=>{d.style.background=i===obSlide?"#C1121F":"#2a2a2a";});
+  if(obSlide===total-1) document.getElementById("ob-next-btn").style.display="none";
+}
+function finishOnboarding(){
+  document.getElementById("onboarding-screen").style.display="none";
+  localStorage.setItem("ascend_onboarded_"+cUser.uid,"1");
+  showToast("Welcome to Ascend! 💪");
+  renderGettingStarted();
+}
+
+function renderGettingStarted(){
+  // Show checklist card if not all done
+  const tasks=[
+    {id:"split",label:"Set up your split",done:!!getSplit()},
+    {id:"workout",label:"Log your first workout",done:S.logs.filter(l=>l.type==="lift").length>0},
+    {id:"bw",label:"Add your bodyweight",done:S.bwLog.length>0},
+    {id:"crew",label:"Invite a crew member",done:false},
+  ];
+  const allDone=tasks.every(t=>t.done);
+  const el=document.getElementById("getting-started-card");
+  if(!el) return;
+  if(allDone){el.style.display="none";return;}
+  el.style.display="block";
+  el.innerHTML="<div style='font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#C1121F;margin-bottom:10px;'>Getting started</div>"+
+    tasks.map(t=>"<div style='display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid #1e1e1e;'><div style='width:16px;height:16px;border-radius:50%;border:1.5px solid "+(t.done?"#2F7A5C":"#2a2a2a")+";background:"+(t.done?"rgba(47,122,92,0.2)":"transparent")+";display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;'>"+(t.done?"✓":"")+"</div><div style='font-size:13px;color:"+(t.done?"#444":"#888")+";"+(t.done?"text-decoration:line-through;":"")+">"+t.label+"</div></div>").join("");
+}
+
 function showApp(){
   hideLoading();
   document.getElementById("login-screen").style.display="none";
@@ -611,6 +726,13 @@ function showApp(){
   document.getElementById("profile-info").innerHTML="<strong style='color:var(--text);'>"+name+"</strong><br>"+cUser.email+"<br><br><span style='font-size:11px;color:var(--text3);'>UID: "+cUser.uid+"</span>";
   if(!S.activeDay&&getDays().length)S.activeDay=getDays()[0];
   renderExSelect();renderSSExSelect();renderLog();renderTimerConfig();
+  // Show onboarding if first time
+  const onboarded=localStorage.getItem("ascend_onboarded_"+cUser.uid);
+  if(!onboarded){
+    document.getElementById("onboarding-screen").style.display="flex";
+  } else {
+    renderGettingStarted();
+  }
 }
 
 function fmtDate(d){return d.toISOString().split("T")[0];}
@@ -646,9 +768,60 @@ function renderWeekStrip(){
   for(let i=0;i<7;i++){
     const d=new Date(td);d.setDate(td.getDate()+mo+i);
     const ds=fmtDate(d),div=document.createElement("div");
-    div.className="wday"+(trained.has(ds)?" trained":"")+(ds===tds?" today":"");
+    div.className="wday"+(trained.has(ds)?" trained":"")+(skipped.has(ds)?" skipped":"")+(ds===tds?" today":"");
     div.innerHTML="<span class='wl'>"+days[i]+"</span><span class='wn'>"+d.getDate()+"</span><div class='wdot'></div>";
     el.appendChild(div);
+  }
+}
+
+function getTodayDayName(){
+  const names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  return names[new Date().getDay()];
+}
+
+function getSmartDay(){
+  // Match today's day name to a split day
+  const days=getDays();
+  if(!days.length) return null;
+  const todayName=getTodayDayName().toLowerCase();
+  // Try to find a day that contains today's name
+  const matched=days.find(d=>d.toLowerCase().includes(todayName));
+  if(matched) return matched;
+  // Fall back to manually selected day
+  if(S.activeDay&&days.includes(S.activeDay)) return S.activeDay;
+  return days[0];
+}
+
+function isRestDay(day){
+  if(!day) return false;
+  const lower=day.toLowerCase();
+  return lower.includes("rest")||lower.includes("off")||lower.includes("recovery");
+}
+
+function getLastWeekWorkout(day){
+  // Find most recent log for this day
+  return S.logs.find(l=>l.type==="lift"&&l.day===day);
+}
+
+function autoLoadDay(){
+  const day=getSmartDay();
+  if(!day) return;
+  // Only auto-load if no exercises currently in progress
+  if(S.currentEx.length>0) return;
+  if(isRestDay(day)) return;
+  // Load last week exercises for this day
+  const lastSession=getLastWeekWorkout(day);
+  if(lastSession&&lastSession.exercises&&lastSession.exercises.length>0){
+    S.currentEx=JSON.parse(JSON.stringify(lastSession.exercises));
+    // Reset done status on all sets
+    S.currentEx.forEach(ex=>{
+      if(ex.type==="superset"){
+        ex.exA.sets.forEach(s=>s.done=false);
+        ex.exB.sets.forEach(s=>s.done=false);
+      } else {
+        ex.sets.forEach(s=>s.done=false);
+      }
+    });
   }
 }
 
@@ -656,12 +829,29 @@ function renderSplitUI(){
   const sp=getSplit();
   document.getElementById("split-name-display").textContent=sp?sp.name:"No split — tap Change";
   const el=document.getElementById("day-row");el.innerHTML="";
-  const active=getDay();
+  const smartDay=getSmartDay();
+  // Auto-set active day to today's smart day
+  if(smartDay&&!S.activeDay){S.activeDay=smartDay;}
+  const active=S.activeDay||smartDay;
   getDays().forEach(day=>{
     const c=document.createElement("div");
     c.className="daychip"+(active===day?" active":"");
     c.textContent=day;
-    c.onclick=()=>{S.activeDay=day;S.currentEx=[];checkDuplicate();saveData();renderLog();};
+    c.onclick=()=>{
+      S.activeDay=day;
+      S.currentEx=[];
+      // Auto-load last session for manually selected day
+      const last=getLastWeekWorkout(day);
+      if(last&&last.exercises&&!isRestDay(day)){
+        S.currentEx=JSON.parse(JSON.stringify(last.exercises));
+        S.currentEx.forEach(ex=>{
+          if(ex.type==="superset"){ex.exA.sets.forEach(s=>s.done=false);ex.exB.sets.forEach(s=>s.done=false);}
+          else ex.sets.forEach(s=>s.done=false);
+        });
+        showToast("Loaded last "+day+" session");
+      }
+      checkDuplicate();saveData();renderLog();
+    };
     el.appendChild(c);
   });
 }
@@ -773,12 +963,83 @@ function renderTaunt(){
 function calcStreak(){
   const dates=[...new Set(S.logs.map(l=>l.date))].sort((a,b)=>b.localeCompare(a));
   if(!dates.length)return 0;
-  let streak=0;const t=today();
-  for(let i=0;i<dates.length;i++){const diff=Math.round((new Date(t)-new Date(dates[i]))/86400000);if(diff<=streak+1)streak++;else break;}
+  let streak=0;
+  const t=new Date(today());
+  let check=new Date(t);
+  const dayNames=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  for(let i=0;i<365;i++){
+    const ds=fmtDate(check);
+    const dayName=dayNames[check.getDay()];
+    const days=getDays();
+    // Check if this day is a planned rest day in the split
+    const splitDay=days.find(d=>d.toLowerCase().includes(dayName.toLowerCase()));
+    const isPlannedRest=splitDay&&isRestDay(splitDay);
+    if(isPlannedRest){
+      // Skip rest days — they don't affect streak
+      check.setDate(check.getDate()-1);
+      continue;
+    }
+    const hasLog=S.logs.some(l=>l.date===ds&&l.type==="lift");
+    if(hasLog){streak++;check.setDate(check.getDate()-1);}
+    else break;
+  }
   return streak;
 }
 
-function renderLog(){renderWeekStrip();renderSplitUI();renderExList();renderTaunt();document.getElementById("streak-badge").textContent="🔥 "+calcStreak();checkDuplicate();}
+function renderLog(){
+  renderWeekStrip();
+  renderSplitUI();
+  const day=getSmartDay();
+  if(day&&isRestDay(day)){
+    renderRestDayScreen(day);
+  } else {
+    document.getElementById("rest-day-card").style.display="none";
+    document.getElementById("ex-list-wrap").style.display="block";
+    document.getElementById("log-workout-btn").style.display="block";
+    // Auto-load today's workout if nothing loaded yet
+    autoLoadDay();
+    renderExList();
+    renderTaunt();
+    checkDuplicate();
+  }
+  document.getElementById("streak-badge").textContent="🔥 "+calcStreak();
+}
+
+function renderRestDayScreen(day){
+  document.getElementById("rest-day-card").style.display="block";
+  document.getElementById("ex-list-wrap").style.display="none";
+  document.getElementById("log-workout-btn").style.display="none";
+  document.getElementById("taunt-area").innerHTML="";
+  document.getElementById("dup-warning").style.display="none";
+  // Build weekly summary
+  const days=getDays();
+  const todayStr=today();
+  const weekStart=new Date();
+  weekStart.setDate(weekStart.getDate()-weekStart.getDay()+1);
+  const weekLogs=S.logs.filter(l=>{
+    const d=new Date(l.date);
+    return d>=weekStart&&l.type==="lift";
+  });
+  const loggedDays=new Set(weekLogs.map(l=>l.day));
+  const summary=days.filter(d=>!isRestDay(d)).map(d=>
+    "<div style='display:flex;justify-content:space-between;font-size:11px;color:#555;padding:6px 0;border-bottom:0.5px solid #1e1e1e;'><span>"+d+"</span><span style='color:"+(loggedDays.has(d)?"#2F7A5C":"#333")+"'>"+(loggedDays.has(d)?"✓ Done":"—")+"</span></div>"
+  ).join("");
+  document.getElementById("rest-day-card").innerHTML=
+    "<div style='text-align:center;padding:20px 14px 14px;'><div style='font-size:32px;margin-bottom:8px;'>😴</div>"+
+    "<div style='font-size:16px;font-weight:800;color:#F0F0EE;margin-bottom:4px;'>"+day+"</div>"+
+    "<div style='font-size:12px;color:#555;margin-bottom:16px;line-height:1.5;'>Planned rest day — your streak is safe.<br>Recovery is part of the programme.</div>"+
+    "<button onclick='overrideRestDay()' style='background:none;border:0.5px solid #2a2a2a;border-radius:8px;color:#555;font-size:12px;padding:9px 20px;cursor:pointer;font-family:inherit;'>Log anyway (optional)</button></div>"+
+    "<div style='background:#141414;border:0.5px solid #2a2a2a;border-radius:10px;padding:12px 13px;margin:0 14px 14px;'>"+
+    "<div style='font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#444;margin-bottom:8px;'>This week</div>"+
+    summary+"</div>";
+}
+
+function overrideRestDay(){
+  document.getElementById("rest-day-card").style.display="none";
+  document.getElementById("ex-list-wrap").style.display="block";
+  document.getElementById("log-workout-btn").style.display="block";
+  renderExList();renderTaunt();
+}
 
 function renderTimerConfig(){
   ["prepare","work","rest","rounds","cycles","cyclerest"].forEach(f=>{const el=document.getElementById("val-"+f);if(el)el.textContent=S.timerConfig[f];});
@@ -1192,6 +1453,18 @@ document.getElementById("save-ss-btn").onclick=()=>{
 };
 document.getElementById("cancel-ss-btn").onclick=()=>closeModal("ss-modal");
 document.getElementById("log-workout-btn").onclick=logWorkout;
+document.getElementById("skip-day-btn").onclick=async()=>{
+  const day=getSmartDay();
+  if(!day){showToast("No day to skip");return;}
+  const entry={uid:cUser.uid,date:today(),split:getSplit()?.name||"Workout",day,exercises:[],type:"skip",createdAt:serverTimestamp()};
+  try{
+    const ref=await addDoc(collection(db,"logs"),entry);
+    S.logs.unshift({id:ref.id,...entry});
+    await saveData();
+    showToast("Day skipped — streak protected");
+    renderLog();renderWeekStrip();
+  }catch(e){showToast("Error: "+e.message);}
+};
 
 document.getElementById("add-abs-btn").onclick=()=>{
   const sel=document.getElementById("abs-ex-select"),opt=sel.options[sel.selectedIndex];
