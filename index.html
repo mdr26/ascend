@@ -524,8 +524,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.0/firebas
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut as fbSignOut } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, getDocs, onSnapshot, addDoc, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
 
-const FB_CONFIG = {apiKey:"AIzaSyDxTql_KmAjZCSlZ3aopA5jGRimHflb4gY",authDomain:"ascend-cc72d.firebaseapp.com",projectId:"ascend-cc72d",storageBucket:"ascend-cc72d.firebasestorage.app",messagingSenderId:"83800140517",appId:"1:83800140517:web:8eaa702fe15c7d1c9cc20c"};
-// Note: authDomain must match the domain where auth redirect returns to
+const FB_CONFIG = {apiKey:"AIzaSyDxTql_KmAjZCSlZ3aopA5jGRimHflb4gY",authDomain:"ascend-cc72d.web.app",projectId:"ascend-cc72d",storageBucket:"ascend-cc72d.firebasestorage.app",messagingSenderId:"83800140517",appId:"1:83800140517:web:8eaa702fe15c7d1c9cc20c"};
 const ADMIN_UID = "XGweLsPofXT7AOtf1RxQ9U0usZy1";
 const fbApp = initializeApp(FB_CONFIG);
 const auth = getAuth(fbApp);
