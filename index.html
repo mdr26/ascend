@@ -651,22 +651,7 @@ getRedirectResult(auth).then(result=>{
   }
 });
 
-// MOBILE: track if redirect is in progress
-let processingRedirect=false;
-getRedirectResult(auth).then(result=>{
-  processingRedirect=false;
-  sessionStorage.removeItem('pendingRedirect');
-  if(result&&result.user) console.log("Redirect sign-in OK");
-}).catch(e=>{
-  processingRedirect=false;
-  sessionStorage.removeItem('pendingRedirect');
-  console.log("Redirect result:",e.code);
-});
-if(sessionStorage.getItem('pendingRedirect')==='1') processingRedirect=true;
-
-setTimeout(()=>{
-  if(document.getElementById("loading-screen").style.display!=="none"&&!processingRedirect) showLogin();
-},8000);
+// No redirect needed - using OTP auth
 
 // OTP STATE
 let confirmationResult = null;
@@ -692,7 +677,7 @@ setTimeout(()=>{if(document.getElementById("loading-screen").style.display!=="no
 
 // AUTH
 onAuthStateChanged(auth,async user=>{
-  if(!user){if(!processingRedirect)showLogin();return;}
+  if(!user){showLogin();return;}
   cUser=user;isAdmin=user.uid===ADMIN_UID;
   try{
     const pSnap=await getDoc(doc(db,"users",user.uid));
