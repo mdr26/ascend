@@ -1428,24 +1428,12 @@ document.getElementById("google-btn").onclick=async()=>{
   try{
     const provider=new GoogleAuthProvider();
     provider.setCustomParameters({prompt:"select_account"});
-    // Always try popup first - works on desktop and Android Chrome
-    // iOS Safari will catch the error and fall back
-    try {
-      await signInWithPopup(auth,provider);
-    } catch(popupErr) {
-      console.log("Popup failed, trying redirect:",popupErr.code);
-      if(popupErr.code==="auth/popup-blocked"||
-         popupErr.code==="auth/popup-closed-by-user"||
-         popupErr.code==="auth/cancelled-popup-request"||
-         popupErr.code==="auth/internal-error"){
-        await signInWithRedirect(auth,provider);
-      } else {
-        throw popupErr;
-      }
-    }
+    await signInWithPopup(auth,provider);
   }catch(e){
     console.error("Sign-in error:",e.code,e.message);
-    showToast("Sign-in failed: "+e.code);
+    if(e.code!=="auth/popup-closed-by-user"&&e.code!=="auth/cancelled-popup-request"){
+      showToast("Sign-in failed. Try again.");
+    }
   }
 };
 
