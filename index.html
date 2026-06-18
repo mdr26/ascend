@@ -631,6 +631,18 @@ const CIN=[
   const stage=document.getElementById("cin-stage");
   const seq=CIN[Math.floor(Math.random()*CIN.length)];
   seq.forEach(l=>{const d=document.createElement("div");d.className="cin-line";d.style.cssText="font-size:"+l.s+";color:"+l.c+";font-weight:"+l.w+";letter-spacing:0.14em;text-transform:uppercase;margin-bottom:14px;animation-delay:"+l.d+"ms;";d.textContent=l.t;stage.appendChild(d);});
+  // Hard fallback - hide loading after 3 seconds no matter what
+  setTimeout(()=>{
+    const ls=document.getElementById("loading-screen");
+    if(ls){
+      ls.style.display="none";
+      ls.style.visibility="hidden";
+      ls.style.opacity="0";
+      ls.style.pointerEvents="none";
+      ls.style.zIndex="-1";
+    }
+    showLogin();
+  },3000);
 })();
 // Handle redirect result FIRST before auth state listener fires
 let redirectHandled=false;
@@ -734,7 +746,16 @@ async function saveData(){
   }
 }
 
-function hideLoading(){document.getElementById("loading-screen").style.display="none";}
+function hideLoading(){
+  const ls=document.getElementById("loading-screen");
+  if(ls){
+    ls.style.display="none";
+    ls.style.visibility="hidden";
+    ls.style.opacity="0";
+    ls.style.zIndex="-1";
+    ls.style.pointerEvents="none";
+  }
+}
 function showLogin(){
   hideLoading();
   document.getElementById("login-screen").style.display="flex";
