@@ -236,15 +236,29 @@ textarea{-webkit-appearance:none;resize:none;}
   <div id="cin-stage" style="text-align:center;position:relative;z-index:1;"></div>
 </div>
 <div id="login-screen">
-  <div style="text-align:center;margin-bottom:32px;">
-    <svg width="80" height="80" viewBox="0 0 110 110" style="display:block;margin:0 auto 16px;"><rect x="0" y="0" width="110" height="110" rx="24" fill="#1A0608"/><polygon points="55,18 78,72 55,60 32,72" fill="#C1121F"/><polygon points="55,34 70,72 55,64 40,72" fill="#3D0608"/></svg>
-    <div style="font-size:36px;font-weight:800;color:#C1121F;font-style:italic;letter-spacing:-0.03em;">Ascend</div>
+  <div style="text-align:center;margin-bottom:28px;">
+    <svg width="72" height="72" viewBox="0 0 110 110" style="display:block;margin:0 auto 14px;"><rect x="0" y="0" width="110" height="110" rx="24" fill="#1A0608"/><polygon points="55,18 78,72 55,60 32,72" fill="#C1121F"/><polygon points="55,34 70,72 55,64 40,72" fill="#3D0608"/></svg>
+    <div style="font-size:34px;font-weight:800;color:#C1121F;font-style:italic;letter-spacing:-0.03em;">Ascend</div>
     <div style="font-size:13px;color:#333;margin-top:6px;">Track. Compete. Rank up.</div>
   </div>
-  <button class="google-btn" id="google-btn">
-    <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-    Continue with Google
-  </button>
+  <div id="phone-step">
+    <div style="font-size:13px;color:#555;margin-bottom:12px;text-align:center;">Enter your phone number to sign in</div>
+    <div style="display:flex;gap:8px;margin-bottom:10px;">
+      <input id="country-code" value="+91" style="width:70px;background:#141414;border:0.5px solid #2a2a2a;border-radius:9px;color:#F0F0EE;font-size:15px;padding:13px 10px;font-family:inherit;text-align:center;" maxlength="4">
+      <input id="phone-input" type="tel" placeholder="9876543210" inputmode="numeric" style="flex:1;background:#141414;border:0.5px solid #2a2a2a;border-radius:9px;color:#F0F0EE;font-size:15px;padding:13px 14px;font-family:inherit;" maxlength="15">
+    </div>
+    <div id="recaptcha-container" style="margin-bottom:10px;display:flex;justify-content:center;min-height:78px;"></div>
+    <button id="send-otp-btn" style="width:100%;background:#C1121F;color:#fff;border:none;border-radius:9px;padding:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;">Send OTP</button>
+    <div id="phone-err" style="font-size:12px;color:#C1121F;text-align:center;margin-top:8px;display:none;"></div>
+  </div>
+  <div id="otp-step" style="display:none;">
+    <div style="font-size:13px;color:#555;margin-bottom:6px;text-align:center;">OTP sent to <span id="phone-display" style="color:#F0F0EE;font-weight:700;"></span></div>
+    <div style="font-size:12px;color:#444;margin-bottom:16px;text-align:center;">Enter the 6-digit code</div>
+    <input id="otp-input" type="number" placeholder="000000" inputmode="numeric" style="width:100%;background:#141414;border:0.5px solid #2a2a2a;border-radius:9px;color:#F0F0EE;font-size:24px;font-weight:800;padding:14px;font-family:inherit;text-align:center;letter-spacing:0.2em;margin-bottom:10px;">
+    <button id="verify-otp-btn" style="width:100%;background:#C1121F;color:#fff;border:none;border-radius:9px;padding:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;">Verify OTP</button>
+    <button id="resend-otp-btn" style="width:100%;background:none;border:none;color:#555;font-size:12px;padding:10px;cursor:pointer;font-family:inherit;margin-top:4px;">Resend OTP</button>
+    <div id="otp-err" style="font-size:12px;color:#C1121F;text-align:center;margin-top:8px;display:none;"></div>
+  </div>
   <p style="font-size:11px;color:#333;text-align:center;line-height:1.6;margin-top:16px;">By signing in you agree to use this app responsibly.<br>Data stored securely on Firebase.</p>
 </div>
 <div id="invite-screen">
@@ -521,7 +535,7 @@ textarea{-webkit-appearance:none;resize:none;}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut as fbSignOut } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
+import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, onAuthStateChanged, signOut as fbSignOut } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, getDocs, onSnapshot, addDoc, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
 
 const FB_CONFIG = {apiKey:"AIzaSyDxTql_KmAjZCSlZ3aopA5jGRimHflb4gY",authDomain:"ascend-cc72d.firebaseapp.com",projectId:"ascend-cc72d",storageBucket:"ascend-cc72d.firebasestorage.app",messagingSenderId:"83800140517",appId:"1:83800140517:web:8eaa702fe15c7d1c9cc20c"};
@@ -654,6 +668,28 @@ setTimeout(()=>{
   if(document.getElementById("loading-screen").style.display!=="none"&&!processingRedirect) showLogin();
 },8000);
 
+// OTP STATE
+let confirmationResult = null;
+let recaptchaVerifier = null;
+
+function initRecaptcha(){
+  if(recaptchaVerifier) return;
+  try{
+    recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+      size: 'normal',
+      callback: ()=>{ document.getElementById('send-otp-btn').disabled=false; },
+    });
+    recaptchaVerifier.render().catch(e=>console.log('recaptcha render:',e));
+  }catch(e){console.log('recaptcha init:',e);}
+}
+
+function showPhoneErr(msg){ const e=document.getElementById('phone-err'); if(e){e.textContent=msg;e.style.display='block';} }
+function hidePhoneErr(){ const e=document.getElementById('phone-err'); if(e)e.style.display='none'; }
+function showOtpErr(msg){ const e=document.getElementById('otp-err'); if(e){e.textContent=msg;e.style.display='block';} }
+function hideOtpErr(){ const e=document.getElementById('otp-err'); if(e)e.style.display='none'; }
+
+setTimeout(()=>{if(document.getElementById("loading-screen").style.display!=="none")showLogin();},6000);
+
 // AUTH
 onAuthStateChanged(auth,async user=>{
   if(!user){if(!processingRedirect)showLogin();return;}
@@ -671,7 +707,7 @@ onAuthStateChanged(auth,async user=>{
 });
 
 async function createProfile(user,code){
-  const p={uid:user.uid,name:user.displayName||"Lifter",email:user.email,isAdmin:user.uid===ADMIN_UID,joinedAt:serverTimestamp(),sessions:0,banned:false};
+  const p={uid:user.uid,name:user.displayName||user.phoneNumber||"Lifter",email:user.email||"",phone:user.phoneNumber||"",isAdmin:user.uid===ADMIN_UID,joinedAt:serverTimestamp(),sessions:0,banned:false};
   await setDoc(doc(db,"users",user.uid),p);uProfile=p;
   if(code)await updateDoc(doc(db,"inviteCodes",code),{used:true,usedBy:user.uid,usedAt:serverTimestamp()});
 }
@@ -714,7 +750,19 @@ async function saveData(){
 }
 
 function hideLoading(){document.getElementById("loading-screen").style.display="none";}
-function showLogin(){hideLoading();document.getElementById("login-screen").style.display="flex";document.getElementById("invite-screen").style.display="none";document.getElementById("app").style.display="none";}
+function showLogin(){
+  hideLoading();
+  document.getElementById("login-screen").style.display="flex";
+  document.getElementById("invite-screen").style.display="none";
+  document.getElementById("app").style.display="none";
+  // Reset OTP form
+  document.getElementById('phone-step').style.display='block';
+  document.getElementById('otp-step').style.display='none';
+  document.getElementById('phone-input').value='';
+  document.getElementById('otp-input').value='';
+  hidePhoneErr();hideOtpErr();
+  setTimeout(initRecaptcha,300);
+}
 function showInvite(){hideLoading();document.getElementById("login-screen").style.display="none";document.getElementById("invite-screen").style.display="flex";document.getElementById("app").style.display="none";}
 // ONBOARDING
 let obSlide=0;
@@ -754,7 +802,7 @@ function showApp(){
   document.getElementById("login-screen").style.display="none";
   document.getElementById("invite-screen").style.display="none";
   document.getElementById("app").style.display="flex";
-  const name=uProfile?.name||cUser?.displayName||"Lifter";
+  const name=uProfile?.name||(uProfile?.name!=="Lifter"?uProfile?.name:null)||cUser?.displayName||cUser?.phoneNumber||"Lifter";
   document.getElementById("user-nm").textContent=name.split(" ")[0];
   document.getElementById("user-av").textContent=name[0].toUpperCase();
   document.getElementById("profile-info").innerHTML="<strong style='color:var(--text);'>"+name+"</strong><br>"+cUser.email+"<br><br><span style='font-size:11px;color:var(--text3);'>UID: "+cUser.uid+"</span>";
@@ -1439,24 +1487,50 @@ function showPR(exName,weight){
 
 
 // WIRE UP ALL BUTTONS
-document.getElementById("google-btn").onclick=async()=>{
+document.getElementById("send-otp-btn").onclick=async()=>{
+  hidePhoneErr();
+  const cc=document.getElementById('country-code').value.trim();
+  const ph=document.getElementById('phone-input').value.trim();
+  if(!ph||ph.length<10){showPhoneErr('Enter a valid phone number');return;}
+  const fullPhone=cc+ph;
+  document.getElementById('phone-display').textContent=fullPhone;
   try{
-    const provider=new GoogleAuthProvider();
-    provider.setCustomParameters({prompt:"select_account"});
-    const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    if(isMobile){
-      sessionStorage.setItem('pendingRedirect','1');
-      await signInWithRedirect(auth,provider);
-    } else {
-      await signInWithPopup(auth,provider);
-    }
+    document.getElementById('send-otp-btn').textContent='Sending...';
+    document.getElementById('send-otp-btn').disabled=true;
+    confirmationResult=await signInWithPhoneNumber(auth,fullPhone,recaptchaVerifier);
+    document.getElementById('phone-step').style.display='none';
+    document.getElementById('otp-step').style.display='block';
+    showToast('OTP sent!');
   }catch(e){
-    console.error("Sign-in error:",e.code,e.message);
-    sessionStorage.removeItem('pendingRedirect');
-    if(e.code!=="auth/popup-closed-by-user"){
-      showToast("Sign-in failed. Try again.");
-    }
+    console.error('OTP send error:',e);
+    document.getElementById('send-otp-btn').textContent='Send OTP';
+    document.getElementById('send-otp-btn').disabled=false;
+    showPhoneErr('Failed to send OTP: '+e.message);
+    if(recaptchaVerifier){recaptchaVerifier.clear();recaptchaVerifier=null;}
+    initRecaptcha();
   }
+};
+document.getElementById("verify-otp-btn").onclick=async()=>{
+  hideOtpErr();
+  const code=document.getElementById('otp-input').value.trim();
+  if(!code||code.length!==6){showOtpErr('Enter the 6-digit OTP');return;}
+  try{
+    document.getElementById('verify-otp-btn').textContent='Verifying...';
+    document.getElementById('verify-otp-btn').disabled=true;
+    await confirmationResult.confirm(code);
+    // onAuthStateChanged will fire and handle the rest
+  }catch(e){
+    console.error('OTP verify error:',e);
+    document.getElementById('verify-otp-btn').textContent='Verify OTP';
+    document.getElementById('verify-otp-btn').disabled=false;
+    showOtpErr('Invalid OTP. Try again.');
+  }
+};
+document.getElementById("resend-otp-btn").onclick=()=>{
+  document.getElementById('otp-step').style.display='none';
+  document.getElementById('phone-step').style.display='block';
+  if(recaptchaVerifier){recaptchaVerifier.clear();recaptchaVerifier=null;}
+  initRecaptcha();
 };
 
 document.getElementById("invite-btn").onclick=async()=>{
