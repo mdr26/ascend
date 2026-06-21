@@ -245,7 +245,7 @@ textarea{-webkit-appearance:none;resize:none;}
       <input id="country-code" value="+91" style="width:70px;background:#141414;border:0.5px solid #2a2a2a;border-radius:9px;color:#F0F0EE;font-size:15px;padding:13px 10px;font-family:inherit;text-align:center;" maxlength="4">
       <input id="phone-input" type="tel" placeholder="9876543210" inputmode="numeric" style="flex:1;background:#141414;border:0.5px solid #2a2a2a;border-radius:9px;color:#F0F0EE;font-size:15px;padding:13px 14px;font-family:inherit;" maxlength="15">
     </div>
-    <div id="recaptcha-container"></div>
+    <div id="recaptcha-container" style="margin:10px 0;display:flex;justify-content:center;"></div>
     <button id="send-otp-btn" style="width:100%;background:#C1121F;color:#fff;border:none;border-radius:9px;padding:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;">Send OTP</button>
     <div id="phone-err" style="font-size:12px;color:#C1121F;text-align:center;margin-top:8px;display:none;"></div>
   </div>
@@ -532,40 +532,43 @@ textarea{-webkit-appearance:none;resize:none;}
 <div class="toast" id="toast"></div>
 
 <script>
-// OTP Auth - runs after Firebase module sets window._auth
+// OTP Auth
 var _confirmationResult = null;
 var _rcVerifier = null;
 
 function _initRC(){
-  if(_rcVerifier || !window._auth) return;
+  if(_rcVerifier || !window._auth || !window._RecaptchaVerifier) return;
   try{
-    _rcVerifier = new window._RecaptchaVerifier(window._auth,'recaptcha-container',{size:'invisible'});
-    _rcVerifier.render();
-  }catch(e){console.log('rc:',e);}
+    _rcVerifier = new window._RecaptchaVerifier(window._auth,'recaptcha-container',{
+      size:'normal',
+      theme:'dark',
+      callback:function(token){
+        console.log('recaptcha solved');
+        document.getElementById('send-otp-btn').disabled=false;
+      }
+    });
+    _rcVerifier.render().then(function(id){
+      console.log('recaptcha rendered, id:',id);
+    }).catch(function(e){ console.log('render error (ok for invisible):',e); });
+  }catch(e){console.log('rc init:',e);}
 }
 
 window.sendOTP = function(){
   var cc = document.getElementById('country-code').value.trim();
   var ph = document.getElementById('phone-input').value.trim();
   var err = document.getElementById('phone-err');
-  if(!ph || ph.length < 10){ err.textContent='Enter a valid 10-digit number'; err.style.display='block'; return; }
-  // Check Firebase is ready
-  if(!window._auth || !window._signInWithPhoneNumber){
-    err.textContent='App still loading. Wait 2 seconds and try again.'; err.style.display='block'; return;
-  }
   err.style.display='none';
+  if(!ph || ph.length < 10){ err.textContent='Enter a valid 10-digit number'; err.style.display='block'; return; }
+  if(!window._auth || !window._signInWithPhoneNumber){
+    err.textContent='App loading... try again in 2 seconds.'; err.style.display='block'; return;
+  }
   var btn = document.getElementById('send-otp-btn');
   btn.textContent='Sending...'; btn.disabled=true;
   var fullPhone = cc + ph;
   document.getElementById('phone-display').textContent = fullPhone;
-  // Create recaptcha inline if needed
   if(!_rcVerifier){
-    try{
-      _rcVerifier = new window._RecaptchaVerifier(window._auth,'recaptcha-container',{size:'invisible'});
-    }catch(e){
-      err.textContent='reCAPTCHA error: '+e.message; err.style.display='block';
-      btn.textContent='Send OTP'; btn.disabled=false; return;
-    }
+    err.textContent='Please complete the reCAPTCHA first'; err.style.display='block';
+    btn.textContent='Send OTP'; btn.disabled=false; return;
   }
   window._signInWithPhoneNumber(window._auth, fullPhone, _rcVerifier).then(function(result){
     _confirmationResult = result;
@@ -573,9 +576,10 @@ window.sendOTP = function(){
     document.getElementById('otp-step').style.display='block';
   }).catch(function(e){
     console.error('OTP error:',e.code, e.message);
-    err.textContent = 'Error: '+e.message; err.style.display='block';
+    err.textContent = e.code+': '+e.message; err.style.display='block';
     btn.textContent='Send OTP'; btn.disabled=false;
-    if(_rcVerifier){try{_rcVerifier.clear();}catch(ex){} _rcVerifier=null;}
+    try{if(_rcVerifier){_rcVerifier.clear();_rcVerifier=null;}}catch(ex){}
+    setTimeout(_initRC, 500);
   });
 };
 
