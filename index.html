@@ -604,12 +604,14 @@ document.addEventListener('DOMContentLoaded', function(){
   document.getElementById('send-otp-btn').onclick = window.sendOTP;
   document.getElementById('verify-otp-btn').onclick = window.verifyOTP;
   document.getElementById('resend-otp-btn').onclick = window.resendOTP;
-  // Init recaptcha after module loads - retry a few times
-  function tryInitRC(attempts){
-    if(window._auth && window._RecaptchaVerifier){ _initRC(); }
-    else if(attempts > 0){ setTimeout(function(){ tryInitRC(attempts-1); }, 500); }
+  // Init recaptcha when Firebase is ready
+  if(window._auth){
+    setTimeout(_initRC, 100);
+  } else {
+    window.addEventListener('firebaseReady', function(){
+      setTimeout(_initRC, 100);
+    });
   }
-  setTimeout(function(){ tryInitRC(10); }, 500);
 });
 </script>
 
@@ -623,10 +625,14 @@ const ADMIN_UID = "XGweLsPofXT7AOtf1RxQ9U0usZy1";
 const fbApp = initializeApp(FB_CONFIG);
 const auth = getAuth(fbApp);
 const db = getFirestore(fbApp);
-// Expose to window for OTP functions
+// Expose to window IMMEDIATELY
 window._auth = auth;
+window._db = db;
 window._RecaptchaVerifier = RecaptchaVerifier;
 window._signInWithPhoneNumber = signInWithPhoneNumber;
+// Fire a custom event so OTP script knows Firebase is ready
+window.dispatchEvent(new Event('firebaseReady'));
+console.log('Firebase ready - auth exposed to window');
 
 const EX_DB = {
   Chest:[{name:"Bench Press",variants:["Barbell","Dumbbell","Machine","Cable"]},{name:"Incline Press",variants:["Barbell","Dumbbell","Smith"]},{name:"Chest Fly",variants:["Dumbbell","Cable","Machine"]},{name:"Push-up",variants:["Bodyweight","Weighted"]},{name:"Decline Press",variants:["Barbell","Dumbbell"]},{name:"Cable Crossover",variants:["High","Low","Mid"]}],
