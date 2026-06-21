@@ -541,25 +541,30 @@ window.sendOTP = function(){
   var err = document.getElementById('phone-err');
   err.style.display='none';
   if(!ph||ph.length<10){err.textContent='Enter valid 10-digit number';err.style.display='block';return;}
-  if(!window._auth||!window._signInWithPhoneNumber){err.textContent='Loading... wait 2 secs';err.style.display='block';return;}
+  if(!window._auth||!window._signInWithPhoneNumber){err.textContent='Loading... wait 2 secs and try again';err.style.display='block';return;}
   var btn=document.getElementById('send-otp-btn');
   btn.textContent='Sending...';btn.disabled=true;
   var phone=cc+ph;
   document.getElementById('phone-display').textContent=phone;
-  // Get the verifier that was already rendered by the module
-  var verifier=window._rcv;
-  if(!verifier){err.textContent='reCAPTCHA not ready. Refresh page.';err.style.display='block';btn.textContent='Send OTP';btn.disabled=false;return;}
-  window._signInWithPhoneNumber(window._auth,phone,verifier).then(function(r){
+  // Create verifier if not exists
+  if(!window._rcv){
+    try{
+      window._rcv=new window._RecaptchaVerifier(window._auth,'recaptcha-container',{size:'invisible'});
+    }catch(e){
+      err.textContent='Error: '+e.message;err.style.display='block';
+      btn.textContent='Send OTP';btn.disabled=false;return;
+    }
+  }
+  window._signInWithPhoneNumber(window._auth,phone,window._rcv).then(function(r){
     _confirmResult=r;
     document.getElementById('phone-step').style.display='none';
     document.getElementById('otp-step').style.display='block';
   }).catch(function(e){
+    console.error('SMS error:',e.code,e.message);
     err.textContent=e.message;err.style.display='block';
     btn.textContent='Send OTP';btn.disabled=false;
-    // Reset verifier
     try{window._rcv.clear();}catch(ex){}
     window._rcv=null;
-    setTimeout(window._initRCV,500);
   });
 };
 
@@ -711,7 +716,7 @@ const CIN=[
       ls.style.pointerEvents="none";
       ls.style.zIndex="-1";
     }
-    showLogin();
+    if(window.showLogin)window.showLogin();
   },3000);
 })();
 // OTP auth - no redirect
