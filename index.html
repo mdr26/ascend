@@ -729,7 +729,7 @@ const CIN=[
 (()=>{
   const stage=document.getElementById("cin-stage");
   const seq=CIN[Math.floor(Math.random()*CIN.length)];
-  seq.forEach(l=>{const d=document.createElement("div");d.className="cin-line";d.style.cssText="font-size:"+l.s+";color:"+l.c+";font-weight:"+l.w+";letter-spacing:0.14em;text-transform:uppercase;margin-bottom:14px;animation-delay:"+l.d+"ms;";d.textContent=l.t;stage.appendChild(d);});
+  if(stage) seq.forEach(l=>{const d=document.createElement("div");d.className="cin-line";d.style.cssText="font-size:"+l.s+";color:"+l.c+";font-weight:"+l.w+";letter-spacing:0.14em;text-transform:uppercase;margin-bottom:14px;animation-delay:"+l.d+"ms;";d.textContent=l.t;stage.appendChild(d);});
   // Hard fallback - hide loading after 3 seconds no matter what
   setTimeout(()=>{
     const ls=document.getElementById("loading-screen");
