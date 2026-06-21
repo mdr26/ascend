@@ -532,95 +532,66 @@ textarea{-webkit-appearance:none;resize:none;}
 <div class="toast" id="toast"></div>
 
 <script>
-// OTP Auth
-var _confirmationResult = null;
-var _rcVerifier = null;
-
-function _initRC(){
-  if(_rcVerifier || !window._auth || !window._RecaptchaVerifier) return;
-  try{
-    _rcVerifier = new window._RecaptchaVerifier(window._auth,'recaptcha-container',{
-      size:'normal',
-      theme:'dark',
-      callback:function(token){
-        console.log('recaptcha solved');
-        document.getElementById('send-otp-btn').disabled=false;
-      }
-    });
-    _rcVerifier.render().then(function(id){
-      console.log('recaptcha rendered, id:',id);
-    }).catch(function(e){ console.log('render error (ok for invisible):',e); });
-  }catch(e){console.log('rc init:',e);}
-}
+// OTP Auth - single source of truth
+var _confirmResult = null;
 
 window.sendOTP = function(){
   var cc = document.getElementById('country-code').value.trim();
   var ph = document.getElementById('phone-input').value.trim();
   var err = document.getElementById('phone-err');
   err.style.display='none';
-  if(!ph || ph.length < 10){ err.textContent='Enter a valid 10-digit number'; err.style.display='block'; return; }
-  if(!window._auth || !window._signInWithPhoneNumber){
-    err.textContent='App loading... try again in 2 seconds.'; err.style.display='block'; return;
-  }
-  var btn = document.getElementById('send-otp-btn');
-  btn.textContent='Sending...'; btn.disabled=true;
-  var fullPhone = cc + ph;
-  document.getElementById('phone-display').textContent = fullPhone;
-  if(!_rcVerifier){
-    err.textContent='Please complete the reCAPTCHA first'; err.style.display='block';
-    btn.textContent='Send OTP'; btn.disabled=false; return;
-  }
-  window._signInWithPhoneNumber(window._auth, fullPhone, _rcVerifier).then(function(result){
-    _confirmationResult = result;
+  if(!ph||ph.length<10){err.textContent='Enter valid 10-digit number';err.style.display='block';return;}
+  if(!window._auth||!window._signInWithPhoneNumber){err.textContent='Loading... wait 2 secs';err.style.display='block';return;}
+  var btn=document.getElementById('send-otp-btn');
+  btn.textContent='Sending...';btn.disabled=true;
+  var phone=cc+ph;
+  document.getElementById('phone-display').textContent=phone;
+  // Get the verifier that was already rendered by the module
+  var verifier=window._rcv;
+  if(!verifier){err.textContent='reCAPTCHA not ready. Refresh page.';err.style.display='block';btn.textContent='Send OTP';btn.disabled=false;return;}
+  window._signInWithPhoneNumber(window._auth,phone,verifier).then(function(r){
+    _confirmResult=r;
     document.getElementById('phone-step').style.display='none';
     document.getElementById('otp-step').style.display='block';
   }).catch(function(e){
-    console.error('OTP error:',e.code, e.message);
-    err.textContent = e.code+': '+e.message; err.style.display='block';
-    btn.textContent='Send OTP'; btn.disabled=false;
-    try{if(_rcVerifier){_rcVerifier.clear();_rcVerifier=null;}}catch(ex){}
-    setTimeout(_initRC, 500);
+    err.textContent=e.message;err.style.display='block';
+    btn.textContent='Send OTP';btn.disabled=false;
+    // Reset verifier
+    try{window._rcv.clear();}catch(ex){}
+    window._rcv=null;
+    setTimeout(window._initRCV,500);
   });
 };
 
 window.verifyOTP = function(){
-  var code = document.getElementById('otp-input').value.trim();
-  var err = document.getElementById('otp-err');
-  if(!code || code.length !== 6){ err.textContent='Enter 6-digit OTP'; err.style.display='block'; return; }
+  var code=document.getElementById('otp-input').value.trim();
+  var err=document.getElementById('otp-err');
   err.style.display='none';
-  var btn = document.getElementById('verify-otp-btn');
-  btn.textContent='Verifying...'; btn.disabled=true;
-  if(!_confirmationResult){ err.textContent='Session expired. Resend OTP.'; err.style.display='block'; btn.textContent='Verify OTP'; btn.disabled=false; return; }
-  _confirmationResult.confirm(code).then(function(result){
-    console.log('OTP verified!', result.user.uid);
-    // onAuthStateChanged will fire and load the app
+  if(!code||code.length!==6){err.textContent='Enter 6-digit code';err.style.display='block';return;}
+  if(!_confirmResult){err.textContent='Session expired. Resend OTP.';err.style.display='block';return;}
+  var btn=document.getElementById('verify-otp-btn');
+  btn.textContent='Verifying...';btn.disabled=true;
+  _confirmResult.confirm(code).then(function(r){
+    console.log('OTP verified!',r.user.uid);
   }).catch(function(e){
-    console.error('Verify error:',e.code, e.message);
-    err.textContent = e.code === 'auth/invalid-verification-code' ? 'Wrong OTP. Try again.' : 'Error: '+e.message;
+    err.textContent=e.code==='auth/invalid-verification-code'?'Wrong code. Try again.':e.message;
     err.style.display='block';
-    btn.textContent='Verify OTP'; btn.disabled=false;
+    btn.textContent='Verify OTP';btn.disabled=false;
   });
 };
 
 window.resendOTP = function(){
   document.getElementById('otp-step').style.display='none';
   document.getElementById('phone-step').style.display='block';
-  if(_rcVerifier){try{_rcVerifier.clear();}catch(e){} _rcVerifier=null;}
+  try{window._rcv.clear();}catch(e){}
+  window._rcv=null;
+  setTimeout(window._initRCV,500);
 };
 
-// Wire buttons on DOM ready
-document.addEventListener('DOMContentLoaded', function(){
-  document.getElementById('send-otp-btn').onclick = window.sendOTP;
-  document.getElementById('verify-otp-btn').onclick = window.verifyOTP;
-  document.getElementById('resend-otp-btn').onclick = window.resendOTP;
-  // Init recaptcha when Firebase is ready
-  if(window._auth){
-    setTimeout(_initRC, 100);
-  } else {
-    window.addEventListener('firebaseReady', function(){
-      setTimeout(_initRC, 100);
-    });
-  }
+document.addEventListener('DOMContentLoaded',function(){
+  document.getElementById('send-otp-btn').onclick=window.sendOTP;
+  document.getElementById('verify-otp-btn').onclick=window.verifyOTP;
+  document.getElementById('resend-otp-btn').onclick=window.resendOTP;
 });
 </script>
 
@@ -801,13 +772,17 @@ window.verifyOTP = async function(){
   }
 };
 
-function initRecaptcha(){
-  if(_moduleRcVerifier) return;
+function initRecaptcha(){}
+window._initRCV = function(){
+  if(window._rcv) return;
   try{
-    _moduleRcVerifier=new RecaptchaVerifier(auth,'recaptcha-container',{size:'invisible'});
-    _moduleRcVerifier.render().catch(e=>console.log('recaptcha:',e));
-  }catch(e){console.log('recaptcha init:',e);}
-}
+    window._rcv = new RecaptchaVerifier(auth,'recaptcha-container',{
+      size:'normal', theme:'dark',
+      callback:function(){ console.log('recaptcha solved'); }
+    });
+    window._rcv.render().then(function(id){ console.log('recaptcha rendered, id:',id); }).catch(function(e){ console.log('render err:',e); });
+  }catch(e){ console.log('recaptcha init err:',e); }
+};
 
 function showPhoneErr(msg){ const e=document.getElementById('phone-err'); if(e){e.textContent=msg;e.style.display='block';} }
 function hidePhoneErr(){ const e=document.getElementById('phone-err'); if(e)e.style.display='none'; }
@@ -899,7 +874,7 @@ function showLogin(){
   document.getElementById('phone-input').value='';
   document.getElementById('otp-input').value='';
   hidePhoneErr();hideOtpErr();
-  setTimeout(initRecaptcha,300);
+  setTimeout(function(){if(window._initRCV)window._initRCV();},300);
 }
 function showInvite(){hideLoading();document.getElementById("login-screen").style.display="none";document.getElementById("invite-screen").style.display="flex";document.getElementById("app").style.display="none";}
 // ONBOARDING
@@ -1809,7 +1784,7 @@ document.querySelectorAll(".nbtn").forEach(btn=>btn.onclick=()=>{
 document.querySelectorAll(".overlay").forEach(o=>o.addEventListener("click",e=>{if(e.target===o)o.classList.remove("open");}));
 
 // Init recaptcha when page loads
-window.addEventListener("load",()=>setTimeout(initRecaptcha,500));
+window.addEventListener("load",function(){setTimeout(function(){if(window._initRCV)window._initRCV();},500);});
 
 </script>
 </body>
