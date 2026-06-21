@@ -253,7 +253,7 @@ textarea{-webkit-appearance:none;resize:none;}
     <div style="font-size:13px;color:#555;margin-bottom:6px;text-align:center;">OTP sent to <span id="phone-display" style="color:#F0F0EE;font-weight:700;"></span></div>
     <div style="font-size:12px;color:#444;margin-bottom:16px;text-align:center;">Enter the 6-digit code</div>
     <input id="otp-input" type="number" placeholder="000000" inputmode="numeric" style="width:100%;background:#141414;border:0.5px solid #2a2a2a;border-radius:9px;color:#F0F0EE;font-size:24px;font-weight:800;padding:14px;font-family:inherit;text-align:center;letter-spacing:0.2em;margin-bottom:10px;">
-    <button id="verify-otp-btn" style="width:100%;background:#C1121F;color:#fff;border:none;border-radius:9px;padding:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;">Verify OTP</button>
+    <button id="verify-otp-btn" onclick="verifyOTP()" style="width:100%;background:#C1121F;color:#fff;border:none;border-radius:9px;padding:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;">Verify OTP</button>
     <button id="resend-otp-btn" style="width:100%;background:none;border:none;color:#555;font-size:12px;padding:10px;cursor:pointer;font-family:inherit;margin-top:4px;">Resend OTP</button>
     <div id="otp-err" style="font-size:12px;color:#C1121F;text-align:center;margin-top:8px;display:none;"></div>
   </div>
@@ -666,6 +666,55 @@ getRedirectResult(auth).then(result=>{
 // OTP STATE
 let confirmationResult = null;
 let recaptchaVerifier = null;
+
+// Global function callable from HTML onclick
+window.sendOTP = async function(){
+  document.getElementById('send-otp-btn').textContent='Sending...';
+  document.getElementById('send-otp-btn').disabled=true;
+  hidePhoneErr();
+  const cc=document.getElementById('country-code').value.trim();
+  const ph=document.getElementById('phone-input').value.trim();
+  if(!ph||ph.length<5){
+    showPhoneErr('Enter a valid phone number');
+    document.getElementById('send-otp-btn').textContent='Send OTP';
+    document.getElementById('send-otp-btn').disabled=false;
+    return;
+  }
+  const fullPhone=cc+ph;
+  document.getElementById('phone-display').textContent=fullPhone;
+  try{
+    if(!recaptchaVerifier){
+      recaptchaVerifier=new RecaptchaVerifier(auth,'recaptcha-container',{size:'invisible'});
+      await recaptchaVerifier.render();
+    }
+    confirmationResult=await signInWithPhoneNumber(auth,fullPhone,recaptchaVerifier);
+    document.getElementById('phone-step').style.display='none';
+    document.getElementById('otp-step').style.display='block';
+    showToast('OTP sent to '+fullPhone);
+  }catch(e){
+    console.error('OTP error:',e.code,e.message);
+    showPhoneErr('Failed: '+e.message);
+    document.getElementById('send-otp-btn').textContent='Send OTP';
+    document.getElementById('send-otp-btn').disabled=false;
+    try{if(recaptchaVerifier){recaptchaVerifier.clear();recaptchaVerifier=null;}}catch(ex){}
+  }
+};
+
+window.verifyOTP = async function(){
+  hideOtpErr();
+  const code=document.getElementById('otp-input').value.trim();
+  if(!code||code.length!==6){showOtpErr('Enter the 6-digit OTP');return;}
+  try{
+    document.getElementById('verify-otp-btn').textContent='Verifying...';
+    document.getElementById('verify-otp-btn').disabled=true;
+    await confirmationResult.confirm(code);
+  }catch(e){
+    console.error('Verify error:',e);
+    showOtpErr('Wrong OTP. Try again.');
+    document.getElementById('verify-otp-btn').textContent='Verify OTP';
+    document.getElementById('verify-otp-btn').disabled=false;
+  }
+};
 
 function initRecaptcha(){
   if(recaptchaVerifier) return;
@@ -1493,9 +1542,11 @@ function showPR(exName,weight){
 // WIRE UP ALL BUTTONS
 document.getElementById("send-otp-btn").onclick=async()=>{
   hidePhoneErr();
+  showPhoneErr('Processing...');
   const cc=document.getElementById('country-code').value.trim();
   const ph=document.getElementById('phone-input').value.trim();
-  if(!ph||ph.length<10){showPhoneErr('Enter a valid phone number');return;}
+  if(!ph||ph.length<10){showPhoneErr('Enter a valid 10-digit number');return;}
+  hidePhoneErr();
   const fullPhone=cc+ph;
   document.getElementById('phone-display').textContent=fullPhone;
   try{
