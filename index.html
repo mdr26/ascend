@@ -804,7 +804,7 @@ window.verifyOTP = async function(){
 function initRecaptcha(){
   if(_moduleRcVerifier) return;
   try{
-    recaptchaVerifier=new RecaptchaVerifier(auth,'recaptcha-container',{size:'invisible'});
+    _moduleRcVerifier=new RecaptchaVerifier(auth,'recaptcha-container',{size:'invisible'});
     _moduleRcVerifier.render().catch(e=>console.log('recaptcha:',e));
   }catch(e){console.log('recaptcha init:',e);}
 }
