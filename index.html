@@ -532,21 +532,84 @@ textarea{-webkit-appearance:none;resize:none;}
 <div class="toast" id="toast"></div>
 
 <script>
-// Wait for module to load then wire buttons
-window.addEventListener('load', function(){
-  var sendBtn = document.getElementById('send-otp-btn');
-  var verifyBtn = document.getElementById('verify-otp-btn');
-  var resendBtn = document.getElementById('resend-otp-btn');
-  if(sendBtn) sendBtn.addEventListener('click', function(){
-    if(window.sendOTP) window.sendOTP();
-    else alert('App still loading, try again');
+// OTP Auth - runs after Firebase module sets window._auth
+var _confirmationResult = null;
+var _rcVerifier = null;
+
+function _initRC(){
+  if(_rcVerifier || !window._auth) return;
+  try{
+    _rcVerifier = new window._RecaptchaVerifier(window._auth,'recaptcha-container',{size:'invisible'});
+    _rcVerifier.render();
+  }catch(e){console.log('rc:',e);}
+}
+
+window.sendOTP = function(){
+  var cc = document.getElementById('country-code').value.trim();
+  var ph = document.getElementById('phone-input').value.trim();
+  var err = document.getElementById('phone-err');
+  if(!ph || ph.length < 10){ err.textContent='Enter a valid 10-digit number'; err.style.display='block'; return; }
+  // Check Firebase is ready
+  if(!window._auth || !window._signInWithPhoneNumber){
+    err.textContent='App still loading. Wait 2 seconds and try again.'; err.style.display='block'; return;
+  }
+  err.style.display='none';
+  var btn = document.getElementById('send-otp-btn');
+  btn.textContent='Sending...'; btn.disabled=true;
+  var fullPhone = cc + ph;
+  document.getElementById('phone-display').textContent = fullPhone;
+  // Create recaptcha inline if needed
+  if(!_rcVerifier){
+    try{
+      _rcVerifier = new window._RecaptchaVerifier(window._auth,'recaptcha-container',{size:'invisible'});
+    }catch(e){
+      err.textContent='reCAPTCHA error: '+e.message; err.style.display='block';
+      btn.textContent='Send OTP'; btn.disabled=false; return;
+    }
+  }
+  window._signInWithPhoneNumber(window._auth, fullPhone, _rcVerifier).then(function(result){
+    _confirmationResult = result;
+    document.getElementById('phone-step').style.display='none';
+    document.getElementById('otp-step').style.display='block';
+  }).catch(function(e){
+    console.error('OTP error:',e.code, e.message);
+    err.textContent = 'Error: '+e.message; err.style.display='block';
+    btn.textContent='Send OTP'; btn.disabled=false;
+    if(_rcVerifier){try{_rcVerifier.clear();}catch(ex){} _rcVerifier=null;}
   });
-  if(verifyBtn) verifyBtn.addEventListener('click', function(){
-    if(window.verifyOTP) window.verifyOTP();
+};
+
+window.verifyOTP = function(){
+  var code = document.getElementById('otp-input').value.trim();
+  var err = document.getElementById('otp-err');
+  if(!code || code.length !== 6){ err.textContent='Enter 6-digit OTP'; err.style.display='block'; return; }
+  err.style.display='none';
+  var btn = document.getElementById('verify-otp-btn');
+  btn.textContent='Verifying...'; btn.disabled=true;
+  if(!_confirmationResult){ err.textContent='Session expired. Resend OTP.'; err.style.display='block'; btn.textContent='Verify OTP'; btn.disabled=false; return; }
+  _confirmationResult.confirm(code).catch(function(e){
+    err.textContent='Wrong OTP. Try again.'; err.style.display='block';
+    btn.textContent='Verify OTP'; btn.disabled=false;
   });
-  if(resendBtn) resendBtn.addEventListener('click', function(){
-    if(window.resendOTP) window.resendOTP();
-  });
+};
+
+window.resendOTP = function(){
+  document.getElementById('otp-step').style.display='none';
+  document.getElementById('phone-step').style.display='block';
+  if(_rcVerifier){try{_rcVerifier.clear();}catch(e){} _rcVerifier=null;}
+};
+
+// Wire buttons on DOM ready
+document.addEventListener('DOMContentLoaded', function(){
+  document.getElementById('send-otp-btn').onclick = window.sendOTP;
+  document.getElementById('verify-otp-btn').onclick = window.verifyOTP;
+  document.getElementById('resend-otp-btn').onclick = window.resendOTP;
+  // Init recaptcha after module loads - retry a few times
+  function tryInitRC(attempts){
+    if(window._auth && window._RecaptchaVerifier){ _initRC(); }
+    else if(attempts > 0){ setTimeout(function(){ tryInitRC(attempts-1); }, 500); }
+  }
+  setTimeout(function(){ tryInitRC(10); }, 500);
 });
 </script>
 
@@ -560,6 +623,10 @@ const ADMIN_UID = "XGweLsPofXT7AOtf1RxQ9U0usZy1";
 const fbApp = initializeApp(FB_CONFIG);
 const auth = getAuth(fbApp);
 const db = getFirestore(fbApp);
+// Expose to window for OTP functions
+window._auth = auth;
+window._RecaptchaVerifier = RecaptchaVerifier;
+window._signInWithPhoneNumber = signInWithPhoneNumber;
 
 const EX_DB = {
   Chest:[{name:"Bench Press",variants:["Barbell","Dumbbell","Machine","Cable"]},{name:"Incline Press",variants:["Barbell","Dumbbell","Smith"]},{name:"Chest Fly",variants:["Dumbbell","Cable","Machine"]},{name:"Push-up",variants:["Bodyweight","Weighted"]},{name:"Decline Press",variants:["Barbell","Dumbbell"]},{name:"Cable Crossover",variants:["High","Low","Mid"]}],
