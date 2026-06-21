@@ -743,30 +743,14 @@ const CIN=[
     showLogin();
   },3000);
 })();
-// Handle redirect result FIRST before auth state listener fires
-let redirectHandled=false;
-getRedirectResult(auth).then(result=>{
-  redirectHandled=true;
-  if(result&&result.user){
-    console.log("Redirect sign-in successful:",result.user.email);
-    // onAuthStateChanged will fire next and handle the rest
-  }
-}).catch(e=>{
-  redirectHandled=true;
-  console.error("Redirect result error:",e.code,e.message);
-  // Only show login if not a network error
-  if(e.code!=="auth/null-user"){
-    hideLoading();
-    showLogin();
-    showToast("Sign-in failed. Try again.");
-  }
-});
+// OTP auth - no redirect
+
 
 // No redirect needed - using OTP auth
 
 // OTP STATE
 let confirmationResult = null;
-let recaptchaVerifier = null;
+let _moduleRcVerifier = null;
 
 // Global function callable from HTML onclick
 window.sendOTP = async function(){
@@ -786,7 +770,7 @@ window.sendOTP = async function(){
   try{
     if(!recaptchaVerifier){
       recaptchaVerifier=new RecaptchaVerifier(auth,'recaptcha-container',{size:'invisible'});
-      await recaptchaVerifier.render();
+      await _moduleRcVerifier.render();
     }
     confirmationResult=await signInWithPhoneNumber(auth,fullPhone,recaptchaVerifier);
     document.getElementById('phone-step').style.display='none';
@@ -818,10 +802,10 @@ window.verifyOTP = async function(){
 };
 
 function initRecaptcha(){
-  if(recaptchaVerifier) return;
+  if(_moduleRcVerifier) return;
   try{
     recaptchaVerifier=new RecaptchaVerifier(auth,'recaptcha-container',{size:'invisible'});
-    recaptchaVerifier.render().catch(e=>console.log('recaptcha:',e));
+    _moduleRcVerifier.render().catch(e=>console.log('recaptcha:',e));
   }catch(e){console.log('recaptcha init:',e);}
 }
 
