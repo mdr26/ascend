@@ -591,8 +591,13 @@ window.verifyOTP = function(){
   var btn = document.getElementById('verify-otp-btn');
   btn.textContent='Verifying...'; btn.disabled=true;
   if(!_confirmationResult){ err.textContent='Session expired. Resend OTP.'; err.style.display='block'; btn.textContent='Verify OTP'; btn.disabled=false; return; }
-  _confirmationResult.confirm(code).catch(function(e){
-    err.textContent='Wrong OTP. Try again.'; err.style.display='block';
+  _confirmationResult.confirm(code).then(function(result){
+    console.log('OTP verified!', result.user.uid);
+    // onAuthStateChanged will fire and load the app
+  }).catch(function(e){
+    console.error('Verify error:',e.code, e.message);
+    err.textContent = e.code === 'auth/invalid-verification-code' ? 'Wrong OTP. Try again.' : 'Error: '+e.message;
+    err.style.display='block';
     btn.textContent='Verify OTP'; btn.disabled=false;
   });
 };
