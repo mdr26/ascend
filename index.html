@@ -233,7 +233,7 @@ textarea{-webkit-appearance:none;resize:none;}
 <body>
 <div id="loading-screen" style="display:none;">
 </div>
-<div id="login-screen">
+<div id="login-screen" style="display:flex;">
   <div style="text-align:center;margin-bottom:28px;">
     <svg width="72" height="72" viewBox="0 0 110 110" style="display:block;margin:0 auto 14px;"><rect x="0" y="0" width="110" height="110" rx="24" fill="#1A0608"/><polygon points="55,18 78,72 55,60 32,72" fill="#C1121F"/><polygon points="55,34 70,72 55,64 40,72" fill="#3D0608"/></svg>
     <div style="font-size:34px;font-weight:800;color:#C1121F;font-style:italic;letter-spacing:-0.03em;">Ascend</div>
@@ -253,7 +253,7 @@ textarea{-webkit-appearance:none;resize:none;}
     <div style="font-size:13px;color:#555;margin-bottom:6px;text-align:center;">OTP sent to <span id="phone-display" style="color:#F0F0EE;font-weight:700;"></span></div>
     <div style="font-size:12px;color:#444;margin-bottom:16px;text-align:center;">Enter the 6-digit code</div>
     <input id="otp-input" type="number" placeholder="000000" inputmode="numeric" style="width:100%;background:#141414;border:0.5px solid #2a2a2a;border-radius:9px;color:#F0F0EE;font-size:24px;font-weight:800;padding:14px;font-family:inherit;text-align:center;letter-spacing:0.2em;margin-bottom:10px;">
-    <button id="verify-otp-btn" onclick="verifyOTP()" style="width:100%;background:#C1121F;color:#fff;border:none;border-radius:9px;padding:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;">Verify OTP</button>
+    <button id="verify-otp-btn" style="width:100%;background:#C1121F;color:#fff;border:none;border-radius:9px;padding:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;">Verify OTP</button>
     <button id="resend-otp-btn" style="width:100%;background:none;border:none;color:#555;font-size:12px;padding:10px;cursor:pointer;font-family:inherit;margin-top:4px;">Resend OTP</button>
     <div id="otp-err" style="font-size:12px;color:#C1121F;text-align:center;margin-top:8px;display:none;"></div>
   </div>
@@ -530,6 +530,25 @@ textarea{-webkit-appearance:none;resize:none;}
 <canvas id="confetti-canvas"></canvas>
 <div id="pr-overlay"><div style="position:relative;z-index:1000;"><div style="font-size:64px;margin-bottom:8px;animation:prBounce 0.5s ease-out;">🏆</div><div style="font-size:32px;font-weight:800;color:#C1121F;letter-spacing:-0.02em;margin-bottom:6px;animation:prSlide 0.4s ease-out 0.2s both;">NEW PR!</div><div style="font-size:18px;font-weight:700;color:#F0F0EE;margin-bottom:4px;animation:prSlide 0.4s ease-out 0.3s both;" id="pr-ex-name"></div><div style="font-size:13px;color:#666;margin-bottom:24px;font-style:italic;animation:prSlide 0.4s ease-out 0.4s both;" id="pr-msg"></div><div style="background:#0d0d0d;border:0.5px solid #222;border-radius:12px;padding:16px 32px;margin-bottom:24px;display:inline-block;animation:prSlide 0.4s ease-out 0.5s both;"><div style="font-size:10px;color:#333;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:4px;">New weight</div><div style="font-size:42px;font-weight:800;color:#C1121F;" id="pr-weight-val"></div></div><br><button id="close-pr-btn" style="background:#C1121F;color:#fff;border:none;border-radius:10px;padding:14px 44px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;text-transform:uppercase;animation:prSlide 0.4s ease-out 0.6s both;">Let's go! 💪</button></div></div>
 <div class="toast" id="toast"></div>
+
+<script>
+// Wait for module to load then wire buttons
+window.addEventListener('load', function(){
+  var sendBtn = document.getElementById('send-otp-btn');
+  var verifyBtn = document.getElementById('verify-otp-btn');
+  var resendBtn = document.getElementById('resend-otp-btn');
+  if(sendBtn) sendBtn.addEventListener('click', function(){
+    if(window.sendOTP) window.sendOTP();
+    else alert('App still loading, try again');
+  });
+  if(verifyBtn) verifyBtn.addEventListener('click', function(){
+    if(window.verifyOTP) window.verifyOTP();
+  });
+  if(resendBtn) resendBtn.addEventListener('click', function(){
+    if(window.resendOTP) window.resendOTP();
+  });
+});
+</script>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js";
@@ -1584,12 +1603,12 @@ document.getElementById("verify-otp-btn").onclick=async()=>{
     showOtpErr('Invalid OTP. Try again.');
   }
 };
-document.getElementById("resend-otp-btn").onclick=()=>{
+window.resendOTP=()=>{
   document.getElementById('otp-step').style.display='none';
   document.getElementById('phone-step').style.display='block';
-  if(recaptchaVerifier){recaptchaVerifier.clear();recaptchaVerifier=null;}
-  initRecaptcha();
+  try{if(recaptchaVerifier){recaptchaVerifier.clear();recaptchaVerifier=null;}}catch(e){}
 };
+document.getElementById("resend-otp-btn").onclick=window.resendOTP;
 
 document.getElementById("invite-btn").onclick=async()=>{
   const code=document.getElementById("invite-input").value.trim().toUpperCase();
