@@ -753,7 +753,21 @@ document.getElementById("signout-btn").onclick=async()=>{if(crewUnsub)crewUnsub(
 document.getElementById("close-profile-btn").onclick=()=>closeModal("profile-modal");
 document.getElementById("profile-pill").onclick=()=>openModal("profile-modal");
 document.getElementById("split-change-btn").onclick=()=>openModal("split-modal");
-document.getElementById("save-split-btn").onclick=saveSplit;
+async function saveSplit(){
+  const name=document.getElementById("cs-name").value.trim();
+  const raw=document.getElementById("cs-days").value.trim();
+  if(!name||!raw){showToast("Fill in name and days");return;}
+  const days=raw.replace(/\r/g,"").split("\n").map(s=>s.trim()).filter(Boolean);
+  if(!days.length){showToast("Add at least one day");return;}
+  const key=editSplitKey||("c_"+Date.now());
+  S.customSplits[key]={name,days};
+  S.split=key;S.activeDay=days[0];S.currentEx=[];editSplitKey=null;
+  document.getElementById("cs-name").value="";
+  document.getElementById("cs-days").value="";
+  await saveData();closeModal("split-modal");renderLog();showToast("Split saved!");
+}
+
+document.getElementById("save-split-btn").onclick=function(){saveSplit();};
 document.getElementById("cancel-split-btn").onclick=()=>closeModal("split-modal");
 document.getElementById("save-cex-btn").onclick=()=>{
   const name=document.getElementById("cex-name").value.trim(),vs=document.getElementById("cex-variants").value.trim();
