@@ -767,6 +767,8 @@ async function saveSplit(){
   await saveData();closeModal("split-modal");renderLog();showToast("Split saved!");
 }
 
+// Wire all buttons after everything is defined
+function wireAllButtons(){
 document.getElementById("save-split-btn").onclick=function(){saveSplit();};
 document.getElementById("cancel-split-btn").onclick=()=>closeModal("split-modal");
 document.getElementById("save-cex-btn").onclick=()=>{
@@ -886,6 +888,9 @@ document.querySelectorAll(".overlay").forEach(o=>o.addEventListener("click",e=>{
 
 // Init recaptcha when page loads
 window.addEventListener("load",function(){setTimeout(function(){if(window._initRCV)window._initRCV();},500);});
+}
+// Call immediately (module runs after DOM is ready)
+wireAllButtons();
 
 </script>
 </body>
