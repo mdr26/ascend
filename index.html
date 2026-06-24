@@ -239,24 +239,15 @@ textarea{-webkit-appearance:none;resize:none;}
     <div style="font-size:34px;font-weight:800;color:#C1121F;font-style:italic;letter-spacing:-0.03em;">Ascend</div>
     <div style="font-size:13px;color:#333;margin-top:6px;">Track. Compete. Rank up.</div>
   </div>
-  <div id="phone-step">
-    <div style="font-size:13px;color:#555;margin-bottom:12px;text-align:center;">Enter your phone number to sign in</div>
-    <div style="display:flex;gap:8px;margin-bottom:10px;">
-      <input id="country-code" value="+91" style="width:70px;background:#141414;border:0.5px solid #2a2a2a;border-radius:9px;color:#F0F0EE;font-size:15px;padding:13px 10px;font-family:inherit;text-align:center;" maxlength="4">
-      <input id="phone-input" type="tel" placeholder="9876543210" inputmode="numeric" style="flex:1;background:#141414;border:0.5px solid #2a2a2a;border-radius:9px;color:#F0F0EE;font-size:15px;padding:13px 14px;font-family:inherit;" maxlength="15">
-    </div>
-    <div id="recaptcha-container" style="margin:10px 0;display:flex;justify-content:center;"></div>
-    <button id="send-otp-btn" style="width:100%;background:#C1121F;color:#fff;border:none;border-radius:9px;padding:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;">Send OTP</button>
-    <div id="phone-err" style="font-size:12px;color:#C1121F;text-align:center;margin-top:8px;display:none;"></div>
+  <div id="login-tabs" style="display:flex;gap:0;margin-bottom:20px;background:#141414;border-radius:10px;padding:3px;">
+    <button onclick="showTab('signin')" id="tab-signin" style="flex:1;padding:9px;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;background:#C1121F;color:#fff;">Sign in</button>
+    <button onclick="showTab('register')" id="tab-register" style="flex:1;padding:9px;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;background:transparent;color:#555;">Register</button>
   </div>
-  <div id="otp-step" style="display:none;">
-    <div style="font-size:13px;color:#555;margin-bottom:6px;text-align:center;">OTP sent to <span id="phone-display" style="color:#F0F0EE;font-weight:700;"></span></div>
-    <div style="font-size:12px;color:#444;margin-bottom:16px;text-align:center;">Enter the 6-digit code</div>
-    <input id="otp-input" type="number" placeholder="000000" inputmode="numeric" style="width:100%;background:#141414;border:0.5px solid #2a2a2a;border-radius:9px;color:#F0F0EE;font-size:24px;font-weight:800;padding:14px;font-family:inherit;text-align:center;letter-spacing:0.2em;margin-bottom:10px;">
-    <button id="verify-otp-btn" style="width:100%;background:#C1121F;color:#fff;border:none;border-radius:9px;padding:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;">Verify OTP</button>
-    <button id="resend-otp-btn" style="width:100%;background:none;border:none;color:#555;font-size:12px;padding:10px;cursor:pointer;font-family:inherit;margin-top:4px;">Resend OTP</button>
-    <div id="otp-err" style="font-size:12px;color:#C1121F;text-align:center;margin-top:8px;display:none;"></div>
-  </div>
+  <input id="email-input" type="email" placeholder="Email address" inputmode="email" style="width:100%;background:#141414;border:0.5px solid #2a2a2a;border-radius:9px;color:#F0F0EE;font-size:15px;padding:13px 14px;font-family:inherit;margin-bottom:10px;">
+  <input id="password-input" type="password" placeholder="Password" style="width:100%;background:#141414;border:0.5px solid #2a2a2a;border-radius:9px;color:#F0F0EE;font-size:15px;padding:13px 14px;font-family:inherit;margin-bottom:10px;">
+  <input id="name-input" type="text" placeholder="Your name" style="width:100%;background:#141414;border:0.5px solid #2a2a2a;border-radius:9px;color:#F0F0EE;font-size:15px;padding:13px 14px;font-family:inherit;margin-bottom:10px;display:none;">
+  <button id="auth-btn" style="width:100%;background:#C1121F;color:#fff;border:none;border-radius:9px;padding:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;margin-bottom:8px;">Sign in</button>
+  <div id="auth-err" style="font-size:12px;color:#C1121F;text-align:center;margin-top:4px;display:none;"></div>
   <p style="font-size:11px;color:#333;text-align:center;line-height:1.6;margin-top:16px;">By signing in you agree to use this app responsibly.<br>Data stored securely on Firebase.</p>
 </div>
 <div id="invite-screen">
@@ -532,77 +523,61 @@ textarea{-webkit-appearance:none;resize:none;}
 <div class="toast" id="toast"></div>
 
 <script>
-// OTP Auth - single source of truth
-var _confirmResult = null;
+// Email auth
+var _authMode = 'signin';
 
-window.sendOTP = function(){
-  var cc = document.getElementById('country-code').value.trim();
-  var ph = document.getElementById('phone-input').value.trim();
-  var err = document.getElementById('phone-err');
-  err.style.display='none';
-  if(!ph||ph.length<10){err.textContent='Enter valid 10-digit number';err.style.display='block';return;}
-  if(!window._auth||!window._signInWithPhoneNumber){err.textContent='Loading... wait 2 secs and try again';err.style.display='block';return;}
-  var btn=document.getElementById('send-otp-btn');
-  btn.textContent='Sending...';btn.disabled=true;
-  var phone=cc+ph;
-  document.getElementById('phone-display').textContent=phone;
-  // Create verifier if not exists
-  if(!window._rcv){
-    try{
-      window._rcv=new window._RecaptchaVerifier(window._auth,'recaptcha-container',{size:'invisible'});
-    }catch(e){
-      err.textContent='Error: '+e.message;err.style.display='block';
-      btn.textContent='Send OTP';btn.disabled=false;return;
-    }
+window.showTab = function(mode){
+  _authMode = mode;
+  var si = document.getElementById('tab-signin');
+  var re = document.getElementById('tab-register');
+  var ni = document.getElementById('name-input');
+  var btn = document.getElementById('auth-btn');
+  if(mode === 'signin'){
+    si.style.background='#C1121F'; si.style.color='#fff';
+    re.style.background='transparent'; re.style.color='#555';
+    ni.style.display='none';
+    btn.textContent='Sign in';
+  } else {
+    re.style.background='#C1121F'; re.style.color='#fff';
+    si.style.background='transparent'; si.style.color='#555';
+    ni.style.display='block';
+    btn.textContent='Create account';
   }
-  window._signInWithPhoneNumber(window._auth,phone,window._rcv).then(function(r){
-    _confirmResult=r;
-    document.getElementById('phone-step').style.display='none';
-    document.getElementById('otp-step').style.display='block';
-  }).catch(function(e){
-    console.error('SMS error:',e.code,e.message);
-    err.textContent=e.message;err.style.display='block';
-    btn.textContent='Send OTP';btn.disabled=false;
-    try{window._rcv.clear();}catch(ex){}
-    window._rcv=null;
-  });
 };
 
-window.verifyOTP = function(){
-  var code=document.getElementById('otp-input').value.trim();
-  var err=document.getElementById('otp-err');
+window.doAuth = function(){
+  var email = document.getElementById('email-input').value.trim();
+  var password = document.getElementById('password-input').value.trim();
+  var name = document.getElementById('name-input').value.trim();
+  var err = document.getElementById('auth-err');
+  var btn = document.getElementById('auth-btn');
   err.style.display='none';
-  if(!code||code.length!==6){err.textContent='Enter 6-digit code';err.style.display='block';return;}
-  if(!_confirmResult){err.textContent='Session expired. Resend OTP.';err.style.display='block';return;}
-  var btn=document.getElementById('verify-otp-btn');
-  btn.textContent='Verifying...';btn.disabled=true;
-  _confirmResult.confirm(code).then(function(r){
-    console.log('OTP verified!',r.user.uid);
-  }).catch(function(e){
-    err.textContent=e.code==='auth/invalid-verification-code'?'Wrong code. Try again.':e.message;
-    err.style.display='block';
-    btn.textContent='Verify OTP';btn.disabled=false;
-  });
-};
-
-window.resendOTP = function(){
-  document.getElementById('otp-step').style.display='none';
-  document.getElementById('phone-step').style.display='block';
-  try{window._rcv.clear();}catch(e){}
-  window._rcv=null;
-  setTimeout(window._initRCV,500);
+  if(!email||!password){err.textContent='Enter email and password';err.style.display='block';return;}
+  if(_authMode==='register'&&!name){err.textContent='Enter your name';err.style.display='block';return;}
+  if(!window._auth||!window._signInWithEmail){err.textContent='Loading... try again';err.style.display='block';return;}
+  btn.disabled=true; btn.textContent='Please wait...';
+  if(_authMode==='signin'){
+    window._signInWithEmail(window._auth,email,password).catch(function(e){
+      err.textContent=e.code==='auth/invalid-credential'?'Wrong email or password':e.message;
+      err.style.display='block'; btn.disabled=false; btn.textContent='Sign in';
+    });
+  } else {
+    window._nameForProfile = name;
+    window._createWithEmail(window._auth,email,password).catch(function(e){
+      err.textContent=e.code==='auth/email-already-in-use'?'Email already registered. Sign in instead.':e.message;
+      err.style.display='block'; btn.disabled=false; btn.textContent='Create account';
+    });
+  }
 };
 
 document.addEventListener('DOMContentLoaded',function(){
-  document.getElementById('send-otp-btn').onclick=window.sendOTP;
-  document.getElementById('verify-otp-btn').onclick=window.verifyOTP;
-  document.getElementById('resend-otp-btn').onclick=window.resendOTP;
+  document.getElementById('auth-btn').onclick = window.doAuth;
 });
 </script>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js";
-import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, onAuthStateChanged, signOut as fbSignOut } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut as fbSignOut } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, getDocs, onSnapshot, addDoc, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
 
 const FB_CONFIG = {apiKey:"AIzaSyDxTql_KmAjZCSlZ3aopA5jGRimHflb4gY",authDomain:"ascend-cc72d.firebaseapp.com",projectId:"ascend-cc72d",storageBucket:"ascend-cc72d.firebasestorage.app",messagingSenderId:"83800140517",appId:"1:83800140517:web:8eaa702fe15c7d1c9cc20c"};
@@ -613,8 +588,10 @@ const db = getFirestore(fbApp);
 // Expose to window IMMEDIATELY
 window._auth = auth;
 window._db = db;
-window._RecaptchaVerifier = RecaptchaVerifier;
-window._signInWithPhoneNumber = signInWithPhoneNumber;
+window._signInWithEmail = signInWithEmailAndPassword;
+window._createWithEmail = createUserWithEmailAndPassword;
+window.dispatchEvent(new Event('firebaseReady'));
+console.log('Firebase ready - auth exposed to window');
 // Fire a custom event so OTP script knows Firebase is ready
 window.dispatchEvent(new Event('firebaseReady'));
 console.log('Firebase ready - auth exposed to window');
