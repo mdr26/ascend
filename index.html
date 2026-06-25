@@ -678,10 +678,10 @@ textarea{-webkit-appearance:none;}
     <div class="mtitle" id="split-modal-title">My split</div>
     <div id="existing-splits"></div>
     <div id="split-builder">
-      <input class="minput" id="cs-name" placeholder="Split name (e.g. My Weekly Plan)">
-      <div style="font-size:11px;color:var(--text3);margin-bottom:8px;margin-top:-4px;">Days — one per line</div>
-      <textarea class="minput" id="cs-days" rows="7" style="resize:none;line-height:1.6;font-size:13px;" placeholder="Monday - Chest&#10;Tuesday - Back&#10;Wednesday - Rest&#10;Thursday - Legs&#10;Friday - Shoulders&#10;Saturday - Arms&#10;Sunday - Rest"></textarea>
-      <button class="mbtn" id="save-split-btn">Save split</button>
+      <input class="minput" id="cs-name" placeholder="Split name (e.g. My PPL)">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px;margin-top:-4px;">Assign a muscle group to each day</div>
+      <div id="day-builder-rows"></div>
+      <button class="mbtn" id="save-split-btn" style="margin-top:8px;">Save split</button>
       <button class="mcancel" id="cancel-split-btn">Cancel</button>
     </div>
   </div>
@@ -918,14 +918,30 @@ async function loadData(){
       S.lastWeights=d.lastWeights||{}; S.bwLog=d.bwLog||[];
       S.plankPR=d.plankPR||0;
       if(d.timerConfig) S.timerConfig=d.timerConfig;
+    } else {
+      // Try localStorage fallback
+      const local=localStorage.getItem("ascend_local_"+cUser.uid);
+      if(local){const d=JSON.parse(local);S.split=d.split||null;S.customSplits=d.customSplits||{};S.activeDay=d.activeDay||null;S.lastVariants=d.lastVariants||{};S.lastWeights=d.lastWeights||{};S.bwLog=d.bwLog||[];S.plankPR=d.plankPR||0;if(d.timerConfig)S.timerConfig=d.timerConfig;}
     }
     const q=query(collection(db,"logs"),where("uid","==",cUser.uid),orderBy("createdAt","desc"));
     const lSnap=await getDocs(q);
     S.logs=lSnap.docs.map(d=>({id:d.id,...d.data()}));
-  } catch(e){console.error("Load error:",e);}
+  } catch(e){
+    console.error("Load error:",e);
+    // Try localStorage fallback
+    try{const local=localStorage.getItem("ascend_local_"+cUser.uid);if(local){const d=JSON.parse(local);S.split=d.split||null;S.customSplits=d.customSplits||{};}}catch(le){}
+  }
 }
 
 async function saveData(){
+  // Always save to localStorage as backup
+  try{
+    localStorage.setItem("ascend_local_"+cUser.uid, JSON.stringify({
+      split:S.split,customSplits:S.customSplits,activeDay:S.activeDay,
+      lastVariants:S.lastVariants,lastWeights:S.lastWeights,
+      bwLog:S.bwLog,plankPR:S.plankPR,timerConfig:S.timerConfig
+    }));
+  }catch(le){}
   try{
     await setDoc(doc(db,"userData",cUser.uid),{
       split:S.split,customSplits:S.customSplits,activeDay:S.activeDay,
@@ -967,10 +983,9 @@ function showApp(){
     getDocs(collection(db,"users")).then(snap=>{
       snap.docs.forEach(async d=>{
         const u=d.data();
-        // Delete any user named Ryan/Mohammed Rayan that is NOT the current admin UID
-        // and has 0 sessions (stale old entry)
-        if(u.uid!==cUser.uid && u.uid===ADMIN_UID && d.id!==cUser.uid){
-          try{ await deleteDoc(doc(db,"users",d.id)); console.log("Removed stale user:",d.id); }catch(e){}
+        // Delete any admin entry that is NOT the current user (stale duplicate)
+        if(d.id!==cUser.uid && u.isAdmin===true){
+          try{ await deleteDoc(doc(db,"users",d.id)); console.log("Removed stale admin:",d.id); }catch(e){}
         }
       });
     }).catch(()=>{});
@@ -1020,9 +1035,17 @@ function renderWeekStrip(){
 // ── SPLIT UI ──────────────────────────────────────────────────────
 function renderSplitUI(){
   const sp=getSplit();
-  document.getElementById("split-name-display").textContent=sp?sp.name:"No split set up";
+  document.getElementById("split-name-display").textContent=sp?sp.name:"No split — tap Change";
   const el=document.getElementById("day-row"); el.innerHTML="";
+
+  // Auto-detect today's day from split
+  if(sp&&!S.activeDay){
+    const todayName=getTodayDayName();
+    const matched=getDays().find(d=>d.startsWith(todayName));
+    if(matched) S.activeDay=matched;
+  }
   const active=getDay();
+
   // On first render, auto-load today's active day session if nothing loaded
   if(!S.currentEx.length&&active){
     const last=S.logs.find(l=>l.type==="lift"&&l.day===active);
@@ -1037,7 +1060,14 @@ function renderSplitUI(){
   getDays().forEach(day=>{
     const c=document.createElement("div");
     c.className="daychip"+(active===day?" active":"");
-    c.textContent=day;
+    // Day chips: show "Mon" and muscle group below
+    const parts=day.split(" - ");
+    const dayShort=parts[0].slice(0,3);
+    const muscle=parts.length>1?parts.slice(1).join(" - "):"";
+    const isRest=muscle.toLowerCase()==="rest";
+    c.innerHTML=`<span style="font-size:11px;font-weight:700;">${dayShort}</span>${muscle?`<span style="font-size:9px;display:block;margin-top:1px;opacity:0.8;">${muscle.length>6?muscle.slice(0,5)+"…":muscle}</span>`:""}`;
+    c.style.minWidth="42px";
+    c.style.opacity=isRest?"0.5":"1";
     c.onclick=()=>{
       S.activeDay=day; S.currentEx=[];
       // Auto-load last session for this day
@@ -1244,6 +1274,10 @@ async function logWorkout(){
 }
 
 // ── RENDER LOG ────────────────────────────────────────────────────
+function getTodayDayName(){
+  return["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][new Date().getDay()];
+}
+
 function renderLog(){
   renderWeekStrip(); renderSplitUI(); renderExList(); renderTaunt(); renderStreakBadge(); checkDuplicate();
 }
@@ -1638,7 +1672,7 @@ async function renderCrew(){
   crewEl.innerHTML="<div class='empty'>Loading crew...</div>";
   if(crewUnsub) crewUnsub();
   crewUnsub=onSnapshot(collection(db,"users"),snap=>{
-    const users=snap.docs.map(d=>d.data()).filter(u=>!u.banned&&u.uid!==cUser.uid).sort((a,b)=>(b.sessions||0)-(a.sessions||0));
+    const users=snap.docs.map(d=>d.data()).filter(u=>!u.banned&&u.uid!==cUser.uid&&!u.isAdmin).sort((a,b)=>(b.sessions||0)-(a.sessions||0));
     if(!users.length){crewEl.innerHTML="<div class='empty'>No crew yet. Share invite codes to grow the squad.</div>";return;}
     const topUid=users[0]?.uid;
     crewEl.innerHTML=users.map(u=>{
@@ -1688,65 +1722,109 @@ function renderAdminPanel(){
   getDocs(collection(db,"users")).then(snap=>{
     const el2=document.getElementById("all-users-list"); if(!el2) return;
     const users=snap.docs.map(d=>({id:d.id,...d.data()}));
-    // Filter out own account and show non-banned first
-    const others=users.filter(u=>u.uid!==cUser.uid);
-    const active=others.filter(u=>!u.banned);
-    const banned=others.filter(u=>u.banned);
-    const allUsers=[...active,...banned];
-    el2.innerHTML=allUsers.map(u=>`<div class="user-row" id="urow-${u.uid}" style="${u.banned?"opacity:0.5":""}">
-      <div class="user-row-av" style="${u.banned?"background:var(--border2)":""}">${(u.name||"?")[0].toUpperCase()}</div>
+    // Hide: current user AND any other entry with ADMIN_UID (duplicate stale)
+    const others=users.filter(u=>u.uid!==cUser.uid&&!u.isAdmin);
+    el2.innerHTML=others.length?others.map(u=>`<div class="user-row" id="urow-${u.uid}">
+      <div class="user-row-av">${(u.name||"?")[0].toUpperCase()}</div>
       <div style="flex:1;min-width:0;">
-        <div style="font-size:13px;font-weight:600;color:var(--text);">${u.name||"Unknown"}${u.isAdmin?" 👑":""}${u.banned?" (banned)":""}</div>
+        <div style="font-size:13px;font-weight:600;color:var(--text);">${u.name||"Unknown"}</div>
         <div style="font-size:11px;color:var(--text3);">${u.sessions||0} days</div>
       </div>
-      ${!u.isAdmin?`<button class="ban-btn" data-uid="${u.uid}" data-name="${u.name||"user"}" data-banned="${!!u.banned}" style="background:${u.banned?"var(--green)":"rgba(193,18,31,0.15)"};border-color:${u.banned?"var(--green)":"rgba(193,18,31,0.4)"};color:${u.banned?"var(--green)":"var(--red)"}">${u.banned?"✓ Unban":"Ban"}</button>`:""}
-    </div>`).join("");
+      <button class="ban-btn" data-uid="${u.uid}" data-name="${u.name||"user"}"
+        style="background:rgba(193,18,31,0.12);border:0.5px solid rgba(193,18,31,0.35);border-radius:6px;color:var(--red,#C1121F);font-size:11px;padding:5px 12px;cursor:pointer;font-family:inherit;">
+        Remove
+      </button>
+    </div>`).join(""):"<div style='font-size:12px;color:var(--text3);padding:8px 0;'>No other users yet.</div>";
     el2.querySelectorAll(".ban-btn").forEach(b=>b.onclick=async()=>{
-      const isBanned=b.dataset.banned==="true";
       const name=b.dataset.name;
-      const action=isBanned?"Unban":"Ban";
-      if(!confirm(`${action} ${name}? ${isBanned?"They will regain access.":"They will be removed from the crew."}`)) return;
-      b.disabled=true; b.textContent="...";
+      if(!confirm("Remove "+name+" from Ascend? They won't be able to log in again.")) return;
+      b.disabled=true; b.textContent="Removing...";
       try{
-        await updateDoc(doc(db,"users",b.dataset.uid),{banned:!isBanned});
-        // If banning, visually remove the row
-        if(!isBanned){
-          const row=document.getElementById("urow-"+b.dataset.uid);
-          if(row){row.style.transition="opacity 0.4s";row.style.opacity="0";setTimeout(()=>row.remove(),400);}
-        }
-        showToast(action+"ned "+name);
-        setTimeout(()=>renderAdminPanel(),500);
-      }catch(e){showToast("Error: "+e.message);b.disabled=false;b.textContent=action;}
+        // Delete their user doc — they can no longer authenticate
+        await deleteDoc(doc(db,"users",b.dataset.uid));
+        const row=document.getElementById("urow-"+b.dataset.uid);
+        if(row){row.style.transition="opacity 0.3s";row.style.opacity="0";setTimeout(()=>row.remove(),300);}
+        showToast(name+" removed");
+      }catch(e){showToast("Error: "+e.message);b.disabled=false;b.textContent="Remove";}
     });
   });
 }
 
 // ── SPLIT MODAL ───────────────────────────────────────────────────
+const SPLIT_OPTIONS=["Chest","Back","Legs","Shoulders","Arms","Full Body","Push","Pull","Cardio","Rest"];
+const DAY_NAMES=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+
+function renderDayBuilder(existingDays){
+  const container=document.getElementById("day-builder-rows");
+  if(!container) return;
+  container.innerHTML=DAY_NAMES.map((day,i)=>{
+    // Parse existing value: "Monday - Chest" → "Chest"
+    let selected="Rest";
+    if(existingDays&&existingDays[i]){
+      const parts=existingDays[i].split(" - ");
+      selected=parts.length>1?parts.slice(1).join(" - "):parts[0];
+    }
+    const opts=SPLIT_OPTIONS.map(o=>`<option value="${o}"${o===selected?" selected":""}>${o}</option>`).join("");
+    return`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--border);">
+      <div style="font-size:13px;font-weight:600;color:var(--text);min-width:80px;">${day}</div>
+      <select data-day="${day}" style="flex:1;background:var(--bg3);border:0.5px solid var(--border2);border-radius:8px;color:var(--text);font-size:13px;padding:8px 10px;font-family:inherit;">${opts}</select>
+    </div>`;
+  }).join("");
+}
+
 function renderSplitModal(){
   const el=document.getElementById("existing-splits");
   const keys=Object.keys(S.customSplits);
   document.getElementById("split-modal-title").textContent=keys.length?"Your split":"Create your split";
-  el.innerHTML=keys.map(key=>{
-    const sp=S.customSplits[key], active=S.split===key;
-    const cls=active?"split-option active-split":"split-option";
-    return`<div class="${cls}">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-        <div style="font-size:14px;font-weight:700;color:${active?"var(--acc)":"var(--text)"};">${sp.name}${active?" ✓":""}</div>
+
+  if(keys.length){
+    // Show current split with edit button
+    const key=S.split||keys[0];
+    const sp=S.customSplits[key];
+    el.innerHTML=`<div class="split-option active-split" style="margin-bottom:14px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div style="font-size:15px;font-weight:800;color:var(--acc);">${sp.name} ✓</div>
         <div style="display:flex;gap:8px;">
-          <button data-key="${key}" class="split-edit-btn" style="background:none;border:none;color:var(--text3);font-size:11px;cursor:pointer;font-family:inherit;">Edit</button>
-          <button data-key="${key}" class="split-del-btn" style="background:none;border:none;color:var(--text3);font-size:11px;cursor:pointer;font-family:inherit;">Delete</button>
+          <button data-key="${key}" class="split-edit-btn" style="background:var(--bg3);border:0.5px solid var(--border2);border-radius:6px;color:var(--text2);font-size:12px;padding:5px 12px;cursor:pointer;font-family:inherit;">Edit</button>
+          <button data-key="${key}" class="split-del-btn" style="background:none;border:0.5px solid rgba(193,18,31,0.3);border-radius:6px;color:var(--red,#C1121F);font-size:12px;padding:5px 12px;cursor:pointer;font-family:inherit;">Delete</button>
         </div>
       </div>
-      <div style="font-size:11px;color:var(--text3);">${sp.days.join(" · ")}</div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;">
+        ${sp.days.map(d=>{
+          const parts=d.split(" - ");
+          const dayShort=parts[0].slice(0,3);
+          const muscle=parts.length>1?parts.slice(1).join(" - "):parts[0];
+          const isRest=muscle.toLowerCase()==="rest";
+          return`<div style="text-align:center;padding:6px 2px;background:${isRest?"var(--bg3)":"rgba(200,121,65,0.1)"};border:0.5px solid ${isRest?"var(--border2)":"var(--acc)"};border-radius:6px;">
+            <div style="font-size:9px;color:var(--text3);font-weight:700;">${dayShort}</div>
+            <div style="font-size:9px;color:${isRest?"var(--text3)":"var(--acc)"};font-weight:600;margin-top:2px;">${muscle.length>6?muscle.slice(0,5)+"…":muscle}</div>
+          </div>`;
+        }).join("")}
+      </div>
     </div>`;
-  }).join("");
+    // Hide builder unless editing
+    document.getElementById("split-builder").querySelector("#day-builder-rows").innerHTML="";
+    document.getElementById("cs-name").value="";
+    document.getElementById("save-split-btn").style.display="none";
+    document.getElementById("cancel-split-btn").textContent="Close";
+  } else {
+    el.innerHTML="";
+    document.getElementById("save-split-btn").style.display="block";
+    document.getElementById("cancel-split-btn").textContent="Cancel";
+    renderDayBuilder(null);
+  }
+
   el.querySelectorAll(".split-edit-btn").forEach(b=>b.onclick=()=>{
     const sp=S.customSplits[b.dataset.key];
     document.getElementById("cs-name").value=sp.name;
-    document.getElementById("cs-days").value=sp.days.join("\n");
     editSplitKey=b.dataset.key;
+    // Parse days for the builder
+    renderDayBuilder(sp.days);
+    document.getElementById("save-split-btn").style.display="block";
+    document.getElementById("cancel-split-btn").textContent="Cancel";
   });
   el.querySelectorAll(".split-del-btn").forEach(b=>b.onclick=async()=>{
+    if(!confirm("Delete this split?")) return;
     delete S.customSplits[b.dataset.key];
     if(S.split===b.dataset.key){S.split=null;S.activeDay=null;S.currentEx=[];}
     await saveData(); renderSplitModal(); renderLog(); showToast("Split deleted");
@@ -1755,16 +1833,23 @@ function renderSplitModal(){
 
 async function saveSplit(){
   const name=document.getElementById("cs-name").value.trim();
-  const raw=document.getElementById("cs-days").value.trim();
-  if(!name||!raw){showToast("Fill in name and days");return;}
-  const days=raw.split(/[\r\n]+/).map(s=>s.trim()).filter(Boolean);
-  if(!days.length){showToast("Add at least one day");return;}
+  if(!name){showToast("Enter a split name");return;}
+  // Read from day builder dropdowns
+  const selects=document.querySelectorAll("#day-builder-rows select");
+  const days=[...selects].map(sel=>`${sel.dataset.day} - ${sel.value}`);
+  if(!days.length){showToast("Set up your days first");return;}
   const key=editSplitKey||("c_"+Date.now());
   S.customSplits[key]={name,days};
   S.split=key; S.activeDay=days[0]; S.currentEx=[]; editSplitKey=null;
   document.getElementById("cs-name").value="";
   document.getElementById("cs-days").value="";
-  await saveData(); closeModal("split-modal"); renderLog(); showToast("Split saved!");
+  try{
+    await saveData();
+    closeModal("split-modal"); renderLog(); showToast("Split saved! 💪");
+  }catch(e){
+    showToast("Save failed: "+e.message);
+    console.error("saveSplit error:",e);
+  }
 }
 
 // ── PR ────────────────────────────────────────────────────────────
@@ -1794,7 +1879,7 @@ function launchConfetti(){
 // ── MODALS ────────────────────────────────────────────────────────
 function openModal(id){
   document.getElementById(id).classList.add("open");
-  if(id==="split-modal"){editSplitKey=null;document.getElementById("cs-name").value="";document.getElementById("cs-days").value="";renderSplitModal();}
+  if(id==="split-modal"){editSplitKey=null;document.getElementById("cs-name").value="";renderSplitModal();if(!Object.keys(S.customSplits).length)renderDayBuilder(null);}
 }
 function closeModal(id){document.getElementById(id).classList.remove("open");}
 
