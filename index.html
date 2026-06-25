@@ -380,11 +380,13 @@ function showToast(msg, dur=2800){
   t.textContent=msg; t.classList.add("show");
   setTimeout(()=>t.classList.remove("show"), dur);
 }
+window.showToast = showToast;
 
 function hideLoading(){
   const ls=document.getElementById("loading-screen");
   if(ls){ ls.style.display="none"; }
 }
+window.hideLoading = hideLoading;
 
 function showLogin(){
   hideLoading();
@@ -393,6 +395,7 @@ function showLogin(){
   document.getElementById("app").style.display="none";
   document.getElementById("onboarding-screen").style.display="none";
 }
+window.showLogin = showLogin;
 
 function showInvite(){
   hideLoading();
@@ -400,6 +403,7 @@ function showInvite(){
   document.getElementById("login-screen").style.display="none";
   document.getElementById("app").style.display="none";
 }
+window.showInvite = showInvite;
 
 function showApp(){
   hideLoading();
@@ -414,6 +418,7 @@ function showApp(){
   switchTab("log");
   loadLogTab();
 }
+window.showApp = showApp;
 
 // ── ANONYMOUS AUTH ────────────────────────────────────────
 async function signInAndLoad(){
