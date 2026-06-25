@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-title" content="Ascend">
 <title>Ascend</title>
 <style>
-:root{--bg:#F5F0E8;--bg2:#EDE8DE;--bg3:#E4DDD0;--bg4:#D8D0C0;--bg5:#CCC0A8;--acc:#C87941;--dark:#3D2A1A;--text:#2A1A0A;--text2:#6B5240;--text3:#9B8270;--border:#D8D0C0;--border2:#C8BCA8;--green:#2D6A4F;--rad:10px;--rad-lg:14px;}
+:root{--bg:#F5F0E8;--bg2:#EDE8DE;--bg3:#E4DDD0;--bg4:#D8D0C0;--bg5:#CCC0A8;--acc:#C87941;--dark:#3D2A1A;--text:#2A1A0A;--text2:#6B5240;--text3:#9B8270;--border:#D8D0C0;--border2:#C8BCA8;--green:#2D6A4F;--red:#C1121F;--rad:10px;--rad-lg:14px;}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,'Helvetica Neue',sans-serif;overscroll-behavior:none;}
 body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;}
@@ -304,6 +304,7 @@ textarea{-webkit-appearance:none;}
     <input id="login-secret" type="password" placeholder="Invite code (leave blank if admin)" style="width:100%;background:#FFFDF8;border:1px solid #D8D0C0;border-radius:10px;color:#2A1A0A;font-size:15px;padding:13px 14px;font-family:inherit;margin-bottom:10px;">
     <button id="login-btn" style="width:100%;background:#3D2A1A;color:#F5EED8;border:none;border-radius:10px;padding:15px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;">Enter Ascend</button>
   </div>
+  <button id="restore-btn" style="background:none;border:none;color:var(--text3);font-size:12px;padding:8px;cursor:pointer;font-family:inherit;margin-top:4px;width:100%;text-align:center;">Restore account from another phone</button>
   <div id="login-err" style="font-size:12px;color:#C1121F;text-align:center;margin-top:10px;display:none;"></div>
 </div>
 
@@ -321,6 +322,69 @@ textarea{-webkit-appearance:none;}
 </div>
 
 <!-- APP -->
+
+<!-- ONBOARDING -->
+<div id="onboarding-screen" style="display:none;position:fixed;inset:0;background:var(--dark,#3D2A1A);z-index:9000;max-width:430px;margin:0 auto;flex-direction:column;">
+  <div style="flex:1;overflow:hidden;position:relative;">
+    <div id="ob-slides" style="display:flex;transition:transform 0.35s ease;height:100%;width:400%;">
+
+      <!-- Slide 1 -->
+      <div style="min-width:25%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;text-align:center;">
+        <svg width="80" height="80" viewBox="0 0 110 110" style="margin-bottom:24px;"><rect width="110" height="110" rx="24" fill="#5A3E28"/><polygon points="55,18 80,74 55,58 30,74" fill="#C87941"/><polygon points="55,34 70,74 55,62 40,74" fill="#3D2A1A"/></svg>
+        <div style="font-family:Georgia,serif;font-size:32px;font-weight:700;font-style:italic;color:#C87941;margin-bottom:10px;">Ascend</div>
+        <div style="font-size:16px;font-weight:700;color:#F5EED8;margin-bottom:12px;">Your gym. Your ranks. Your crew.</div>
+        <div style="font-size:13px;color:#9B8270;line-height:1.7;">Track every workout, compete with friends, and climb from Peter Parker all the way to Superman.</div>
+      </div>
+
+      <!-- Slide 2 -->
+      <div style="min-width:25%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;text-align:center;">
+        <div style="font-size:56px;margin-bottom:20px;">📅</div>
+        <div style="font-size:20px;font-weight:800;color:#F5EED8;margin-bottom:12px;">Set up your split</div>
+        <div style="font-size:13px;color:#9B8270;line-height:1.7;margin-bottom:20px;">Create your weekly plan once. The app detects today's workout automatically and loads your last session — weights included.</div>
+        <div style="background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.1);border-radius:12px;padding:14px;width:100%;text-align:left;">
+          <div style="font-size:11px;color:#C87941;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">Example</div>
+          <div style="font-size:12px;color:#9B8270;line-height:2;">Monday - Chest · Tuesday - Back · Wednesday - Legs · Thursday - Shoulders · Friday - Arms · Sunday - Rest</div>
+        </div>
+      </div>
+
+      <!-- Slide 3 -->
+      <div style="min-width:25%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;text-align:center;">
+        <div style="font-size:56px;margin-bottom:20px;">⚡</div>
+        <div style="font-size:20px;font-weight:800;color:#F5EED8;margin-bottom:12px;">Log your workout</div>
+        <div style="font-size:13px;color:#9B8270;line-height:1.7;margin-bottom:16px;">Last week's weights load automatically. Tap "Log set" for each set. Hit a PR and the crew gets notified.</div>
+        <div style="display:flex;flex-direction:column;gap:8px;width:100%;">
+          <div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;"><div style="width:8px;height:8px;border-radius:50%;background:#C87941;flex-shrink:0;"></div><div style="font-size:12px;color:#9B8270;">Weights remembered from last session</div></div>
+          <div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;"><div style="width:8px;height:8px;border-radius:50%;background:#C87941;flex-shrink:0;"></div><div style="font-size:12px;color:#9B8270;">+2.5kg suggestion each week</div></div>
+          <div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;"><div style="width:8px;height:8px;border-radius:50%;background:#C87941;flex-shrink:0;"></div><div style="font-size:12px;color:#9B8270;">PR = confetti + crew notification 🎉</div></div>
+        </div>
+      </div>
+
+      <!-- Slide 4 -->
+      <div style="min-width:25%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;text-align:center;">
+        <div style="font-size:56px;margin-bottom:20px;">👑</div>
+        <div style="font-size:20px;font-weight:800;color:#F5EED8;margin-bottom:12px;">Crew &amp; ranks</div>
+        <div style="font-size:13px;color:#9B8270;line-height:1.7;margin-bottom:16px;">Invite friends with a code. Compete on the leaderboard. Climb the ranks from Peter Parker to Superman.</div>
+        <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:24px;">
+          <span style="background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.1);border-radius:99px;padding:5px 12px;font-size:11px;color:#9B8270;">🧪 Peter Parker</span>
+          <span style="background:rgba(200,121,65,0.15);border:0.5px solid #C87941;border-radius:99px;padding:5px 12px;font-size:11px;color:#C87941;">🔴 Superman</span>
+        </div>
+        <button onclick="finishOnboarding()" style="width:100%;background:#C87941;color:#fff;border:none;border-radius:10px;padding:15px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;">Let's go 💪</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Dots + Next -->
+  <div style="padding:20px 32px 44px;display:flex;align-items:center;justify-content:space-between;">
+    <div style="display:flex;gap:6px;" id="ob-dots">
+      <div style="width:8px;height:8px;border-radius:50%;background:#C87941;transition:all 0.3s;" class="ob-dot"></div>
+      <div style="width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.15);transition:all 0.3s;" class="ob-dot"></div>
+      <div style="width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.15);transition:all 0.3s;" class="ob-dot"></div>
+      <div style="width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.15);transition:all 0.3s;" class="ob-dot"></div>
+    </div>
+    <button id="ob-next-btn" onclick="obNext()" style="background:none;border:0.5px solid rgba(255,255,255,0.2);border-radius:8px;color:#9B8270;font-size:13px;font-weight:700;padding:10px 20px;cursor:pointer;font-family:inherit;">Next →</button>
+  </div>
+</div>
 <div id="app">
   <div class="topbar">
     <div class="topbar-left">
@@ -340,6 +404,11 @@ textarea{-webkit-appearance:none;}
 
     <!-- LOG TAB -->
     <div class="screen active" id="screen-log">
+      <!-- Edit mode back bar -->
+      <div id="edit-back-bar" style="display:none;align-items:center;gap:10px;background:rgba(200,121,65,0.12);border:0.5px solid rgba(200,121,65,0.3);border-radius:var(--rad);padding:10px 14px;margin-bottom:12px;">
+        <button onclick="cancelEditFromBack()" style="background:none;border:none;color:var(--acc);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;padding:0;">← Back to history</button>
+        <span style="flex:1;font-size:12px;color:var(--text2);">Editing session — tap Log Workout to save</span>
+      </div>
       <div class="slabel">This week</div>
       <div class="week-strip" id="week-strip"></div>
 
@@ -589,6 +658,15 @@ textarea{-webkit-appearance:none;}
     <div class="handle"></div>
     <div class="mtitle">Your profile</div>
     <div id="profile-info" style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.8;"></div>
+    <div style="background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--rad);padding:14px;margin-bottom:12px;">
+      <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">Transfer account</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Generate a code to restore your account on a new phone. Valid for 24h.</div>
+      <button id="gen-transfer-btn" class="mbtn" style="margin-bottom:8px;">Generate transfer code</button>
+      <div id="transfer-code-display" style="display:none;background:var(--bg2);border:0.5px solid var(--border2);border-radius:8px;padding:12px;text-align:center;">
+        <div style="font-size:24px;font-weight:800;letter-spacing:0.2em;color:var(--acc);margin-bottom:4px;" id="transfer-code-val">——</div>
+        <div style="font-size:11px;color:var(--text3);">Expires in 24h · one-time use</div>
+      </div>
+    </div>
     <button class="mbtn" style="background:var(--bg3);color:var(--text2);border:0.5px solid var(--border2);margin-bottom:8px;" id="signout-btn">Sign out</button>
     <button class="mcancel" id="close-profile-btn">Close</button>
   </div>
@@ -875,6 +953,28 @@ function showApp(){
   if(!S.activeDay&&getDays().length) S.activeDay=getDays()[0];
   renderExSelect(); renderSSExSelect();
   renderLog(); renderTimerConfig();
+  // Show onboarding for first-time users
+  const onboarded=localStorage.getItem("ascend_onboarded_"+cUser.uid);
+  if(!onboarded){
+    obSlide=0;
+    document.getElementById("ob-slides").style.transform="translateX(0)";
+    document.querySelectorAll(".ob-dot").forEach((d,i)=>{d.style.background=i===0?"#C87941":"rgba(255,255,255,0.15)";d.style.width=i===0?"12px":"8px";});
+    document.getElementById("ob-next-btn").style.display="block";
+    document.getElementById("onboarding-screen").style.display="flex";
+  }
+  // One-time: clean up any duplicate/stale Ryan entry with old UID
+  if(isAdmin){
+    getDocs(collection(db,"users")).then(snap=>{
+      snap.docs.forEach(async d=>{
+        const u=d.data();
+        // Delete any user named Ryan/Mohammed Rayan that is NOT the current admin UID
+        // and has 0 sessions (stale old entry)
+        if(u.uid!==cUser.uid && u.uid===ADMIN_UID && d.id!==cUser.uid){
+          try{ await deleteDoc(doc(db,"users",d.id)); console.log("Removed stale user:",d.id); }catch(e){}
+        }
+      });
+    }).catch(()=>{});
+  }
 }
 
 // ── SPLIT ─────────────────────────────────────────────────────────
@@ -923,11 +1023,34 @@ function renderSplitUI(){
   document.getElementById("split-name-display").textContent=sp?sp.name:"No split set up";
   const el=document.getElementById("day-row"); el.innerHTML="";
   const active=getDay();
+  // On first render, auto-load today's active day session if nothing loaded
+  if(!S.currentEx.length&&active){
+    const last=S.logs.find(l=>l.type==="lift"&&l.day===active);
+    if(last&&last.exercises&&last.exercises.length){
+      S.currentEx=JSON.parse(JSON.stringify(last.exercises));
+      S.currentEx.forEach(ex=>{
+        if(ex.type==="superset"){ex.exA.sets.forEach(s=>s.done=false);ex.exB.sets.forEach(s=>s.done=false);}
+        else ex.sets.forEach(s=>s.done=false);
+      });
+    }
+  }
   getDays().forEach(day=>{
     const c=document.createElement("div");
     c.className="daychip"+(active===day?" active":"");
     c.textContent=day;
-    c.onclick=()=>{S.activeDay=day;S.currentEx=[];checkDuplicate();saveData();renderLog();};
+    c.onclick=()=>{
+      S.activeDay=day; S.currentEx=[];
+      // Auto-load last session for this day
+      const last=S.logs.find(l=>l.type==="lift"&&l.day===day);
+      if(last&&last.exercises&&last.exercises.length){
+        S.currentEx=JSON.parse(JSON.stringify(last.exercises));
+        S.currentEx.forEach(ex=>{
+          if(ex.type==="superset"){ex.exA.sets.forEach(s=>s.done=false);ex.exB.sets.forEach(s=>s.done=false);}
+          else ex.sets.forEach(s=>s.done=false);
+        });
+        showToast("Loaded last "+day+" session 💪");
+      }
+      checkDuplicate();saveData();renderLog();};
     el.appendChild(c);
   });
 }
@@ -1113,6 +1236,7 @@ async function logWorkout(){
     });
     S.currentEx=[];
     await saveData();
+    document.getElementById("edit-back-bar").style.display="none";
     if(prEx) showPR(prEx,prWeight); else showToast("Workout logged. Beast.");
     renderLog();
     checkDuplicate();
@@ -1406,6 +1530,8 @@ function openEditSession(id){
   closeModal("edit-session-modal");
   showScreen("log");
   document.querySelectorAll(".nbtn").forEach(b=>{b.classList.toggle("active",b.dataset.screen==="log");});
+  // Show back button
+  document.getElementById("edit-back-bar").style.display="flex";
   showToast("Edit mode — make changes and tap Log Workout");
   renderExList();
 }
@@ -1561,14 +1687,36 @@ function renderAdminPanel(){
   };
   getDocs(collection(db,"users")).then(snap=>{
     const el2=document.getElementById("all-users-list"); if(!el2) return;
-    el2.innerHTML=snap.docs.map(d=>d.data()).map(u=>`<div class="user-row">
-      <div class="user-row-av">${(u.name||"?")[0].toUpperCase()}</div>
-      <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:600;color:var(--text);">${u.name||"Unknown"}${u.isAdmin?" ??":""}</div><div style="font-size:11px;color:var(--text3);">${u.email||""} · ${u.sessions||0} days</div></div>
-      ${!u.isAdmin?`<button class="ban-btn" data-uid="${u.uid}" data-banned="${!!u.banned}">${u.banned?"Unban":"Ban"}</button>`:""}
+    const users=snap.docs.map(d=>({id:d.id,...d.data()}));
+    // Filter out own account and show non-banned first
+    const others=users.filter(u=>u.uid!==cUser.uid);
+    const active=others.filter(u=>!u.banned);
+    const banned=others.filter(u=>u.banned);
+    const allUsers=[...active,...banned];
+    el2.innerHTML=allUsers.map(u=>`<div class="user-row" id="urow-${u.uid}" style="${u.banned?"opacity:0.5":""}">
+      <div class="user-row-av" style="${u.banned?"background:var(--border2)":""}">${(u.name||"?")[0].toUpperCase()}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:600;color:var(--text);">${u.name||"Unknown"}${u.isAdmin?" 👑":""}${u.banned?" (banned)":""}</div>
+        <div style="font-size:11px;color:var(--text3);">${u.sessions||0} days</div>
+      </div>
+      ${!u.isAdmin?`<button class="ban-btn" data-uid="${u.uid}" data-name="${u.name||"user"}" data-banned="${!!u.banned}" style="background:${u.banned?"var(--green)":"rgba(193,18,31,0.15)"};border-color:${u.banned?"var(--green)":"rgba(193,18,31,0.4)"};color:${u.banned?"var(--green)":"var(--red)"}">${u.banned?"✓ Unban":"Ban"}</button>`:""}
     </div>`).join("");
     el2.querySelectorAll(".ban-btn").forEach(b=>b.onclick=async()=>{
-      await updateDoc(doc(db,"users",b.dataset.uid),{banned:b.dataset.banned!=="true"});
-      showToast("Done"); renderAdminPanel();
+      const isBanned=b.dataset.banned==="true";
+      const name=b.dataset.name;
+      const action=isBanned?"Unban":"Ban";
+      if(!confirm(`${action} ${name}? ${isBanned?"They will regain access.":"They will be removed from the crew."}`)) return;
+      b.disabled=true; b.textContent="...";
+      try{
+        await updateDoc(doc(db,"users",b.dataset.uid),{banned:!isBanned});
+        // If banning, visually remove the row
+        if(!isBanned){
+          const row=document.getElementById("urow-"+b.dataset.uid);
+          if(row){row.style.transition="opacity 0.4s";row.style.opacity="0";setTimeout(()=>row.remove(),400);}
+        }
+        showToast(action+"ned "+name);
+        setTimeout(()=>renderAdminPanel(),500);
+      }catch(e){showToast("Error: "+e.message);b.disabled=false;b.textContent=action;}
     });
   });
 }
@@ -1758,7 +1906,7 @@ document.getElementById("close-pr-btn").onclick=()=>{
   document.getElementById("pr-overlay").style.display="none";
   const c=document.getElementById("confetti-canvas"),ctx=c.getContext("2d");ctx.clearRect(0,0,c.width,c.height);
 };
-document.getElementById("cancel-edit-btn").onclick=()=>{closeModal("edit-session-modal");editingSessionId=null;S.currentEx=[];renderExList();};
+document.getElementById("cancel-edit-btn").onclick=()=>{closeModal("edit-session-modal");editingSessionId=null;S.currentEx=[];document.getElementById("edit-back-bar").style.display="none";renderExList();};
 document.getElementById("save-edit-btn").onclick=()=>{closeModal("edit-session-modal");logWorkout();};
 
 // Timer config arrows
@@ -1814,9 +1962,118 @@ document.querySelectorAll(".nbtn").forEach(btn=>{
   };
 });
 
+function cancelEditFromBack(){
+  editingSessionId=null; S.currentEx=[];
+  document.getElementById("edit-back-bar").style.display="none";
+  renderExList();
+  // Go back to progress tab history
+  document.querySelectorAll(".nbtn").forEach(b=>b.classList.toggle("active",b.dataset.screen==="progress"));
+  showScreen("progress");
+  renderProgress();
+}
+
 // Close overlays on bg click
 document.querySelectorAll(".overlay").forEach(o=>o.addEventListener("click",e=>{if(e.target===o)o.classList.remove("open");}));
 
+// ── ONBOARDING ────────────────────────────────────────────────────
+let obSlide=0;
+window.obNext=function(){
+  const total=4;
+  obSlide=Math.min(obSlide+1,total-1);
+  document.getElementById("ob-slides").style.transform="translateX(-"+(obSlide*25)+"%)"
+  document.querySelectorAll(".ob-dot").forEach((d,i)=>{
+    d.style.background=i===obSlide?"#C87941":"rgba(255,255,255,0.15)";
+    d.style.width=i===obSlide?"12px":"8px";
+  });
+  if(obSlide===total-1) document.getElementById("ob-next-btn").style.display="none";
+};
+window.finishOnboarding=function(){
+  document.getElementById("onboarding-screen").style.display="none";
+  localStorage.setItem("ascend_onboarded_"+(cUser?.uid||"x"),"1");
+  showToast("Welcome to Ascend! 💪");
+};
+
+// ── TRANSFER CODES ─────────────────────────────────────────────────
+document.getElementById("gen-transfer-btn").onclick=async()=>{
+  const btn=document.getElementById("gen-transfer-btn");
+  btn.disabled=true; btn.textContent="Generating...";
+  try{
+    const code=Math.random().toString(36).slice(2,10).toUpperCase();
+    await setDoc(doc(db,"transferCodes",code),{
+      uid:cUser.uid,
+      name:uProfile?.name||"Lifter",
+      createdAt:serverTimestamp(),
+      expiresAt:new Date(Date.now()+86400000),
+      used:false
+    });
+    document.getElementById("transfer-code-display").style.display="block";
+    document.getElementById("transfer-code-val").textContent=code;
+    btn.textContent="Generate new code";
+  }catch(e){showToast("Error: "+e.message);}
+  btn.disabled=false;
+};
+
+document.getElementById("restore-cancel-btn").onclick=()=>closeModal("restore-modal");
+document.getElementById("restore-code-input").oninput=e=>{e.target.value=e.target.value.toUpperCase();};
+
+document.getElementById("restore-submit-btn").onclick=async()=>{
+  const code=document.getElementById("restore-code-input").value.trim().toUpperCase();
+  const errEl=document.getElementById("restore-err");
+  errEl.style.display="none";
+  if(!code||code.length<6){errEl.textContent="Enter a valid code";errEl.style.display="block";return;}
+  const btn=document.getElementById("restore-submit-btn");
+  btn.disabled=true; btn.textContent="Restoring...";
+  try{
+    const snap=await getDoc(doc(db,"transferCodes",code));
+    if(!snap.exists()||snap.data().used){
+      errEl.textContent="Invalid or already used code.";errEl.style.display="block";
+      btn.disabled=false;btn.textContent="Restore account";return;
+    }
+    const data=snap.data();
+    if(data.expiresAt?.toDate&&data.expiresAt.toDate()<new Date()){
+      errEl.textContent="Code expired. Generate a new one.";errEl.style.display="block";
+      btn.disabled=false;btn.textContent="Restore account";return;
+    }
+    // Mark used
+    await updateDoc(doc(db,"transferCodes",code),{used:true,usedAt:serverTimestamp(),newUid:cUser.uid});
+    // Copy userData from old UID to current UID
+    const oldData=await getDoc(doc(db,"userData",data.uid));
+    if(oldData.exists()){
+      await setDoc(doc(db,"userData",cUser.uid),oldData.data());
+    }
+    // Copy user profile
+    const oldProfile=await getDoc(doc(db,"users",data.uid));
+    if(oldProfile.exists()){
+      await setDoc(doc(db,"users",cUser.uid),{...oldProfile.data(),uid:cUser.uid});
+    }
+    closeModal("restore-modal");
+    showToast("Account restored! Reloading...");
+    setTimeout(()=>location.reload(),1200);
+  }catch(e){
+    errEl.textContent="Error: "+e.message;errEl.style.display="block";
+    btn.disabled=false;btn.textContent="Restore account";
+  }
+};
+
+// Wire restore-btn on login screen
+const restoreBtn=document.getElementById("restore-btn");
+if(restoreBtn) restoreBtn.onclick=()=>{
+  document.getElementById("restore-modal").classList.add("open");
+};
+
 </script>
+
+<!-- RESTORE ACCOUNT MODAL -->
+<div class="overlay" id="restore-modal" style="z-index:1100;">
+  <div class="sheet">
+    <div class="handle"></div>
+    <div class="mtitle">Restore account</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.5;">Enter your transfer code to restore your account and all your data.</div>
+    <input class="minput" id="restore-code-input" placeholder="Enter transfer code" maxlength="8" style="text-transform:uppercase;letter-spacing:0.15em;font-size:18px;text-align:center;">
+    <div id="restore-err" style="font-size:12px;color:var(--red,#C1121F);margin-bottom:10px;display:none;"></div>
+    <button class="mbtn" id="restore-submit-btn">Restore account</button>
+    <button class="mcancel" id="restore-cancel-btn">Cancel</button>
+  </div>
+</div>
 </body>
 </html>
