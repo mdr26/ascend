@@ -193,6 +193,7 @@ input::placeholder{color:var(--text3);}
   </div>
   <div style="width:100%;margin-bottom:12px;">
     <input id="login-name" type="text" placeholder="Your name" maxlength="30" style="margin-bottom:10px;">
+    <input id="login-secret" type="password" placeholder="Invite code or admin key" style="margin-bottom:10px;">
     <button class="btn btn-dark" id="login-btn">Enter Ascend</button>
   </div>
   <button class="btn-ghost" id="restore-btn" style="width:100%;text-align:center;">Restore account with transfer code</button>
@@ -437,10 +438,8 @@ onAuthStateChanged(auth, async user=>{
     const pSnap = await getDoc(doc(db,"users",user.uid));
     if(!pSnap.exists()){
       if(isAdmin){
-        // Admin gets in automatically - no invite needed
-        await createProfile("Ryan", null);
-        localStorage.setItem(LS_UID_KEY, user.uid);
-        showApp();
+        // Admin gets in but needs name - show login
+        showLogin();
       } else {
         // New anonymous user — need name + invite
         showLogin();
@@ -448,7 +447,7 @@ onAuthStateChanged(auth, async user=>{
     } else {
       uProfile = pSnap.data();
       if(uProfile.banned){ showToast("Account banned."); return; }
-      // Save UID to localStorage for persistence
+      isAdmin = uProfile.isAdmin || user.uid === ADMIN_UID;
       localStorage.setItem(LS_UID_KEY, user.uid);
       showApp();
     }
@@ -465,32 +464,38 @@ setTimeout(()=>{
 signInAndLoad();
 
 // ── LOGIN: Enter name ─────────────────────────────────────
+const ADMIN_SECRET = "ascend_admin_2024";
+
 document.getElementById("login-btn").onclick = async()=>{
-  const name = document.getElementById("login-name").value.trim();
-  const err  = document.getElementById("login-err");
+  const name   = document.getElementById("login-name").value.trim();
+  const secret = document.getElementById("login-secret").value.trim();
+  const err    = document.getElementById("login-err");
   err.style.display="none";
+
   if(!name || name.length < 2){
     err.textContent="Enter your name (at least 2 characters)";
     err.style.display="block"; return;
   }
   if(!cUser){ err.textContent="Still loading... try again"; err.style.display="block"; return; }
 
-  // Check URL for invite code
-  const urlParams = new URLSearchParams(window.location.search);
-  const inviteCode = urlParams.get("invite");
-
-  if(isAdmin){
+  // Admin secret bypass
+  if(secret === ADMIN_SECRET){
     await createProfile(name, null);
+    // Save as admin in Firestore
+    await updateDoc(doc(db,"users",cUser.uid),{isAdmin:true});
+    isAdmin = true;
     showApp(); return;
   }
 
+  // Check URL for invite code
+  const urlParams = new URLSearchParams(window.location.search);
+  const inviteCode = urlParams.get("invite") || secret;
+
   if(!inviteCode){
-    // No invite in URL — show invite screen
     window._pendingName = name;
     showInvite(); return;
   }
 
-  // Validate invite code from URL
   await joinWithCode(name, inviteCode);
 };
 
