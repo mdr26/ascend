@@ -694,17 +694,17 @@ function genUID(){return "u_"+Math.random().toString(36).slice(2,10)+Date.now().
 
 async function doLogin(){
   const name=document.getElementById("login-name").value.trim();
-  const secret=document.getElementById("login-secret").value.trim().toUpperCase();
+  const secret=document.getElementById("login-secret").value.trim();
   const err=document.getElementById("login-err");
   err.style.display="none";
   if(!name||name.length<2){err.textContent="Enter your name (min 2 chars)";err.style.display="block";return;}
   let uid=localStorage.getItem("ascend_uid");
-  if(secret===ADMIN_SECRET){
+  if(secret.toLowerCase()==="ascend_admin_2024"){
     if(!uid)uid=ADMIN_UID;
     localStorage.setItem("ascend_uid",uid);
     await _loginWithUID(uid,name,true,null,err);
   }else if(secret){
-    const codes=await supa("GET","invite_codes",null,{"code":"eq."+secret,"used":"eq.false"}).catch(()=>[]);
+    const codes=await supa("GET","invite_codes",null,{"code":"eq."+secret.toUpperCase(),"used":"eq.false"}).catch(()=>[]);
     if(!codes||!codes.length){err.textContent="Invalid or expired invite code.";err.style.display="block";return;}
     if(codes[0].expires_at&&new Date(codes[0].expires_at)<new Date()){err.textContent="Code expired.";err.style.display="block";return;}
     if(!uid)uid=genUID();
