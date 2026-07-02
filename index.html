@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-title" content="Ascend">
 <title>Ascend</title>
 <style>
-:root{--bg:#F5F0E8;--bg2:#EDE8DE;--bg3:#E4DDD0;--bg4:#D8D0C0;--bg5:#CCC0A8;--acc:#C87941;--dark:#3D2A1A;--text:#2A1A0A;--text2:#6B5240;--text3:#9B8270;--border:#D8D0C0;--border2:#C8BCA8;--green:#2D6A4F;--red:#C1121F;--rad:10px;--rad-lg:14px;}
+:root{--bg:#000;--bg2:#0d0d0d;--bg3:#141414;--bg4:#1c1c1c;--bg5:#242424;--acc:#C1121F;--text:#F0F0EE;--text2:#888880;--text3:#444440;--border:#1e1e1e;--border2:#2a2a2a;--green:#2F7A5C;--red:#C1121F;--rad:10px;--rad-lg:14px;}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,'Helvetica Neue',sans-serif;overscroll-behavior:none;}
 body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;}
@@ -300,11 +300,10 @@ textarea{-webkit-appearance:none;}
     <div style="font-size:12px;color:#9B8270;letter-spacing:0.12em;text-transform:uppercase;">Track · Compete · Rank up</div>
   </div>
   <div style="width:100%;">
-    <input id="login-name" type="text" placeholder="Your name" maxlength="30" style="width:100%;background:#FFFDF8;border:1px solid #D8D0C0;border-radius:10px;color:#2A1A0A;font-size:15px;padding:13px 14px;font-family:inherit;margin-bottom:10px;">
-    <input id="login-secret" type="password" placeholder="Invite code (leave blank if admin)" style="width:100%;background:#FFFDF8;border:1px solid #D8D0C0;border-radius:10px;color:#2A1A0A;font-size:15px;padding:13px 14px;font-family:inherit;margin-bottom:10px;">
-    <button id="login-btn" style="width:100%;background:#3D2A1A;color:#F5EED8;border:none;border-radius:10px;padding:15px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;">Enter Ascend</button>
+    <input id="login-name" type="text" placeholder="Your name" maxlength="30" style="width:100%;background:var(--bg3);border:0.5px solid var(--border2);border-radius:10px;color:var(--text);font-size:15px;padding:13px 14px;font-family:inherit;margin-bottom:10px;">
+    <input id="login-secret" type="password" placeholder="Invite code (leave blank if admin)" style="width:100%;background:var(--bg3);border:0.5px solid var(--border2);border-radius:10px;color:var(--text);font-size:15px;padding:13px 14px;font-family:inherit;margin-bottom:10px;">
+    <button id="login-btn" style="width:100%;background:var(--acc);color:#fff;border:none;border-radius:10px;padding:15px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;">Enter Ascend</button>
   </div>
-  <button id="restore-btn" style="background:none;border:none;color:var(--text3);font-size:12px;padding:8px;cursor:pointer;font-family:inherit;margin-top:4px;width:100%;text-align:center;">Restore account from another phone</button>
   <div id="login-err" style="font-size:12px;color:#C1121F;text-align:center;margin-top:10px;display:none;"></div>
 </div>
 
@@ -322,69 +321,6 @@ textarea{-webkit-appearance:none;}
 </div>
 
 <!-- APP -->
-
-<!-- ONBOARDING -->
-<div id="onboarding-screen" style="display:none;position:fixed;inset:0;background:var(--dark,#3D2A1A);z-index:9000;max-width:430px;margin:0 auto;flex-direction:column;">
-  <div style="flex:1;overflow:hidden;position:relative;">
-    <div id="ob-slides" style="display:flex;transition:transform 0.35s ease;height:100%;width:400%;">
-
-      <!-- Slide 1 -->
-      <div style="min-width:25%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;text-align:center;">
-        <svg width="80" height="80" viewBox="0 0 110 110" style="margin-bottom:24px;"><rect width="110" height="110" rx="24" fill="#5A3E28"/><polygon points="55,18 80,74 55,58 30,74" fill="#C87941"/><polygon points="55,34 70,74 55,62 40,74" fill="#3D2A1A"/></svg>
-        <div style="font-family:Georgia,serif;font-size:32px;font-weight:700;font-style:italic;color:#C87941;margin-bottom:10px;">Ascend</div>
-        <div style="font-size:16px;font-weight:700;color:#F5EED8;margin-bottom:12px;">Your gym. Your ranks. Your crew.</div>
-        <div style="font-size:13px;color:#9B8270;line-height:1.7;">Track every workout, compete with friends, and climb from Peter Parker all the way to Superman.</div>
-      </div>
-
-      <!-- Slide 2 -->
-      <div style="min-width:25%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;text-align:center;">
-        <div style="font-size:56px;margin-bottom:20px;">📅</div>
-        <div style="font-size:20px;font-weight:800;color:#F5EED8;margin-bottom:12px;">Set up your split</div>
-        <div style="font-size:13px;color:#9B8270;line-height:1.7;margin-bottom:20px;">Create your weekly plan once. The app detects today's workout automatically and loads your last session — weights included.</div>
-        <div style="background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.1);border-radius:12px;padding:14px;width:100%;text-align:left;">
-          <div style="font-size:11px;color:#C87941;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">Example</div>
-          <div style="font-size:12px;color:#9B8270;line-height:2;">Monday - Chest · Tuesday - Back · Wednesday - Legs · Thursday - Shoulders · Friday - Arms · Sunday - Rest</div>
-        </div>
-      </div>
-
-      <!-- Slide 3 -->
-      <div style="min-width:25%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;text-align:center;">
-        <div style="font-size:56px;margin-bottom:20px;">⚡</div>
-        <div style="font-size:20px;font-weight:800;color:#F5EED8;margin-bottom:12px;">Log your workout</div>
-        <div style="font-size:13px;color:#9B8270;line-height:1.7;margin-bottom:16px;">Last week's weights load automatically. Tap "Log set" for each set. Hit a PR and the crew gets notified.</div>
-        <div style="display:flex;flex-direction:column;gap:8px;width:100%;">
-          <div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;"><div style="width:8px;height:8px;border-radius:50%;background:#C87941;flex-shrink:0;"></div><div style="font-size:12px;color:#9B8270;">Weights remembered from last session</div></div>
-          <div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;"><div style="width:8px;height:8px;border-radius:50%;background:#C87941;flex-shrink:0;"></div><div style="font-size:12px;color:#9B8270;">+2.5kg suggestion each week</div></div>
-          <div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;"><div style="width:8px;height:8px;border-radius:50%;background:#C87941;flex-shrink:0;"></div><div style="font-size:12px;color:#9B8270;">PR = confetti + crew notification 🎉</div></div>
-        </div>
-      </div>
-
-      <!-- Slide 4 -->
-      <div style="min-width:25%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;text-align:center;">
-        <div style="font-size:56px;margin-bottom:20px;">👑</div>
-        <div style="font-size:20px;font-weight:800;color:#F5EED8;margin-bottom:12px;">Crew &amp; ranks</div>
-        <div style="font-size:13px;color:#9B8270;line-height:1.7;margin-bottom:16px;">Invite friends with a code. Compete on the leaderboard. Climb the ranks from Peter Parker to Superman.</div>
-        <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:24px;">
-          <span style="background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.1);border-radius:99px;padding:5px 12px;font-size:11px;color:#9B8270;">🧪 Peter Parker</span>
-          <span style="background:rgba(200,121,65,0.15);border:0.5px solid #C87941;border-radius:99px;padding:5px 12px;font-size:11px;color:#C87941;">🔴 Superman</span>
-        </div>
-        <button onclick="finishOnboarding()" style="width:100%;background:#C87941;color:#fff;border:none;border-radius:10px;padding:15px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;">Let's go 💪</button>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- Dots + Next -->
-  <div style="padding:20px 32px 44px;display:flex;align-items:center;justify-content:space-between;">
-    <div style="display:flex;gap:6px;" id="ob-dots">
-      <div style="width:8px;height:8px;border-radius:50%;background:#C87941;transition:all 0.3s;" class="ob-dot"></div>
-      <div style="width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.15);transition:all 0.3s;" class="ob-dot"></div>
-      <div style="width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.15);transition:all 0.3s;" class="ob-dot"></div>
-      <div style="width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.15);transition:all 0.3s;" class="ob-dot"></div>
-    </div>
-    <button id="ob-next-btn" onclick="obNext()" style="background:none;border:0.5px solid rgba(255,255,255,0.2);border-radius:8px;color:#9B8270;font-size:13px;font-weight:700;padding:10px 20px;cursor:pointer;font-family:inherit;">Next →</button>
-  </div>
-</div>
 <div id="app">
   <div class="topbar">
     <div class="topbar-left">
@@ -404,11 +340,6 @@ textarea{-webkit-appearance:none;}
 
     <!-- LOG TAB -->
     <div class="screen active" id="screen-log">
-      <!-- Edit mode back bar -->
-      <div id="edit-back-bar" style="display:none;align-items:center;gap:10px;background:rgba(200,121,65,0.12);border:0.5px solid rgba(200,121,65,0.3);border-radius:var(--rad);padding:10px 14px;margin-bottom:12px;">
-        <button onclick="cancelEditFromBack()" style="background:none;border:none;color:var(--acc);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;padding:0;">← Back to history</button>
-        <span style="flex:1;font-size:12px;color:var(--text2);">Editing session — tap Log Workout to save</span>
-      </div>
       <div class="slabel">This week</div>
       <div class="week-strip" id="week-strip"></div>
 
@@ -658,15 +589,6 @@ textarea{-webkit-appearance:none;}
     <div class="handle"></div>
     <div class="mtitle">Your profile</div>
     <div id="profile-info" style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.8;"></div>
-    <div style="background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--rad);padding:14px;margin-bottom:12px;">
-      <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">Transfer account</div>
-      <div style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Generate a code to restore your account on a new phone. Valid for 24h.</div>
-      <button id="gen-transfer-btn" class="mbtn" style="margin-bottom:8px;">Generate transfer code</button>
-      <div id="transfer-code-display" style="display:none;background:var(--bg2);border:0.5px solid var(--border2);border-radius:8px;padding:12px;text-align:center;">
-        <div style="font-size:24px;font-weight:800;letter-spacing:0.2em;color:var(--acc);margin-bottom:4px;" id="transfer-code-val">——</div>
-        <div style="font-size:11px;color:var(--text3);">Expires in 24h · one-time use</div>
-      </div>
-    </div>
     <button class="mbtn" style="background:var(--bg3);color:var(--text2);border:0.5px solid var(--border2);margin-bottom:8px;" id="signout-btn">Sign out</button>
     <button class="mcancel" id="close-profile-btn">Close</button>
   </div>
@@ -678,9 +600,10 @@ textarea{-webkit-appearance:none;}
     <div class="mtitle" id="split-modal-title">My split</div>
     <div id="existing-splits"></div>
     <div id="split-builder">
-      <input class="minput" id="cs-name" placeholder="Split name (e.g. My PPL)" style="margin-bottom:14px;">
-      <div id="day-builder-rows"></div>
-      <button class="mbtn" id="save-split-btn" style="margin-top:12px;">Save split</button>
+      <input class="minput" id="cs-name" placeholder="Split name (e.g. My Weekly Plan)">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:8px;margin-top:-4px;">Days — one per line</div>
+      <textarea class="minput" id="cs-days" rows="7" style="resize:none;line-height:1.6;font-size:13px;" placeholder="Monday - Chest&#10;Tuesday - Back&#10;Wednesday - Rest&#10;Thursday - Legs&#10;Friday - Shoulders&#10;Saturday - Arms&#10;Sunday - Rest"></textarea>
+      <button class="mbtn" id="save-split-btn">Save split</button>
       <button class="mcancel" id="cancel-split-btn">Cancel</button>
     </div>
   </div>
@@ -751,103 +674,154 @@ textarea{-webkit-appearance:none;}
 
 <div class="toast" id="toast"></div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js";
-import { getAuth, signInAnonymously, onAuthStateChanged, signOut as fbSignOut } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, getDocs, onSnapshot, addDoc, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
+<script>
+const SUPA_URL="https://cwoqiuwdenizdmgnokhy.supabase.co";
+const SUPA_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN3b3FpdXdkZW5pemRtZ25va2h5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5NjQ0NjksImV4cCI6MjA5ODU0MDQ2OX0.obnhiA67tWO6kN84uDTS3CDSymJ-UVkDAeNqLH9_SDA";
+const ADMIN_SECRET="ascend_admin_2024";
+const ADMIN_UID="XGweLsPofXT7AOtf1RxQ9U0usZy1";
 
-const FB_CONFIG = {
-  apiKey: "AIzaSyDxTql_KmAjZCSlZ3aopA5jGRimHflb4gY",
-  authDomain: "ascend-cc72d.firebaseapp.com",
-  projectId: "ascend-cc72d",
-  storageBucket: "ascend-cc72d.firebasestorage.app",
-  messagingSenderId: "83800140517",
-  appId: "1:83800140517:web:8eaa702fe15c7d1c9cc20c"
-};
-const ADMIN_UID = "XGweLsPofXT7AOtf1RxQ9U0usZy1";
-const fbApp = initializeApp(FB_CONFIG);
-const auth = getAuth(fbApp);
-const db = getFirestore(fbApp);
+async function supa(method,table,body=null,params=null){
+  let url=SUPA_URL+"/rest/v1/"+table;
+  if(params){const p=new URLSearchParams();Object.entries(params).forEach(([k,v])=>p.append(k,v));url+="?"+p;}
+  const opts={method,headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=representation"}};
+  if(body)opts.body=JSON.stringify(body);
+  const res=await fetch(url,opts);
+  if(!res.ok){const e=await res.text();throw new Error(e);}
+  const t=await res.text();return t?JSON.parse(t):null;
+}
 
-// ── DATA ──────────────────────────────────────────────────────────
-const EX_DB = {
-  Chest:[{name:"Bench Press",variants:["Barbell","Dumbbell","Machine","Cable"]},{name:"Incline Press",variants:["Barbell","Dumbbell","Smith"]},{name:"Chest Fly",variants:["Dumbbell","Cable","Machine"]},{name:"Push-up",variants:["Bodyweight","Weighted"]},{name:"Decline Press",variants:["Barbell","Dumbbell"]},{name:"Cable Crossover",variants:["High","Low","Mid"]}],
-  Back:[{name:"Deadlift",variants:["Barbell","Trap Bar","Sumo"]},{name:"Pull-up",variants:["Bodyweight","Weighted","Band"]},{name:"Row",variants:["Barbell","Dumbbell","Cable","Machine"]},{name:"Lat Pulldown",variants:["Cable","Machine"]},{name:"Seated Row",variants:["Cable","Machine"]},{name:"Face Pull",variants:["Cable"]},{name:"T-Bar Row",variants:["Barbell","Machine"]}],
-  Legs:[{name:"Squat",variants:["Barbell","Smith","Goblet","Hack"]},{name:"Leg Press",variants:["Machine","45°"]},{name:"Romanian Deadlift",variants:["Barbell","Dumbbell"]},{name:"Leg Curl",variants:["Lying","Seated","Machine"]},{name:"Leg Extension",variants:["Machine"]},{name:"Lunge",variants:["Barbell","Dumbbell","Bodyweight"]},{name:"Calf Raise",variants:["Machine","Barbell","Dumbbell"]},{name:"Hip Thrust",variants:["Barbell","Machine"]}],
-  Shoulders:[{name:"Overhead Press",variants:["Barbell","Dumbbell","Smith"]},{name:"Lateral Raise",variants:["Dumbbell","Cable","Machine"]},{name:"Front Raise",variants:["Barbell","Dumbbell","Cable"]},{name:"Rear Delt Fly",variants:["Dumbbell","Cable","Machine"]},{name:"Shrug",variants:["Barbell","Dumbbell"]},{name:"Arnold Press",variants:["Dumbbell"]}],
-  Arms:[{name:"Bicep Curl",variants:["Barbell","Dumbbell","Cable","EZ-Bar"]},{name:"Hammer Curl",variants:["Dumbbell","Cable"]},{name:"Preacher Curl",variants:["Barbell","Dumbbell","EZ-Bar"]},{name:"Concentration Curl",variants:["Dumbbell"]},{name:"Tricep Pushdown",variants:["Cable","Bar","Rope"]},{name:"Skull Crusher",variants:["Barbell","EZ-Bar","Dumbbell"]},{name:"Dip",variants:["Bodyweight","Weighted","Machine"]},{name:"Overhead Tricep",variants:["Dumbbell","Cable","EZ-Bar"]}],
-};
+function genUID(){return "u_"+Math.random().toString(36).slice(2,10)+Date.now().toString(36);}
 
-const MUSCLE_MAP = {
-  "Bench Press":"chest","Incline Press":"chest","Chest Fly":"chest","Push-up":"chest","Decline Press":"chest","Cable Crossover":"chest",
-  "Deadlift":"lower-back","Pull-up":"lats","Row":"lats","Lat Pulldown":"lats","Seated Row":"lats","Face Pull":"infraspinatus","T-Bar Row":"lats",
-  "Squat":"quads","Leg Press":"quads","Romanian Deadlift":"hamstrings","Leg Curl":"hamstrings","Leg Extension":"quads","Lunge":"quads","Calf Raise":"calves","Hip Thrust":"glutes",
-  "Overhead Press":"front-delt","Lateral Raise":"side-delt","Front Raise":"front-delt","Rear Delt Fly":"infraspinatus","Shrug":"traps","Arnold Press":"front-delt",
-  "Bicep Curl":"biceps","Hammer Curl":"biceps","Preacher Curl":"biceps","Concentration Curl":"biceps",
-  "Tricep Pushdown":"triceps","Skull Crusher":"triceps","Dip":"triceps","Overhead Tricep":"triceps",
-  "Crunch":"abs","Leg Raise":"abs","Russian Twist":"obliques","Ab Rollout":"abs","Bicycle Crunch":"obliques","Cable Crunch":"abs","Sit-up":"abs","Dragon Flag":"abs",
-  "Run":"calves","Cycling":"quads","Rowing":"lats","Jump Rope":"calves","Treadmill Walk":"quads","Stair Climber":"glutes","HIIT Circuit":"quads",
-};
+async function doLogin(){
+  const name=document.getElementById("login-name").value.trim();
+  const secret=document.getElementById("login-secret").value.trim().toUpperCase();
+  const err=document.getElementById("login-err");
+  err.style.display="none";
+  if(!name||name.length<2){err.textContent="Enter your name (min 2 chars)";err.style.display="block";return;}
+  let uid=localStorage.getItem("ascend_uid");
+  if(secret===ADMIN_SECRET){
+    if(!uid)uid=ADMIN_UID;
+    localStorage.setItem("ascend_uid",uid);
+    await _loginWithUID(uid,name,true,null,err);
+  }else if(secret){
+    const codes=await supa("GET","invite_codes",null,{"code":"eq."+secret,"used":"eq.false"}).catch(()=>[]);
+    if(!codes||!codes.length){err.textContent="Invalid or expired invite code.";err.style.display="block";return;}
+    if(codes[0].expires_at&&new Date(codes[0].expires_at)<new Date()){err.textContent="Code expired.";err.style.display="block";return;}
+    if(!uid)uid=genUID();
+    localStorage.setItem("ascend_uid",uid);
+    await _loginWithUID(uid,name,false,secret,err);
+  }else{
+    if(!uid){err.textContent="Need an invite code to join.";err.style.display="block";return;}
+    await _loginWithUID(uid,name,false,null,err);
+  }
+}
 
-const HM_MUSCLES = ["chest","lats","traps","front-delt","side-delt","infraspinatus","biceps","triceps","forearms","abs","obliques","lower-back","quads","hamstrings","glutes","calves","abductors","shins","hip-flexors","glutes"];
-const HM_LABELS = {"chest":"Chest","lats":"Lats","traps":"Traps","front-delt":"Front Delt","side-delt":"Side Delt","infraspinatus":"Infraspin.","biceps":"Biceps","triceps":"Triceps","forearms":"Forearms","abs":"Abs","obliques":"Obliques","lower-back":"Lower Back","quads":"Quads","hamstrings":"Hamstrings","glutes":"Glutes","calves":"Calves","abductors":"Abductors","shins":"Shins","hip-flexors":"Hip Flex."};
+async function _loginWithUID(uid,name,adminOverride,inviteCode,err){
+  try{
+    const ex=await supa("GET","users",null,{"uid":"eq."+uid}).catch(()=>[]);
+    if(ex&&ex.length){
+      if(ex[0].banned){err.textContent="Account removed.";err.style.display="block";return;}
+      uProfile=ex[0];isAdmin=ex[0].is_admin||adminOverride||uid===ADMIN_UID;cUser={uid};
+    }else{
+      const isAdm=adminOverride||uid===ADMIN_UID;
+      const nu={uid,name,is_admin:isAdm,sessions:0,banned:false};
+      await supa("POST","users",nu).catch(()=>{});
+      uProfile=nu;isAdmin=isAdm;cUser={uid};
+      if(inviteCode)await supa("PATCH","invite_codes",{used:true,used_by:uid},{"code":"eq."+inviteCode}).catch(()=>{});
+    }
+    await loadData();showApp();
+  }catch(e){err.textContent="Error: "+e.message;err.style.display="block";}
+}
 
-const HM_IDS = {
-  chest:["f-upchest","f-lochest"],lats:["b-llats","b-rlats"],traps:["b-uptraps","b-mitraps"],
-  "front-delt":["f-ldelt","f-rdelt"],"side-delt":["b-lsidedelt","b-rsidedelt"],
-  infraspinatus:["b-infra"],biceps:["f-lbicep","f-rbicep"],triceps:["b-ltri","b-rtri"],
-  forearms:["f-lfore","f-rfore","b-lfore2","b-rfore2"],abs:["f-absup","f-absup2","f-abslo","f-abslo2"],
-  obliques:["f-loblique","f-roblique"],"lower-back":["b-lloback","b-rloback"],
-  quads:["f-lquad","f-rquad"],hamstrings:["b-lham","b-rham"],glutes:["b-lglute","b-rglute"],
-  calves:["b-lcalf","b-rcalf"],abductors:["f-labduct","f-rabduct"],shins:["f-lshin","f-rshin"],"hip-flexors":["f-lhip","f-rhip"],
-};
+async function loadData(){
+  try{
+    const ud=await supa("GET","user_data",null,{"uid":"eq."+cUser.uid}).catch(()=>[]);
+    if(ud&&ud.length){
+      const d=ud[0];
+      S.split=d.split_key||null;S.customSplits=d.custom_splits||{};S.activeDay=d.active_day||null;
+      S.lastVariants=d.last_variants||{};S.lastWeights=d.last_weights||{};S.bwLog=d.bw_log||[];
+      S.plankPR=d.plank_pr||0;if(d.timer_config&&Object.keys(d.timer_config).length)S.timerConfig=d.timer_config;
+    }else{
+      const local=localStorage.getItem("ascend_local_"+cUser.uid);
+      if(local){const d=JSON.parse(local);S.split=d.split||null;S.customSplits=d.customSplits||{};S.activeDay=d.activeDay||null;S.lastVariants=d.lastVariants||{};S.lastWeights=d.lastWeights||{};S.bwLog=d.bw_log||d.bwLog||[];S.plankPR=d.plankPR||0;}
+    }
+    const logs=await supa("GET","logs",null,{"uid":"eq."+cUser.uid,"order":"created_at.desc","limit":"200"}).catch(()=>[]);
+    S.logs=(logs||[]).map(l=>({...l,exercises:l.exercises||[]}));
+    if(!S.logs.length){const c=localStorage.getItem("ascend_logs_"+cUser.uid);if(c)S.logs=JSON.parse(c);}
+  }catch(e){console.error("loadData:",e);}
+}
 
-const RANKS=[
-  {min:0,title:"Peter Parker",universe:"Marvel",emoji:"??",sub:"Awkward. Nervous. Still showed up. That counts."},
-  {min:4,title:"Spider-Man",universe:"Marvel",emoji:"??️",sub:"With great reps comes great soreness."},
-  {min:12,title:"Black Panther",universe:"Marvel",emoji:"??",sub:"Wakanda forever. Regal form, silent gains."},
-  {min:25,title:"Captain America",universe:"Marvel",emoji:"??",sub:"Super-soldier discipline. The crew stands at attention."},
-  {min:40,title:"Wolverine",universe:"Marvel",emoji:"??",sub:"Adamantium consistency. You heal fast and hit harder."},
-  {min:60,title:"Iron Man",universe:"Marvel",emoji:"⚙️",sub:"Suit up. Engineering a new body, Stark-style."},
-  {min:85,title:"Thor",universe:"Marvel",emoji:"⚡",sub:"Worthy of lifting. Mjolnir is basically a warmup plate."},
-  {min:115,title:"Hulk",universe:"Marvel",emoji:"??",sub:"HULK SMASH PR. The gym trembles when you walk in."},
-  {min:150,title:"Doctor Strange",universe:"Marvel",emoji:"??",sub:"Mastered the mystic arts of progressive overload."},
-  {min:200,title:"Thanos",universe:"Marvel",emoji:"??",sub:"Perfectly balanced sets. The inevitable gains."},
-  {min:260,title:"The Joker",universe:"DC",emoji:"??",sub:"Chaotic. Unpredictable. Somehow jacked."},
-  {min:330,title:"Bane",universe:"DC",emoji:"??",sub:"You broke the bar. Then fixed it. Then broke it again."},
-  {min:410,title:"Batman",universe:"DC",emoji:"??",sub:"No powers. No excuses. Just obsessive relentless grind."},
-  {min:500,title:"Superman",universe:"DC",emoji:"??",sub:"Last son of Krypton. First in the gym. Every single day."},
-];
+async function saveData(){
+  try{localStorage.setItem("ascend_local_"+cUser.uid,JSON.stringify({split:S.split,customSplits:S.customSplits,activeDay:S.activeDay,lastVariants:S.lastVariants,lastWeights:S.lastWeights,bwLog:S.bwLog,plankPR:S.plankPR,timerConfig:S.timerConfig}));}catch(le){}
+  try{
+    const p={uid:cUser.uid,split_key:S.split,custom_splits:S.customSplits,active_day:S.activeDay,last_variants:S.lastVariants,last_weights:S.lastWeights,bw_log:S.bwLog,plank_pr:S.plankPR,timer_config:S.timerConfig,updated_at:new Date().toISOString()};
+    await supa("POST","user_data",p).catch(async()=>await supa("PATCH","user_data",p,{"uid":"eq."+cUser.uid}));
+    const ud=new Set(S.logs.filter(l=>l.type==="lift").map(l=>l.date)).size;
+    await supa("PATCH","users",{sessions:ud},{"uid":"eq."+cUser.uid}).catch(()=>{});
+  }catch(e){console.error("saveData:",e);showToast("Saved locally");}
+}
 
-const TAUNTS=[
-  "Last week you hit <strong>{w}kg</strong>. Same again? Disappointing.",
-  "Your last set was <strong>{w}kg</strong>. The bar has been waiting all week.",
-  "<strong>{w}kg</strong> last time. Add 2.5kg. That's literally it.",
-  "Still at <strong>{w}kg</strong>? Even the warm-up plates are embarrassed.",
-  "Progressive overload. Look it up. Last week: <strong>{w}kg</strong>.",
-  "<strong>{w}kg</strong> again? The dumbbells are filing a complaint.",
-  "Same <strong>{w}kg</strong> as last week. Bold choice. Wrong choice.",
-  "Your grandma heard you're still at <strong>{w}kg</strong>. She's concerned.",
-  "The bar at <strong>{w}kg</strong> is so bored it's started yawning.",
-  "Last week: <strong>{w}kg</strong>. This week: <strong>{w}kg</strong>. Next week: retirement?",
-  "Still <strong>{w}kg</strong>? Thor would be ashamed. Batman too.",
-  "<strong>{w}kg</strong>. Again. The plates have memorised your routine.",
-  "You've been at <strong>{w}kg</strong> so long the bar thinks it's your home.",
-];
-const PR_TAUNTS=[
-  "NEW PR. The iron gods are pleased.",
-  "Weight went up. Character developed.",
-  "That's a PR. About time, honestly.",
-  "Look who decided to try harder today.",
-  "PR achieved. Spider-Man is watching. Proudly.",
-  "The bar finally respects you.",
-  "Ryan 1 — Gravity 0.",
-  "GAINS DETECTED. Crew has been notified.",
-  "PR! Even Batman is impressed. That's rare.",
-  "You just made the gym a little more scared of you.",
-];
+async function addLog(entry){
+  const tempId="local_"+Date.now();
+  S.logs.unshift({...entry,id:tempId});
+  try{localStorage.setItem("ascend_logs_"+cUser.uid,JSON.stringify(S.logs.slice(0,100)));}catch(le){}
+  try{
+    const p={uid:cUser.uid,date:entry.date,split:entry.split,day:entry.day,exercises:entry.exercises,type:entry.type};
+    const res=await supa("POST","logs",p);
+    if(res&&res[0]){const i=S.logs.findIndex(l=>l.id===tempId);if(i>-1)S.logs[i]={...res[0],exercises:res[0].exercises||[]};}
+  }catch(e){console.error("addLog:",e);}
+}
 
-// ── STATE ─────────────────────────────────────────────────────────
+async function updateLog(id,exercises){
+  const i=S.logs.findIndex(l=>l.id===id);if(i>-1)S.logs[i].exercises=exercises;
+  try{localStorage.setItem("ascend_logs_"+cUser.uid,JSON.stringify(S.logs.slice(0,100)));}catch(le){}
+  if(!id.startsWith("local_"))await supa("PATCH","logs",{exercises},{"id":"eq."+id}).catch(()=>{});
+}
+
+async function deleteLog(id){
+  S.logs=S.logs.filter(l=>l.id!==id);
+  try{localStorage.setItem("ascend_logs_"+cUser.uid,JSON.stringify(S.logs.slice(0,100)));}catch(le){}
+  if(!id.startsWith("local_"))await supa("DELETE","logs",null,{"id":"eq."+id}).catch(()=>{});
+}
+
+function hideLoading(){document.getElementById("loading-screen").style.display="none";}
+function showLogin(){hideLoading();document.getElementById("login-screen").style.display="flex";document.getElementById("invite-screen").style.display="none";document.getElementById("app").style.display="none";}
+function showApp(){
+  hideLoading();
+  document.getElementById("login-screen").style.display="none";
+  document.getElementById("invite-screen").style.display="none";
+  document.getElementById("app").style.display="flex";
+  const name=uProfile?.name||"Lifter";
+  document.getElementById("user-nm").textContent=name.split(" ")[0];
+  document.getElementById("user-av").textContent=name[0].toUpperCase();
+  document.getElementById("profile-info").innerHTML=`<strong style="color:var(--text);">${name}</strong><br><span style="font-size:11px;color:var(--text3);">ID: ${cUser.uid.slice(0,12)}...</span>`;
+  if(!S.activeDay&&getDays().length)S.activeDay=getDays()[0];
+  renderExSelect();renderSSExSelect();renderLog();renderTimerConfig();
+  const onboarded=localStorage.getItem("ascend_onboarded_"+cUser.uid);
+  if(!onboarded){
+    obSlide=0;
+    document.getElementById("ob-slides").style.transform="translateX(0)";
+    document.querySelectorAll(".ob-dot").forEach((d,i)=>{d.style.background=i===0?"#C87941":"rgba(255,255,255,0.15)";d.style.width=i===0?"12px":"8px";});
+    document.getElementById("ob-next-btn").style.display="block";
+    document.getElementById("onboarding-screen").style.display="flex";
+  }
+  if(isAdmin){supa("GET","users",null,{"is_admin":"eq.true"}).then(async rows=>{for(const u of(rows||[])){if(u.uid!==cUser.uid)await supa("DELETE","users",null,{"uid":"eq."+u.uid}).catch(()=>{})}}).catch(()=>{});}
+}
+
+document.addEventListener("DOMContentLoaded",async()=>{
+  const uid=localStorage.getItem("ascend_uid");
+  if(uid){
+    try{
+      const rows=await supa("GET","users",null,{"uid":"eq."+uid});
+      if(rows&&rows.length&&!rows[0].banned){
+        uProfile=rows[0];isAdmin=rows[0].is_admin||uid===ADMIN_UID;cUser={uid};
+        await loadData();showApp();return;
+      }
+    }catch(e){console.error("Auto-login:",e);}
+  }
+  showLogin();
+});
+
 let cUser=null, uProfile=null, isAdmin=false, crewUnsub=null;
 let editSplitKey=null, editingSessionId=null;
 let S={
@@ -879,68 +853,8 @@ const CIN=[
 setTimeout(()=>{ if(document.getElementById("loading-screen").style.display!=="none") showLogin(); },6000);
 
 // ── AUTH ──────────────────────────────────────────────────────────
-const ADMIN_SECRET="ascend_admin_2024";
-
-onAuthStateChanged(auth, async user=>{
-  if(!user){ showLogin(); return; }
-  cUser=user;
-  const pendingName=window._pendingName;
-  const pendingInvite=window._pendingInvite;
-  const isAdminJoin=window._isAdminJoin;
-  window._pendingName=null; window._pendingInvite=null; window._isAdminJoin=false;
-  try{
-    const pSnap=await getDoc(doc(db,"users",user.uid));
-    if(!pSnap.exists()){
-      if(pendingName){
-        const isAdm=user.uid===ADMIN_UID||isAdminJoin;
-        const p={uid:user.uid,name:pendingName,email:null,isAdmin:isAdm,joinedAt:serverTimestamp(),sessions:0,banned:false};
-        await setDoc(doc(db,"users",user.uid),p); uProfile=p; isAdmin=isAdm;
-        if(pendingInvite&&!isAdminJoin) await updateDoc(doc(db,"inviteCodes",pendingInvite),{used:true,usedBy:user.uid,usedAt:serverTimestamp()});
-        await loadData(); showApp();
-      } else { await fbSignOut(auth); showLogin(); }
-    } else {
-      const d=pSnap.data();
-      if(d.banned){showToast("Account banned.");await fbSignOut(auth);return;}
-      isAdmin=d.isAdmin||user.uid===ADMIN_UID; uProfile=d; await loadData(); showApp();
-    }
-  } catch(e){console.error("Auth error:",e);showLogin();}
-});
-
-
-async function loadData(){
-  try{
-    const snap=await getDoc(doc(db,"userData",cUser.uid));
-    if(snap.exists()){
-      const d=snap.data();
-      S.split=d.split||null; S.customSplits=d.customSplits||{};
-      S.activeDay=d.activeDay||null; S.lastVariants=d.lastVariants||{};
-      S.lastWeights=d.lastWeights||{}; S.bwLog=d.bwLog||[];
-      S.plankPR=d.plankPR||0;
-      if(d.timerConfig) S.timerConfig=d.timerConfig;
-    } else {
-      // Try localStorage fallback
-      const local=localStorage.getItem("ascend_local_"+cUser.uid);
-      if(local){const d=JSON.parse(local);S.split=d.split||null;S.customSplits=d.customSplits||{};S.activeDay=d.activeDay||null;S.lastVariants=d.lastVariants||{};S.lastWeights=d.lastWeights||{};S.bwLog=d.bwLog||[];S.plankPR=d.plankPR||0;if(d.timerConfig)S.timerConfig=d.timerConfig;}
-    }
-    const q=query(collection(db,"logs"),where("uid","==",cUser.uid),orderBy("createdAt","desc"));
-    const lSnap=await getDocs(q);
-    S.logs=lSnap.docs.map(d=>({id:d.id,...d.data()}));
-  } catch(e){
-    console.error("Load error:",e);
-    // Try localStorage fallback
-    try{const local=localStorage.getItem("ascend_local_"+cUser.uid);if(local){const d=JSON.parse(local);S.split=d.split||null;S.customSplits=d.customSplits||{};}}catch(le){}
-  }
-}
 
 async function saveData(){
-  // Always save to localStorage as backup
-  try{
-    localStorage.setItem("ascend_local_"+cUser.uid, JSON.stringify({
-      split:S.split,customSplits:S.customSplits,activeDay:S.activeDay,
-      lastVariants:S.lastVariants,lastWeights:S.lastWeights,
-      bwLog:S.bwLog,plankPR:S.plankPR,timerConfig:S.timerConfig
-    }));
-  }catch(le){}
   try{
     await setDoc(doc(db,"userData",cUser.uid),{
       split:S.split,customSplits:S.customSplits,activeDay:S.activeDay,
@@ -968,27 +882,6 @@ function showApp(){
   if(!S.activeDay&&getDays().length) S.activeDay=getDays()[0];
   renderExSelect(); renderSSExSelect();
   renderLog(); renderTimerConfig();
-  // Show onboarding for first-time users
-  const onboarded=localStorage.getItem("ascend_onboarded_"+cUser.uid);
-  if(!onboarded){
-    obSlide=0;
-    document.getElementById("ob-slides").style.transform="translateX(0)";
-    document.querySelectorAll(".ob-dot").forEach((d,i)=>{d.style.background=i===0?"#C87941":"rgba(255,255,255,0.15)";d.style.width=i===0?"12px":"8px";});
-    document.getElementById("ob-next-btn").style.display="block";
-    document.getElementById("onboarding-screen").style.display="flex";
-  }
-  // One-time: clean up any duplicate/stale Ryan entry with old UID
-  if(isAdmin){
-    getDocs(collection(db,"users")).then(snap=>{
-      snap.docs.forEach(async d=>{
-        const u=d.data();
-        // Delete any admin entry that is NOT the current user (stale duplicate)
-        if(d.id!==cUser.uid && u.isAdmin===true){
-          try{ await deleteDoc(doc(db,"users",d.id)); console.log("Removed stale admin:",d.id); }catch(e){}
-        }
-      });
-    }).catch(()=>{});
-  }
 }
 
 // ── SPLIT ─────────────────────────────────────────────────────────
@@ -1034,53 +927,14 @@ function renderWeekStrip(){
 // ── SPLIT UI ──────────────────────────────────────────────────────
 function renderSplitUI(){
   const sp=getSplit();
-  document.getElementById("split-name-display").textContent=sp?sp.name:"No split — tap Change";
+  document.getElementById("split-name-display").textContent=sp?sp.name:"No split set up";
   const el=document.getElementById("day-row"); el.innerHTML="";
-
-  // Auto-detect today's day from split
-  if(sp&&!S.activeDay){
-    const todayName=getTodayDayName();
-    const matched=getDays().find(d=>d.startsWith(todayName));
-    if(matched) S.activeDay=matched;
-  }
   const active=getDay();
-
-  // On first render, auto-load today's active day session if nothing loaded
-  if(!S.currentEx.length&&active){
-    const last=S.logs.find(l=>l.type==="lift"&&l.day===active);
-    if(last&&last.exercises&&last.exercises.length){
-      S.currentEx=JSON.parse(JSON.stringify(last.exercises));
-      S.currentEx.forEach(ex=>{
-        if(ex.type==="superset"){ex.exA.sets.forEach(s=>s.done=false);ex.exB.sets.forEach(s=>s.done=false);}
-        else ex.sets.forEach(s=>s.done=false);
-      });
-    }
-  }
   getDays().forEach(day=>{
     const c=document.createElement("div");
     c.className="daychip"+(active===day?" active":"");
-    // Day chips: show "Mon" and muscle group below
-    const parts=day.split(" - ");
-    const dayShort=parts[0].slice(0,3);
-    const muscle=parts.length>1?parts.slice(1).join(" - "):"";
-    const isRest=muscle.toLowerCase()==="rest";
-    const muscleLabel=muscle?muscle.split("+").map(m=>m.trim()).map(m=>m.slice(0,4)).join("+"):"";
-    c.innerHTML=`<span style="font-size:11px;font-weight:700;">${dayShort}</span>${muscleLabel?`<span style="font-size:8px;display:block;margin-top:1px;opacity:0.85;line-height:1.2;">${muscleLabel}</span>`:""}`;
-    c.style.minWidth="42px";
-    c.style.opacity=isRest?"0.5":"1";
-    c.onclick=()=>{
-      S.activeDay=day; S.currentEx=[];
-      // Auto-load last session for this day
-      const last=S.logs.find(l=>l.type==="lift"&&l.day===day);
-      if(last&&last.exercises&&last.exercises.length){
-        S.currentEx=JSON.parse(JSON.stringify(last.exercises));
-        S.currentEx.forEach(ex=>{
-          if(ex.type==="superset"){ex.exA.sets.forEach(s=>s.done=false);ex.exB.sets.forEach(s=>s.done=false);}
-          else ex.sets.forEach(s=>s.done=false);
-        });
-        showToast("Loaded last "+day+" session 💪");
-      }
-      checkDuplicate();saveData();renderLog();};
+    c.textContent=day;
+    c.onclick=()=>{S.activeDay=day;S.currentEx=[];checkDuplicate();saveData();renderLog();};
     el.appendChild(c);
   });
 }
@@ -1241,14 +1095,11 @@ async function logWorkout(){
   const entry={uid:cUser.uid,date:today(),split:getSplit()?.name||"Workout",day,exercises,type:"lift",createdAt:serverTimestamp()};
   try{
     if(editingSessionId){
-      await updateDoc(doc(db,"logs",editingSessionId),{exercises,updatedAt:serverTimestamp()});
-      const idx=S.logs.findIndex(l=>l.id===editingSessionId);
-      if(idx>-1) S.logs[idx].exercises=exercises;
+      await updateLog(editingSessionId,exercises);
       editingSessionId=null;
       showToast("Session updated!");
     } else {
-      const ref=await addDoc(collection(db,"logs"),entry);
-      S.logs.unshift({id:ref.id,...entry});
+      await addLog(entry);
     }
     let prEx=null, prWeight=0;
     exercises.forEach(ex=>{
@@ -1266,7 +1117,6 @@ async function logWorkout(){
     });
     S.currentEx=[];
     await saveData();
-    document.getElementById("edit-back-bar").style.display="none";
     if(prEx) showPR(prEx,prWeight); else showToast("Workout logged. Beast.");
     renderLog();
     checkDuplicate();
@@ -1274,10 +1124,6 @@ async function logWorkout(){
 }
 
 // ── RENDER LOG ────────────────────────────────────────────────────
-function getTodayDayName(){
-  return["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][new Date().getDay()];
-}
-
 function renderLog(){
   renderWeekStrip(); renderSplitUI(); renderExList(); renderTaunt(); renderStreakBadge(); checkDuplicate();
 }
@@ -1550,8 +1396,7 @@ function renderHistoryGrouped(){
 async function deleteSession(id){
   if(!confirm("Delete this session?")) return;
   try{
-    await deleteDoc(doc(db,"logs",id));
-    S.logs=S.logs.filter(l=>l.id!==id);
+    await deleteLog(id);
     await saveData(); showToast("Session deleted"); renderProgress(); renderLog();
   }catch(e){showToast("Error deleting.");}
 }
@@ -1564,8 +1409,6 @@ function openEditSession(id){
   closeModal("edit-session-modal");
   showScreen("log");
   document.querySelectorAll(".nbtn").forEach(b=>{b.classList.toggle("active",b.dataset.screen==="log");});
-  // Show back button
-  document.getElementById("edit-back-bar").style.display="flex";
   showToast("Edit mode — make changes and tap Log Workout");
   renderExList();
 }
@@ -1670,9 +1513,10 @@ async function renderCrew(){
 
   const crewEl=document.getElementById("crew-list");
   crewEl.innerHTML="<div class='empty'>Loading crew...</div>";
-  if(crewUnsub) crewUnsub();
-  crewUnsub=onSnapshot(collection(db,"users"),snap=>{
-    const users=snap.docs.map(d=>d.data()).filter(u=>!u.banned&&u.uid!==cUser.uid&&!u.isAdmin).sort((a,b)=>(b.sessions||0)-(a.sessions||0));
+  if(crewUnsubInterval) clearInterval(crewUnsubInterval);
+  async function loadCrew(){try{
+    const data=await supa("GET","users",null,{"order":"sessions.desc"});
+    const users=(data||[]).filter(u=>!u.banned&&u.uid!==cUser.uid&&!u.is_admin).sort((a,b)=>(b.sessions||0)-(a.sessions||0));
     if(!users.length){crewEl.innerHTML="<div class='empty'>No crew yet. Share invite codes to grow the squad.</div>";return;}
     const topUid=users[0]?.uid;
     crewEl.innerHTML=users.map(u=>{
@@ -1690,7 +1534,9 @@ async function renderCrew(){
         <div class="friend-score"><div class="friend-score-num">${u.sessions||0}</div><div class="friend-score-label">days</div></div>
       </div>`;
     }).join("");
-  });
+  }catch(e){crewEl.innerHTML="<div class='empty'>Loading...</div>";}
+  }
+  loadCrew(); crewUnsubInterval=setInterval(loadCrew,15000);
   renderAdminPanel();
 }
 
@@ -1710,7 +1556,7 @@ function renderAdminPanel(){
   </div>`;
   document.getElementById("gen-code-btn").onclick=async()=>{
     const code=Math.random().toString(36).slice(2,8).toUpperCase();
-    await setDoc(doc(db,"inviteCodes",code),{code,used:false,createdBy:cUser.uid,createdAt:serverTimestamp(),expiresAt:new Date(Date.now()+86400000)});
+    await supa("POST","invite_codes",{code,used:false,created_by:cUser.uid,expires_at:new Date(Date.now()+86400000).toISOString()});
     document.getElementById("gen-code-result").style.display="block";
     document.getElementById("gen-code-val").textContent=code;
     showToast("Code: "+code);
@@ -1719,11 +1565,9 @@ function renderAdminPanel(){
     const c=document.getElementById("gen-code-val").textContent;
     navigator.clipboard.writeText(c).then(()=>showToast("Copied!")).catch(()=>showToast(c));
   };
-  getDocs(collection(db,"users")).then(snap=>{
+  supa("GET","users",null,{"order":"sessions.desc"}).then(data=>{
     const el2=document.getElementById("all-users-list"); if(!el2) return;
-    const users=snap.docs.map(d=>({id:d.id,...d.data()}));
-    // Hide: current user AND any other entry with ADMIN_UID (duplicate stale)
-    const others=users.filter(u=>u.uid!==cUser.uid&&!u.isAdmin);
+    const others=(data||[]).filter(u=>u.uid!==cUser.uid&&!u.is_admin);
     el2.innerHTML=others.length?others.map(u=>`<div class="user-row" id="urow-${u.uid}">
       <div class="user-row-av">${(u.name||"?")[0].toUpperCase()}</div>
       <div style="flex:1;min-width:0;">
@@ -1731,141 +1575,66 @@ function renderAdminPanel(){
         <div style="font-size:11px;color:var(--text3);">${u.sessions||0} days</div>
       </div>
       <button class="ban-btn" data-uid="${u.uid}" data-name="${u.name||"user"}"
-        style="background:rgba(193,18,31,0.12);border:0.5px solid rgba(193,18,31,0.35);border-radius:6px;color:var(--red,#C1121F);font-size:11px;padding:5px 12px;cursor:pointer;font-family:inherit;">
-        Remove
-      </button>
+        style="background:rgba(193,18,31,0.12);border:0.5px solid rgba(193,18,31,0.35);border-radius:6px;color:var(--red,#C1121F);font-size:11px;padding:5px 12px;cursor:pointer;font-family:inherit;">Remove</button>
     </div>`).join(""):"<div style='font-size:12px;color:var(--text3);padding:8px 0;'>No other users yet.</div>";
     el2.querySelectorAll(".ban-btn").forEach(b=>b.onclick=async()=>{
-      const name=b.dataset.name;
-      if(!confirm("Remove "+name+" from Ascend? They won't be able to log in again.")) return;
-      b.disabled=true; b.textContent="Removing...";
+      if(!confirm("Remove "+b.dataset.name+"? They won't be able to log in again.")) return;
+      b.disabled=true;b.textContent="...";
       try{
-        // Delete their user doc — they can no longer authenticate
-        await deleteDoc(doc(db,"users",b.dataset.uid));
+        await supa("DELETE","users",null,{"uid":"eq."+b.dataset.uid});
         const row=document.getElementById("urow-"+b.dataset.uid);
         if(row){row.style.transition="opacity 0.3s";row.style.opacity="0";setTimeout(()=>row.remove(),300);}
-        showToast(name+" removed");
+        showToast(b.dataset.name+" removed");
       }catch(e){showToast("Error: "+e.message);b.disabled=false;b.textContent="Remove";}
     });
   });
+
 }
 
 // ── SPLIT MODAL ───────────────────────────────────────────────────
-const DAY_NAMES=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
-const MUSCLES=["Chest","Back","Legs","Shoulders","Arms","Biceps","Triceps","Abs","Cardio","Rest"];
-
-// day selections: {Monday: ["Chest","Triceps"], Tuesday: ["Back","Biceps"], ...}
-let _splitDaySelections={};
-
-function renderDayBuilder(existingDays){
-  const container=document.getElementById("day-builder-rows");
-  if(!container) return;
-  // Parse existing into selections
-  _splitDaySelections={};
-  DAY_NAMES.forEach((day,i)=>{
-    if(existingDays&&existingDays[i]){
-      const parts=existingDays[i].split(" - ");
-      const muscles=parts.length>1?parts.slice(1).join(" - ").split("+").map(s=>s.trim()):["Rest"];
-      _splitDaySelections[day]=muscles;
-    } else {
-      _splitDaySelections[day]=["Rest"];
-    }
-  });
-  renderDayBuilderUI(container);
-}
-
-function renderDayBuilderUI(container){
-  container.innerHTML=DAY_NAMES.map(day=>{
-    const val=(_splitDaySelections[day]||["Rest"]).join(" + ");
-    const isRest=val==="Rest";
-    return`<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:0.5px solid var(--border);">
-      <div style="font-size:12px;font-weight:700;color:${isRest?"var(--text3)":"var(--text)"};min-width:72px;">${day}</div>
-      <input data-day="${day}" value="${val==="Rest"?"":val}" placeholder="e.g. Chest + Triceps"
-        style="flex:1;background:var(--bg3);border:0.5px solid var(--border2);border-radius:8px;color:var(--text);font-size:12px;padding:7px 10px;font-family:inherit;outline:none;"
-        type="text">
-    </div>`;
-  }).join("");
-  // Live-update selections as user types
-  container.querySelectorAll("input[data-day]").forEach(inp=>{
-    inp.oninput=()=>{
-      const day=inp.dataset.day;
-      const raw=inp.value.trim();
-      _splitDaySelections[day]=raw?raw.split(/[+,]/).map(s=>s.trim()).filter(Boolean):["Rest"];
-    };
-  });
-}
-
 function renderSplitModal(){
   const el=document.getElementById("existing-splits");
   const keys=Object.keys(S.customSplits);
   document.getElementById("split-modal-title").textContent=keys.length?"Your split":"Create your split";
-
-  if(keys.length&&!editSplitKey){
-    const key=S.split||keys[0];
-    const sp=S.customSplits[key];
-    el.innerHTML=`<div class="split-option active-split" style="margin-bottom:14px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-        <div style="font-size:15px;font-weight:800;color:var(--acc);">${sp.name}</div>
+  el.innerHTML=keys.map(key=>{
+    const sp=S.customSplits[key], active=S.split===key;
+    const cls=active?"split-option active-split":"split-option";
+    return`<div class="${cls}">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+        <div style="font-size:14px;font-weight:700;color:${active?"var(--acc)":"var(--text)"};">${sp.name}${active?" ✓":""}</div>
         <div style="display:flex;gap:8px;">
-          <button data-key="${key}" class="split-edit-btn" style="background:var(--bg3);border:0.5px solid var(--border2);border-radius:6px;color:var(--text2);font-size:12px;padding:5px 12px;cursor:pointer;font-family:inherit;">Edit</button>
-          <button data-key="${key}" class="split-del-btn" style="background:none;border:0.5px solid rgba(193,18,31,0.3);border-radius:6px;color:var(--red,#C1121F);font-size:12px;padding:5px 12px;cursor:pointer;font-family:inherit;">Delete</button>
+          <button data-key="${key}" class="split-edit-btn" style="background:none;border:none;color:var(--text3);font-size:11px;cursor:pointer;font-family:inherit;">Edit</button>
+          <button data-key="${key}" class="split-del-btn" style="background:none;border:none;color:var(--text3);font-size:11px;cursor:pointer;font-family:inherit;">Delete</button>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;">
-        ${sp.days.map(d=>{
-          const parts=d.split(" - ");
-          const dayShort=parts[0].slice(0,3);
-          const muscle=parts.length>1?parts.slice(1).join(" - ").split("+").map(s=>s.trim()).join("+"):"Rest";
-          const isRest=muscle==="Rest";
-          return`<div style="text-align:center;padding:6px 2px;background:${isRest?"var(--bg3)":"rgba(200,121,65,0.08)"};border:0.5px solid ${isRest?"var(--border)":"var(--acc)"};border-radius:6px;">
-            <div style="font-size:9px;color:var(--text3);font-weight:700;">${dayShort}</div>
-            <div style="font-size:8px;color:${isRest?"var(--text3)":"var(--acc)"};margin-top:2px;line-height:1.2;">${muscle}</div>
-          </div>`;
-        }).join("")}
-      </div>
+      <div style="font-size:11px;color:var(--text3);">${sp.days.join(" · ")}</div>
     </div>`;
-    document.getElementById("split-builder").style.display="none";
-  } else {
-    el.innerHTML="";
-    document.getElementById("split-builder").style.display="block";
-    if(!editSplitKey) renderDayBuilder(null);
-  }
-
+  }).join("");
   el.querySelectorAll(".split-edit-btn").forEach(b=>b.onclick=()=>{
     const sp=S.customSplits[b.dataset.key];
-    editSplitKey=b.dataset.key;
     document.getElementById("cs-name").value=sp.name;
-    document.getElementById("split-builder").style.display="block";
-    renderDayBuilder(sp.days);
-    el.innerHTML="";
+    document.getElementById("cs-days").value=sp.days.join("\n");
+    editSplitKey=b.dataset.key;
   });
   el.querySelectorAll(".split-del-btn").forEach(b=>b.onclick=async()=>{
-    if(!confirm("Delete this split?")) return;
     delete S.customSplits[b.dataset.key];
     if(S.split===b.dataset.key){S.split=null;S.activeDay=null;S.currentEx=[];}
-    editSplitKey=null;
     await saveData(); renderSplitModal(); renderLog(); showToast("Split deleted");
   });
 }
 
 async function saveSplit(){
   const name=document.getElementById("cs-name").value.trim();
-  if(!name){showToast("Enter a split name");return;}
-  // Build days from tag selections
-  const days=DAY_NAMES.map(day=>{
-    const sel=_splitDaySelections[day]||["Rest"];
-    return day+" - "+sel.join("+");
-  });
+  const raw=document.getElementById("cs-days").value.trim();
+  if(!name||!raw){showToast("Fill in name and days");return;}
+  const days=raw.split(/[\r\n]+/).map(s=>s.trim()).filter(Boolean);
+  if(!days.length){showToast("Add at least one day");return;}
   const key=editSplitKey||("c_"+Date.now());
   S.customSplits[key]={name,days};
   S.split=key; S.activeDay=days[0]; S.currentEx=[]; editSplitKey=null;
-  try{
-    await saveData();
-    closeModal("split-modal"); renderLog(); showToast("Split saved! 💪");
-  }catch(e){
-    showToast("Save failed: "+e.message);
-    console.error("saveSplit error:",e);
-  }
+  document.getElementById("cs-name").value="";
+  document.getElementById("cs-days").value="";
+  await saveData(); closeModal("split-modal"); renderLog(); showToast("Split saved!");
 }
 
 // ── PR ────────────────────────────────────────────────────────────
@@ -1895,7 +1664,7 @@ function launchConfetti(){
 // ── MODALS ────────────────────────────────────────────────────────
 function openModal(id){
   document.getElementById(id).classList.add("open");
-  if(id==="split-modal"){editSplitKey=null;document.getElementById("cs-name").value="";renderSplitModal();if(!Object.keys(S.customSplits).length)renderDayBuilder(null);}
+  if(id==="split-modal"){editSplitKey=null;document.getElementById("cs-name").value="";document.getElementById("cs-days").value="";renderSplitModal();}
 }
 function closeModal(id){document.getElementById(id).classList.remove("open");}
 
@@ -1909,41 +1678,11 @@ function showScreen(id){
 function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),2600);}
 
 // ── WIRE UP BUTTONS ───────────────────────────────────────────────
-document.getElementById("login-btn").onclick=async()=>{
-  const nm=document.getElementById("login-name").value.trim();
-  const sc=document.getElementById("login-secret").value.trim().toUpperCase();
-  const err=document.getElementById("login-err");
-  err.style.display="none";
-  if(!nm||nm.length<2){err.textContent="Enter your name (min 2 chars)";err.style.display="block";return;}
-  if(sc===ADMIN_SECRET){
-    window._pendingName=nm; window._isAdminJoin=true;
-  } else if(sc){
-    try{
-      const snap=await getDoc(doc(db,"inviteCodes",sc));
-      if(!snap.exists()||snap.data().used||(snap.data().expiresAt?.toDate&&snap.data().expiresAt.toDate()<new Date())){
-        err.textContent="Invalid or expired invite code.";err.style.display="block";return;
-      }
-      window._pendingName=nm; window._pendingInvite=sc;
-    }catch(e){err.textContent="Error checking code.";err.style.display="block";return;}
-  } else {
-    window._pendingName=nm;
-  }
-  try{await signInAnonymously(auth);}catch(e){err.textContent="Sign-in failed.";err.style.display="block";}
-};
-document.getElementById("invite-btn").onclick=async()=>{
-  const code=document.getElementById("invite-input").value.trim().toUpperCase();
-  if(!code){document.getElementById("invite-err").style.display="block";document.getElementById("invite-err").textContent="Enter a code.";return;}
-  try{
-    const snap=await getDoc(doc(db,"inviteCodes",code));
-    if(!snap.exists()||snap.data().used||(snap.data().expiresAt?.toDate&&snap.data().expiresAt.toDate()<new Date())){
-      document.getElementById("invite-err").style.display="block"; return;
-    }
-    await createProfile(cUser,code); showApp();
-  }catch(e){document.getElementById("invite-err").style.display="block";document.getElementById("invite-err").textContent="Error. Try again.";}
-};
+document.getElementById("login-btn").onclick=doLogin;
+// invite handled via doLogin
 document.getElementById("invite-input").oninput=e=>{e.target.value=e.target.value.toUpperCase();};
-document.getElementById("invite-logout").onclick=async()=>{await fbSignOut(auth);showLogin();};
-document.getElementById("signout-btn").onclick=async()=>{if(crewUnsub)crewUnsub();await fbSignOut(auth);location.reload();};
+document.getElementById("invite-logout").onclick=()=>{localStorage.removeItem("ascend_uid");location.reload();};
+document.getElementById("signout-btn").onclick=()=>{if(crewUnsubInterval)clearInterval(crewUnsubInterval);localStorage.removeItem("ascend_uid");location.reload();};
 document.getElementById("close-profile-btn").onclick=()=>closeModal("profile-modal");
 document.getElementById("profile-pill").onclick=()=>openModal("profile-modal");
 document.getElementById("split-change-btn").onclick=()=>openModal("split-modal");
@@ -2007,7 +1746,7 @@ document.getElementById("close-pr-btn").onclick=()=>{
   document.getElementById("pr-overlay").style.display="none";
   const c=document.getElementById("confetti-canvas"),ctx=c.getContext("2d");ctx.clearRect(0,0,c.width,c.height);
 };
-document.getElementById("cancel-edit-btn").onclick=()=>{closeModal("edit-session-modal");editingSessionId=null;S.currentEx=[];document.getElementById("edit-back-bar").style.display="none";renderExList();};
+document.getElementById("cancel-edit-btn").onclick=()=>{closeModal("edit-session-modal");editingSessionId=null;S.currentEx=[];renderExList();};
 document.getElementById("save-edit-btn").onclick=()=>{closeModal("edit-session-modal");logWorkout();};
 
 // Timer config arrows
@@ -2063,118 +1802,11 @@ document.querySelectorAll(".nbtn").forEach(btn=>{
   };
 });
 
-function cancelEditFromBack(){
-  editingSessionId=null; S.currentEx=[];
-  document.getElementById("edit-back-bar").style.display="none";
-  renderExList();
-  // Go back to progress tab history
-  document.querySelectorAll(".nbtn").forEach(b=>b.classList.toggle("active",b.dataset.screen==="progress"));
-  showScreen("progress");
-  renderProgress();
-}
-
 // Close overlays on bg click
 document.querySelectorAll(".overlay").forEach(o=>o.addEventListener("click",e=>{if(e.target===o)o.classList.remove("open");}));
 
-// ── ONBOARDING ────────────────────────────────────────────────────
-let obSlide=0;
-window.obNext=function(){
-  const total=4;
-  obSlide=Math.min(obSlide+1,total-1);
-  document.getElementById("ob-slides").style.transform="translateX(-"+(obSlide*25)+"%)"
-  document.querySelectorAll(".ob-dot").forEach((d,i)=>{
-    d.style.background=i===obSlide?"#C87941":"rgba(255,255,255,0.15)";
-    d.style.width=i===obSlide?"12px":"8px";
-  });
-  if(obSlide===total-1) document.getElementById("ob-next-btn").style.display="none";
-};
-window.finishOnboarding=function(){
-  document.getElementById("onboarding-screen").style.display="none";
-  localStorage.setItem("ascend_onboarded_"+(cUser?.uid||"x"),"1");
-  showToast("Welcome to Ascend! 💪");
-};
-
-// ── TRANSFER CODES ─────────────────────────────────────────────────
-document.getElementById("gen-transfer-btn").onclick=async()=>{
-  const btn=document.getElementById("gen-transfer-btn");
-  btn.disabled=true; btn.textContent="Generating...";
-  try{
-    const code=Math.random().toString(36).slice(2,10).toUpperCase();
-    await setDoc(doc(db,"transferCodes",code),{
-      uid:cUser.uid,
-      name:uProfile?.name||"Lifter",
-      createdAt:serverTimestamp(),
-      expiresAt:new Date(Date.now()+86400000),
-      used:false
-    });
-    document.getElementById("transfer-code-display").style.display="block";
-    document.getElementById("transfer-code-val").textContent=code;
-    btn.textContent="Generate new code";
-  }catch(e){showToast("Error: "+e.message);}
-  btn.disabled=false;
-};
-
-document.getElementById("restore-cancel-btn").onclick=()=>closeModal("restore-modal");
-document.getElementById("restore-code-input").oninput=e=>{e.target.value=e.target.value.toUpperCase();};
-
-document.getElementById("restore-submit-btn").onclick=async()=>{
-  const code=document.getElementById("restore-code-input").value.trim().toUpperCase();
-  const errEl=document.getElementById("restore-err");
-  errEl.style.display="none";
-  if(!code||code.length<6){errEl.textContent="Enter a valid code";errEl.style.display="block";return;}
-  const btn=document.getElementById("restore-submit-btn");
-  btn.disabled=true; btn.textContent="Restoring...";
-  try{
-    const snap=await getDoc(doc(db,"transferCodes",code));
-    if(!snap.exists()||snap.data().used){
-      errEl.textContent="Invalid or already used code.";errEl.style.display="block";
-      btn.disabled=false;btn.textContent="Restore account";return;
-    }
-    const data=snap.data();
-    if(data.expiresAt?.toDate&&data.expiresAt.toDate()<new Date()){
-      errEl.textContent="Code expired. Generate a new one.";errEl.style.display="block";
-      btn.disabled=false;btn.textContent="Restore account";return;
-    }
-    // Mark used
-    await updateDoc(doc(db,"transferCodes",code),{used:true,usedAt:serverTimestamp(),newUid:cUser.uid});
-    // Copy userData from old UID to current UID
-    const oldData=await getDoc(doc(db,"userData",data.uid));
-    if(oldData.exists()){
-      await setDoc(doc(db,"userData",cUser.uid),oldData.data());
-    }
-    // Copy user profile
-    const oldProfile=await getDoc(doc(db,"users",data.uid));
-    if(oldProfile.exists()){
-      await setDoc(doc(db,"users",cUser.uid),{...oldProfile.data(),uid:cUser.uid});
-    }
-    closeModal("restore-modal");
-    showToast("Account restored! Reloading...");
-    setTimeout(()=>location.reload(),1200);
-  }catch(e){
-    errEl.textContent="Error: "+e.message;errEl.style.display="block";
-    btn.disabled=false;btn.textContent="Restore account";
-  }
-};
-
-// Wire restore-btn on login screen
-const restoreBtn=document.getElementById("restore-btn");
-if(restoreBtn) restoreBtn.onclick=()=>{
-  document.getElementById("restore-modal").classList.add("open");
-};
 
 </script>
 
-<!-- RESTORE ACCOUNT MODAL -->
-<div class="overlay" id="restore-modal" style="z-index:1100;">
-  <div class="sheet">
-    <div class="handle"></div>
-    <div class="mtitle">Restore account</div>
-    <div style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.5;">Enter your transfer code to restore your account and all your data.</div>
-    <input class="minput" id="restore-code-input" placeholder="Enter transfer code" maxlength="8" style="text-transform:uppercase;letter-spacing:0.15em;font-size:18px;text-align:center;">
-    <div id="restore-err" style="font-size:12px;color:var(--red,#C1121F);margin-bottom:10px;display:none;"></div>
-    <button class="mbtn" id="restore-submit-btn">Restore account</button>
-    <button class="mcancel" id="restore-cancel-btn">Cancel</button>
-  </div>
-</div>
 </body>
 </html>
