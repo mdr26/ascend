@@ -1041,11 +1041,11 @@ function buildExerciseFromTemplate(t){
   if(t.type==="superset"){
     const av=pickVariantFor(t.exA.name,t.exA.variants), bv=pickVariantFor(t.exB.name,t.exB.variants);
     return {type:"superset",
-      exA:{name:t.exA.name,variants:t.exA.variants,activeVariant:av,sets:[{reps:10,weight:S.lastWeights[t.exA.name+"|"+av]||0,done:false}]},
-      exB:{name:t.exB.name,variants:t.exB.variants,activeVariant:bv,sets:[{reps:10,weight:S.lastWeights[t.exB.name+"|"+bv]||0,done:false}]}};
+      exA:{name:t.exA.name,variants:t.exA.variants,activeVariant:av,category:t.exA.category,sets:[{reps:10,weight:S.lastWeights[t.exA.name+"|"+av]||0,done:false}]},
+      exB:{name:t.exB.name,variants:t.exB.variants,activeVariant:bv,category:t.exB.category,sets:[{reps:10,weight:S.lastWeights[t.exB.name+"|"+bv]||0,done:false}]}};
   }
   const av=pickVariantFor(t.name,t.variants);
-  return {name:t.name,variants:t.variants,activeVariant:av,sets:[{reps:10,weight:S.lastWeights[t.name+"|"+av]||0,done:false}]};
+  return {name:t.name,variants:t.variants,activeVariant:av,category:t.category,sets:[{reps:10,weight:S.lastWeights[t.name+"|"+av]||0,done:false}]};
 }
 
 function loadDayTemplate(day){
@@ -1055,7 +1055,7 @@ function loadDayTemplate(day){
   return tmpl.map(buildExerciseFromTemplate);
 }
 
-// Saves the exercise list currently on screen (names/variants only, not weights or reps)
+// Saves the exercise list currently on screen (names/variants/category, not weights or reps)
 // as this day's template, so selecting the day chip auto-loads it from now on.
 async function saveDayTemplate(){
   const day=getDay();
@@ -1064,8 +1064,8 @@ async function saveDayTemplate(){
   const key=S.split;
   if(!S.customSplits[key].templates) S.customSplits[key].templates={};
   S.customSplits[key].templates[day]=S.currentEx.map(ex=>{
-    if(ex.type==="superset") return {type:"superset",exA:{name:ex.exA.name,variants:ex.exA.variants},exB:{name:ex.exB.name,variants:ex.exB.variants}};
-    return {name:ex.name,variants:ex.variants};
+    if(ex.type==="superset") return {type:"superset",exA:{name:ex.exA.name,variants:ex.exA.variants,category:ex.exA.category},exB:{name:ex.exB.name,variants:ex.exB.variants,category:ex.exB.category}};
+    return {name:ex.name,variants:ex.variants,category:ex.category};
   });
   await saveData();
   showToast("Saved as your "+day+" template");
@@ -1265,15 +1265,15 @@ function checkDayMismatch(dayLabel,exercises){
   labelWords.forEach(w=>{ if(DAY_KEYWORD_MUSCLES[w]) DAY_KEYWORD_MUSCLES[w].forEach(m=>expectedMuscles.add(m)); });
   if(!expectedMuscles.size) return true; // label has no recognizable body-part keyword — nothing to check
 
-  const namesInSession=[];
+  const pairsInSession=[]; // [name, category]
   exercises.forEach(ex=>{
-    if(ex.type==="superset"){ namesInSession.push(ex.exA.name,ex.exB.name); }
-    else{ namesInSession.push(ex.name); }
+    if(ex.type==="superset"){ pairsInSession.push([ex.exA.name,ex.exA.category],[ex.exB.name,ex.exB.category]); }
+    else{ pairsInSession.push([ex.name,ex.category]); }
   });
-  const recognized=namesInSession.filter(n=>lookupMuscle(n));
-  if(!recognized.length) return true; // all custom exercises — nothing we can check against
+  const resolved=pairsInSession.map(([n,c])=>resolveMuscle(n,c)).filter(Boolean);
+  if(!resolved.length) return true; // nothing we could resolve — nothing to check
 
-  const anyMatch=recognized.some(n=>expectedMuscles.has(lookupMuscle(n)));
+  const anyMatch=resolved.some(m=>expectedMuscles.has(m));
   if(anyMatch) return true;
 
   return confirm(`This is logged under "${dayLabel}" but the exercises you added don't look like ${labelWords.find(w=>DAY_KEYWORD_MUSCLES[w])} work. Log it anyway?`);
@@ -1570,8 +1570,8 @@ function renderHeatmap(){
   const weekLogs=S.logs.filter(l=>(new Date()-new Date(l.date))/86400000<=7);
   const muscleCount={};
   weekLogs.forEach(l=>l.exercises.forEach(e=>{
-    const names=e.type==="superset"?[e.exA.name,e.exB.name]:[e.name];
-    names.forEach(n=>{const m=lookupMuscle(n);if(m)muscleCount[m]=(muscleCount[m]||0)+1;});
+    const pairs=e.type==="superset"?[[e.exA.name,e.exA.category],[e.exB.name,e.exB.category]]:[[e.name,e.category]];
+    pairs.forEach(([n,c])=>{const m=resolveMuscle(n,c);if(m)muscleCount[m]=(muscleCount[m]||0)+1;});
   }));
   const maxCount=Math.max(...Object.values(muscleCount),1);
   const getState=m=>{ const c=muscleCount[m]||0; if(c===0)return"rest"; if(c/maxCount>0.5)return"hard"; return"light"; };
@@ -1865,7 +1865,7 @@ document.getElementById("save-cex-btn").onclick=()=>{
   const vs=document.getElementById("cex-variants").value.trim();
   if(!name) return;
   const variants=vs?vs.split(",").map(s=>s.trim()).filter(Boolean):["Bodyweight"];
-  S.currentEx.push({name,variants,activeVariant:variants[0],sets:[{reps:10,weight:0,done:false}]});
+  S.currentEx.push({name,variants,activeVariant:variants[0],category:S.activeCat,sets:[{reps:10,weight:0,done:false}]});
   closeModal("custom-ex-modal"); document.getElementById("cex-name").value=""; document.getElementById("cex-variants").value=""; renderExList();
 };
 document.getElementById("cancel-cex-btn").onclick=()=>closeModal("custom-ex-modal");
@@ -1876,7 +1876,7 @@ document.getElementById("add-ex-btn").onclick=()=>{
   const variants=(opt.dataset.variants||"Barbell").split(",");
   const lv=S.lastVariants[val], av=lv&&variants.includes(lv)?lv:variants[0];
   const lw=S.lastWeights[val+"|"+av]||0;
-  S.currentEx.push({name:val,variants,activeVariant:av,sets:[{reps:10,weight:lw,done:false}]});
+  S.currentEx.push({name:val,variants,activeVariant:av,category:S.activeCat,sets:[{reps:10,weight:lw,done:false}]});
   renderExList(); renderTaunt();
 };
 document.getElementById("add-ss-btn").onclick=()=>openModal("ss-modal");
@@ -1885,7 +1885,7 @@ document.getElementById("save-ss-btn").onclick=()=>{
   const optA=selA.options[selA.selectedIndex], optB=selB.options[selB.selectedIndex];
   const varA=(optA.dataset.variants||"Barbell").split(",");
   const varB=(optB.dataset.variants||"Barbell").split(",");
-  S.currentEx.push({type:"superset",exA:{name:optA.text,variants:varA,activeVariant:varA[0],sets:[{reps:10,weight:0,done:false}]},exB:{name:optB.text,variants:varB,activeVariant:varB[0],sets:[{reps:10,weight:0,done:false}]}});
+  S.currentEx.push({type:"superset",exA:{name:optA.text,variants:varA,activeVariant:varA[0],category:S.ssCat,sets:[{reps:10,weight:0,done:false}]},exB:{name:optB.text,variants:varB,activeVariant:varB[0],category:S.ssCat,sets:[{reps:10,weight:0,done:false}]}});
   closeModal("ss-modal"); renderExList();
 };
 document.getElementById("cancel-ss-btn").onclick=()=>closeModal("ss-modal");
@@ -1999,6 +1999,43 @@ const MUSCLE_MAP={
 const MUSCLE_MAP_LC={};
 Object.keys(MUSCLE_MAP).forEach(k=>{ MUSCLE_MAP_LC[k.toLowerCase()]=MUSCLE_MAP[k]; });
 function lookupMuscle(name){ return name?MUSCLE_MAP_LC[name.toLowerCase()]:undefined; }
+
+// Category is captured structurally when an exercise is added (from whichever tab you picked it
+// under), so this works for ANY exercise name/vocabulary — not just names we happen to recognize.
+// A few categories cover more than one muscle zone, so a light keyword check picks the right one;
+// everything else falls back to a single sensible default for that category.
+function resolveMuscle(name,category){
+  const exact=lookupMuscle(name);
+  if(exact) return exact;
+  if(!category) return undefined;
+  const n=(name||"").toLowerCase();
+  switch(category){
+    case "Chest": return "chest";
+    case "Back":
+      if(/row|pulldown|pull.?up|lat/.test(n)) return "lats";
+      if(/deadlift|extension|hyper/.test(n)) return "lower-back";
+      if(/shrug/.test(n)) return "traps";
+      return "lats";
+    case "Legs":
+      if(/curl|hamstring|romanian|rdl/.test(n)) return "hamstrings";
+      if(/calf/.test(n)) return "calves";
+      if(/glute|thrust|hip/.test(n)) return "glutes";
+      return "quads";
+    case "Shoulders":
+      if(/rear|face pull|reverse fly/.test(n)) return "side-delt";
+      if(/lateral|side/.test(n)) return "side-delt";
+      if(/shrug/.test(n)) return "traps";
+      return "front-delt";
+    case "Arms":
+      if(/tricep|pushdown|skull|extension|dip/.test(n)) return "triceps";
+      if(/forearm|wrist/.test(n)) return "forearms";
+      return "biceps";
+    case "Abs":
+      if(/twist|oblique|side bend/.test(n)) return "obliques";
+      return "abs";
+    default: return undefined;
+  }
+}
 const HM_LABELS={"chest":"Chest","abs":"Abs","obliques":"Obliques","front-delt":"Front Delt","side-delt":"Side Delt","biceps":"Biceps","triceps":"Triceps","forearms":"Forearms","quads":"Quads","hamstrings":"Hams","glutes":"Glutes","abductors":"Abductors","calves":"Calves","shins":"Shins","traps":"Traps","lats":"Lats","lower-back":"Low Back","infraspinatus":"Rear Delt"};
 
 // ── RANKS ──────────────────────────────────────────────────────────
