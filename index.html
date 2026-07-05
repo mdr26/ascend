@@ -1169,10 +1169,46 @@ function renderTaunt(){
 }
 
 // ── LOG WORKOUT ───────────────────────────────────────────────────
+const DAY_KEYWORD_MUSCLES={
+  chest:["chest"],
+  back:["lats","lower-back","traps","infraspinatus"],
+  legs:["quads","hamstrings","glutes","calves","abductors","shins"],
+  leg:["quads","hamstrings","glutes","calves","abductors","shins"],
+  shoulder:["front-delt","side-delt"],
+  shoulders:["front-delt","side-delt"],
+  arm:["biceps","triceps","forearms"],
+  arms:["biceps","triceps","forearms"],
+  abs:["abs","obliques"],
+  ab:["abs","obliques"],
+};
+
+// Warns (doesn't block) if what you're logging doesn't match what the day label implies —
+// catches the "selected Chest, actually did Legs" mistake before it gets saved.
+function checkDayMismatch(dayLabel,exercises){
+  const labelWords=dayLabel.toLowerCase().match(/[a-z]+/g)||[];
+  const expectedMuscles=new Set();
+  labelWords.forEach(w=>{ if(DAY_KEYWORD_MUSCLES[w]) DAY_KEYWORD_MUSCLES[w].forEach(m=>expectedMuscles.add(m)); });
+  if(!expectedMuscles.size) return true; // label has no recognizable body-part keyword — nothing to check
+
+  const namesInSession=[];
+  exercises.forEach(ex=>{
+    if(ex.type==="superset"){ namesInSession.push(ex.exA.name,ex.exB.name); }
+    else{ namesInSession.push(ex.name); }
+  });
+  const recognized=namesInSession.filter(n=>MUSCLE_MAP[n]);
+  if(!recognized.length) return true; // all custom exercises — nothing we can check against
+
+  const anyMatch=recognized.some(n=>expectedMuscles.has(MUSCLE_MAP[n]));
+  if(anyMatch) return true;
+
+  return confirm(`This is logged under "${dayLabel}" but the exercises you added don't look like ${labelWords.find(w=>DAY_KEYWORD_MUSCLES[w])} work. Log it anyway?`);
+}
+
 async function logWorkout(){
   if(!S.currentEx.length){showToast("Add at least one exercise");return;}
   const day=getDay(); if(!day){showToast("Set up your split first");return;}
   const exercises=JSON.parse(JSON.stringify(S.currentEx));
+  if(!checkDayMismatch(day,exercises)) return;
   const entry={date:today(),split:getSplit()?.name||"Workout",day,exercises,type:"lift"};
   let saved=true;
   try{
