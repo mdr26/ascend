@@ -295,9 +295,9 @@ textarea{-webkit-appearance:none;}
 <!-- LOGIN -->
 <div id="login-screen" style="display:none;">
   <div style="text-align:center;margin-bottom:28px;">
-    <svg width="72" height="72" viewBox="0 0 110 110" style="display:block;margin:0 auto 14px;"><rect width="110" height="110" rx="22" fill="#3D2A1A"/><polygon points="55,18 80,74 55,58 30,74" fill="#C87941"/><polygon points="55,34 70,74 55,62 40,74" fill="#5A3E28"/></svg>
-    <div style="font-size:32px;font-weight:800;font-style:italic;color:#3D2A1A;letter-spacing:-0.03em;margin-bottom:4px;">Ascend</div>
-    <div style="font-size:12px;color:#9B8270;letter-spacing:0.12em;text-transform:uppercase;">Track · Compete · Rank up</div>
+    <svg width="72" height="72" viewBox="0 0 110 110" style="display:block;margin:0 auto 14px;"><rect width="110" height="110" rx="22" fill="#1A0608"/><polygon points="55,18 80,74 55,58 30,74" fill="#C1121F"/><polygon points="55,34 70,74 55,62 40,74" fill="#3D0608"/></svg>
+    <div style="font-size:32px;font-weight:800;font-style:italic;color:#F0F0EE;letter-spacing:-0.03em;margin-bottom:4px;">Ascend</div>
+    <div style="font-size:12px;color:#888880;letter-spacing:0.12em;text-transform:uppercase;">Track · Compete · Rank up</div>
   </div>
   <div style="width:100%;">
     <input id="login-name" type="text" placeholder="Your name" maxlength="30" style="width:100%;background:var(--bg3);border:0.5px solid var(--border2);border-radius:10px;color:var(--text);font-size:15px;padding:13px 14px;font-family:inherit;margin-bottom:10px;">
@@ -328,7 +328,7 @@ textarea{-webkit-appearance:none;}
       <span>Ascend</span>
     </div>
     <div class="topbar-right">
-      <div class="streak-badge" id="streak-badge">?? 0</div>
+      <div class="streak-badge" id="streak-badge">0</div>
       <div class="user-pill" id="profile-pill">
         <span class="av" id="user-av">?</span>
         <span id="user-nm">Me</span>
@@ -378,7 +378,7 @@ textarea{-webkit-appearance:none;}
         <button class="add-ss-btn" id="add-ss-btn">+ Add superset</button>
       </div>
 
-      <button class="logbtn" id="log-workout-btn">⚡ Log Workout</button>
+      <button class="logbtn" id="log-workout-btn">Log Workout</button>
     </div>
 
     <!-- CARDIO & TIMERS TAB -->
@@ -473,7 +473,7 @@ textarea{-webkit-appearance:none;}
           <button id="add-cardio-btn">Add</button>
         </div>
       </div>
-      <button class="logbtn" id="log-cardio-btn">⚡ Log Cardio Session</button>
+      <button class="logbtn" id="log-cardio-btn">Log Cardio Session</button>
     </div>
 
     <!-- ABS TAB -->
@@ -506,7 +506,7 @@ textarea{-webkit-appearance:none;}
           <button id="add-abs-btn">Add</button>
         </div>
       </div>
-      <button class="logbtn" id="log-abs-btn">⚡ Log Abs Session</button>
+      <button class="logbtn" id="log-abs-btn">Log Abs Session</button>
     </div>
 
     <!-- PROGRESS TAB -->
@@ -659,7 +659,7 @@ textarea{-webkit-appearance:none;}
 <canvas id="confetti-canvas"></canvas>
 <div id="pr-overlay">
   <div style="position:relative;z-index:1000;">
-    <div style="font-size:64px;margin-bottom:8px;animation:prBounce 0.5s ease-out;">??</div>
+    <div style="font-size:64px;margin-bottom:8px;animation:prBounce 0.5s ease-out;">🏆</div>
     <div style="font-size:32px;font-weight:800;color:#C1121F;letter-spacing:-0.02em;margin-bottom:6px;animation:prSlide 0.4s ease-out 0.2s both;">NEW PR!</div>
     <div style="font-size:18px;font-weight:700;color:#F0F0EE;margin-bottom:4px;animation:prSlide 0.4s ease-out 0.3s both;" id="pr-ex-name"></div>
     <div style="font-size:13px;color:#666;margin-bottom:24px;font-style:italic;animation:prSlide 0.4s ease-out 0.4s both;" id="pr-msg"></div>
@@ -668,7 +668,7 @@ textarea{-webkit-appearance:none;}
       <div style="font-size:42px;font-weight:800;color:#C1121F;letter-spacing:-0.03em;" id="pr-weight-val"></div>
     </div>
     <br>
-    <button id="close-pr-btn" style="background:#C1121F;color:#fff;border:none;border-radius:10px;padding:14px 44px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:0.03em;animation:prSlide 0.4s ease-out 0.6s both;">Let's go! ??</button>
+    <button id="close-pr-btn" style="background:#C1121F;color:#fff;border:none;border-radius:10px;padding:14px 44px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:0.03em;animation:prSlide 0.4s ease-out 0.6s both;">Let's go!</button>
   </div>
 </div>
 
@@ -729,6 +729,7 @@ async function _loginWithUID(uid,name,adminOverride,inviteCode,err){
       uProfile=nu;isAdmin=isAdm;cUser={uid};
       if(inviteCode)await supa("PATCH","invite_codes",{used:true,used_by:uid},{"code":"eq."+inviteCode}).catch(()=>{});
     }
+    try{localStorage.setItem("ascend_profile_"+uid,JSON.stringify({name:uProfile.name,is_admin:isAdmin}));}catch(le){}
     await loadData();showApp();
   }catch(e){err.textContent="Error: "+e.message;err.style.display="block";}
 }
@@ -745,10 +746,45 @@ async function loadData(){
       const local=localStorage.getItem("ascend_local_"+cUser.uid);
       if(local){const d=JSON.parse(local);S.split=d.split||null;S.customSplits=d.customSplits||{};S.activeDay=d.activeDay||null;S.lastVariants=d.lastVariants||{};S.lastWeights=d.lastWeights||{};S.bwLog=d.bw_log||d.bwLog||[];S.plankPR=d.plankPR||0;}
     }
-    const logs=await supa("GET","logs",null,{"uid":"eq."+cUser.uid,"order":"created_at.desc","limit":"200"}).catch(()=>[]);
-    S.logs=(logs||[]).map(l=>({...l,exercises:l.exercises||[]}));
-    if(!S.logs.length){const c=localStorage.getItem("ascend_logs_"+cUser.uid);if(c)S.logs=JSON.parse(c);}
+    // Recover any workouts that were logged but never made it to the server yet —
+    // these must survive a fresh fetch, or they'd be silently deleted on next app open.
+    let pending=[];
+    try{
+      const cachedRaw=localStorage.getItem("ascend_logs_"+cUser.uid);
+      if(cachedRaw) pending=JSON.parse(cachedRaw).filter(l=>l&&l.id&&String(l.id).startsWith("local_"));
+    }catch(le){}
+    const logs=await supa("GET","logs",null,{"uid":"eq."+cUser.uid,"order":"created_at.desc","limit":"200"}).catch(()=>null);
+    if(logs){
+      const serverLogs=logs.map(l=>({...l,exercises:l.exercises||[]}));
+      S.logs=[...pending,...serverLogs];
+    }else{
+      // Fully offline — use whatever we have cached rather than wiping history.
+      const c=localStorage.getItem("ascend_logs_"+cUser.uid);
+      S.logs=c?JSON.parse(c):pending;
+    }
+    try{localStorage.setItem("ascend_logs_"+cUser.uid,JSON.stringify(S.logs.slice(0,100)));}catch(le){}
   }catch(e){console.error("loadData:",e);}
+}
+
+async function syncPendingLogs(){
+  const pending=S.logs.filter(l=>l&&l.id&&String(l.id).startsWith("local_"));
+  if(!pending.length) return;
+  let changed=false;
+  for(const entry of pending){
+    try{
+      const p={uid:cUser.uid,date:entry.date,split:entry.split,day:entry.day,exercises:entry.exercises,type:entry.type};
+      const res=await supa("POST","logs",p);
+      if(res&&res[0]){
+        const i=S.logs.findIndex(l=>l.id===entry.id);
+        if(i>-1){S.logs[i]={...res[0],exercises:res[0].exercises||[]};changed=true;}
+      }
+    }catch(e){ /* still offline or a real error — leave it pending, try again next time */ }
+  }
+  if(changed){
+    try{localStorage.setItem("ascend_logs_"+cUser.uid,JSON.stringify(S.logs.slice(0,100)));}catch(le){}
+    showToast("Synced offline workouts");
+    renderLog();
+  }
 }
 
 async function saveData(){
@@ -768,8 +804,16 @@ async function addLog(entry){
   try{
     const p={uid:cUser.uid,date:entry.date,split:entry.split,day:entry.day,exercises:entry.exercises,type:entry.type};
     const res=await supa("POST","logs",p);
-    if(res&&res[0]){const i=S.logs.findIndex(l=>l.id===tempId);if(i>-1)S.logs[i]={...res[0],exercises:res[0].exercises||[]};}
-  }catch(e){console.error("addLog:",e);}
+    if(res&&res[0]){
+      const i=S.logs.findIndex(l=>l.id===tempId);
+      if(i>-1)S.logs[i]={...res[0],exercises:res[0].exercises||[]};
+      try{localStorage.setItem("ascend_logs_"+cUser.uid,JSON.stringify(S.logs.slice(0,100)));}catch(le){}
+    }
+    return true;
+  }catch(e){
+    console.error("addLog:",e);
+    return false; // stays in S.logs with its local_ id — loadData() and syncPendingLogs() will pick it up later
+  }
 }
 
 async function updateLog(id,exercises){
@@ -786,6 +830,7 @@ async function deleteLog(id){
 
 function hideLoading(){document.getElementById("loading-screen").style.display="none";}
 function showLogin(){hideLoading();document.getElementById("login-screen").style.display="flex";document.getElementById("invite-screen").style.display="none";document.getElementById("app").style.display="none";}
+function showInvite(){hideLoading();document.getElementById("login-screen").style.display="none";document.getElementById("invite-screen").style.display="flex";document.getElementById("app").style.display="none";}
 function showApp(){
   hideLoading();
   document.getElementById("login-screen").style.display="none";
@@ -797,32 +842,48 @@ function showApp(){
   document.getElementById("profile-info").innerHTML=`<strong style="color:var(--text);">${name}</strong><br><span style="font-size:11px;color:var(--text3);">ID: ${cUser.uid.slice(0,12)}...</span>`;
   if(!S.activeDay&&getDays().length)S.activeDay=getDays()[0];
   renderExSelect();renderSSExSelect();renderLog();renderTimerConfig();
-  const onboarded=localStorage.getItem("ascend_onboarded_"+cUser.uid);
-  if(!onboarded){
-    obSlide=0;
-    document.getElementById("ob-slides").style.transform="translateX(0)";
-    document.querySelectorAll(".ob-dot").forEach((d,i)=>{d.style.background=i===0?"#C87941":"rgba(255,255,255,0.15)";d.style.width=i===0?"12px":"8px";});
-    document.getElementById("ob-next-btn").style.display="block";
-    document.getElementById("onboarding-screen").style.display="flex";
-  }
   if(isAdmin){supa("GET","users",null,{"is_admin":"eq.true"}).then(async rows=>{for(const u of(rows||[])){if(u.uid!==cUser.uid)await supa("DELETE","users",null,{"uid":"eq."+u.uid}).catch(()=>{})}}).catch(()=>{});}
 }
 
 document.addEventListener("DOMContentLoaded",async()=>{
   const uid=localStorage.getItem("ascend_uid");
-  if(uid){
+  if(!uid){ showLogin(); return; }
+
+  const cachedProfileRaw=localStorage.getItem("ascend_profile_"+uid);
+  let networkFailed=false;
+
+  try{
+    const rows=await supa("GET","users",null,{"uid":"eq."+uid});
+    if(rows&&rows.length){
+      if(rows[0].banned){ showLogin(); return; } // server explicitly confirms account removed — this is the only case that should force a fresh login
+      uProfile=rows[0];isAdmin=rows[0].is_admin||uid===ADMIN_UID;cUser={uid};
+      try{localStorage.setItem("ascend_profile_"+uid,JSON.stringify({name:uProfile.name,is_admin:isAdmin}));}catch(le){}
+      await loadData();showApp();syncPendingLogs();return;
+    }
+    // Server responded successfully but found no such user at all.
+    // If we have no cached profile either, this really is a fresh/unknown device — go to login.
+    if(!cachedProfileRaw){ showLogin(); return; }
+  }catch(e){
+    console.error("Auto-login (likely offline):",e);
+    networkFailed=true;
+  }
+
+  // We get here on a network failure, or a "no rows" response we're choosing not to trust
+  // blindly (e.g. a flaky read right after signup). Fall back to what we know locally
+  // instead of kicking the user back to the login screen every time the connection blips.
+  if(cachedProfileRaw){
     try{
-      const rows=await supa("GET","users",null,{"uid":"eq."+uid});
-      if(rows&&rows.length&&!rows[0].banned){
-        uProfile=rows[0];isAdmin=rows[0].is_admin||uid===ADMIN_UID;cUser={uid};
-        await loadData();showApp();return;
-      }
-    }catch(e){console.error("Auto-login:",e);}
+      const cp=JSON.parse(cachedProfileRaw);
+      uProfile={name:cp.name};isAdmin=cp.is_admin||uid===ADMIN_UID;cUser={uid};
+      await loadData();showApp();syncPendingLogs();
+      if(networkFailed) showToast("Offline — showing your last saved data");
+      return;
+    }catch(pe){ /* fall through to login */ }
   }
   showLogin();
 });
 
-let cUser=null, uProfile=null, isAdmin=false, crewUnsub=null;
+let cUser=null, uProfile=null, isAdmin=false, crewUnsubInterval=null;
 let editSplitKey=null, editingSessionId=null;
 let S={
   split:null, customSplits:{}, activeDay:null,
@@ -852,37 +913,7 @@ const CIN=[
 
 setTimeout(()=>{ if(document.getElementById("loading-screen").style.display!=="none") showLogin(); },6000);
 
-// ── AUTH ──────────────────────────────────────────────────────────
-
-async function saveData(){
-  try{
-    await setDoc(doc(db,"userData",cUser.uid),{
-      split:S.split,customSplits:S.customSplits,activeDay:S.activeDay,
-      lastVariants:S.lastVariants,lastWeights:S.lastWeights,
-      bwLog:S.bwLog,plankPR:S.plankPR,timerConfig:S.timerConfig
-    },{merge:true});
-    const uniqueDays=new Set(S.logs.filter(l=>l.type==="lift").map(l=>l.date)).size;
-    await updateDoc(doc(db,"users",cUser.uid),{sessions:uniqueDays});
-  } catch(e){console.error("Save error:",e); showToast("Save failed — check connection");}
-}
-
-// ── SCREENS ───────────────────────────────────────────────────────
-function hideLoading(){document.getElementById("loading-screen").style.display="none";}
-function showLogin(){hideLoading();document.getElementById("login-screen").style.display="flex";document.getElementById("invite-screen").style.display="none";document.getElementById("app").style.display="none";}
-function showInvite(){hideLoading();document.getElementById("login-screen").style.display="none";document.getElementById("invite-screen").style.display="flex";document.getElementById("app").style.display="none";}
-function showApp(){
-  hideLoading();
-  document.getElementById("login-screen").style.display="none";
-  document.getElementById("invite-screen").style.display="none";
-  document.getElementById("app").style.display="flex";
-  const name=uProfile?.name||cUser?.displayName||"Lifter";
-  document.getElementById("user-nm").textContent=name.split(" ")[0];
-  document.getElementById("user-av").textContent=name[0].toUpperCase();
-  document.getElementById("profile-info").innerHTML=`<strong style="color:var(--text);">${name}</strong><br><span style="font-size:11px;color:var(--text3);">UID: ${cUser.uid}</span>`;
-  if(!S.activeDay&&getDays().length) S.activeDay=getDays()[0];
-  renderExSelect(); renderSSExSelect();
-  renderLog(); renderTimerConfig();
-}
+window.addEventListener("online",()=>{ if(cUser) syncPendingLogs(); });
 
 // ── SPLIT ─────────────────────────────────────────────────────────
 function getSplit(){return S.customSplits[S.split]||null;}
@@ -1008,7 +1039,7 @@ function makeExCard(ex, idx){
 function renderExList(){
   const el=document.getElementById("ex-list");
   if(!getSplit()){
-    el.innerHTML=`<div style="background:var(--bg3);border:0.5px dashed rgba(193,18,31,0.4);border-radius:12px;padding:28px 20px;text-align:center;margin-bottom:12px;"><div style="font-size:28px;margin-bottom:8px;">??️</div><div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">No split set up yet</div><div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Create your custom split to start logging</div><button id="create-split-cta" style="background:var(--acc);color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;">Create my split</button></div>`;
+    el.innerHTML=`<div style="background:var(--bg3);border:0.5px dashed rgba(193,18,31,0.4);border-radius:12px;padding:28px 20px;text-align:center;margin-bottom:12px;"><div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">No split set up yet</div><div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Create your custom split to start logging</div><button id="create-split-cta" style="background:var(--acc);color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;">Create my split</button></div>`;
     document.getElementById("create-split-cta").onclick=()=>openModal("split-modal");
     return;
   }
@@ -1019,7 +1050,7 @@ function renderExList(){
     if(ex.type==="superset"){
       html+=`<div class="superset-block">
         <div class="superset-header">
-          <span class="superset-label">⚡ Superset</span>
+          <span class="superset-label">Superset</span>
           <button class="rmex-btn" data-idx="${idx}" data-action="removex" style="font-size:11px;">Remove</button>
         </div>
         <div class="superset-inner">
@@ -1092,14 +1123,15 @@ async function logWorkout(){
   if(!S.currentEx.length){showToast("Add at least one exercise");return;}
   const day=getDay(); if(!day){showToast("Set up your split first");return;}
   const exercises=JSON.parse(JSON.stringify(S.currentEx));
-  const entry={uid:cUser.uid,date:today(),split:getSplit()?.name||"Workout",day,exercises,type:"lift",createdAt:serverTimestamp()};
+  const entry={date:today(),split:getSplit()?.name||"Workout",day,exercises,type:"lift"};
+  let saved=true;
   try{
     if(editingSessionId){
       await updateLog(editingSessionId,exercises);
       editingSessionId=null;
       showToast("Session updated!");
     } else {
-      await addLog(entry);
+      saved=await addLog(entry);
     }
     let prEx=null, prWeight=0;
     exercises.forEach(ex=>{
@@ -1117,7 +1149,9 @@ async function logWorkout(){
     });
     S.currentEx=[];
     await saveData();
-    if(prEx) showPR(prEx,prWeight); else showToast("Workout logged. Beast.");
+    if(prEx) showPR(prEx,prWeight);
+    else if(!saved) showToast("Saved on device — will sync when back online");
+    else showToast("Workout logged. Beast.");
     renderLog();
     checkDuplicate();
   } catch(e){console.error(e);showToast("Error saving. Check connection.");}
@@ -1137,7 +1171,7 @@ function calcStreak(){
   }
   return streak;
 }
-function renderStreakBadge(){ document.getElementById("streak-badge").textContent="?? "+calcStreak(); }
+function renderStreakBadge(){ document.getElementById("streak-badge").textContent=calcStreak(); }
 
 // ── ABS ───────────────────────────────────────────────────────────
 function renderAbsExList(){
@@ -1177,12 +1211,14 @@ function renderAbsExList(){
 
 async function logAbsWorkout(){
   if(!S.absEx.length){showToast("Add at least one exercise");return;}
-  const entry={uid:cUser.uid,date:today(),split:"Abs",day:"Abs",exercises:JSON.parse(JSON.stringify(S.absEx)),type:"abs",createdAt:serverTimestamp()};
+  const entry={date:today(),split:"Abs",day:"Abs",exercises:JSON.parse(JSON.stringify(S.absEx)),type:"abs"};
   try{
-    const ref=await addDoc(collection(db,"logs"),entry);
-    S.logs.unshift({id:ref.id,...entry}); S.absEx=[];
-    await saveData(); showToast("Abs session logged!"); renderAbsExList(); renderWeekStrip(); renderStreakBadge();
-  }catch(e){showToast("Error saving.");}
+    const saved=await addLog(entry);
+    S.absEx=[];
+    await saveData();
+    showToast(saved?"Abs session logged!":"Saved on device — will sync when back online");
+    renderAbsExList(); renderWeekStrip(); renderStreakBadge();
+  }catch(e){console.error(e);showToast("Error saving.");}
 }
 
 // ── CARDIO ────────────────────────────────────────────────────────
@@ -1217,12 +1253,14 @@ function renderCardioExList(){
 
 async function logCardioSession(){
   if(!S.cardioEx.length){showToast("Add at least one exercise");return;}
-  const entry={uid:cUser.uid,date:today(),split:"Cardio",day:"Cardio",exercises:JSON.parse(JSON.stringify(S.cardioEx)),type:"cardio",createdAt:serverTimestamp()};
+  const entry={date:today(),split:"Cardio",day:"Cardio",exercises:JSON.parse(JSON.stringify(S.cardioEx)),type:"cardio"};
   try{
-    const ref=await addDoc(collection(db,"logs"),entry);
-    S.logs.unshift({id:ref.id,...entry}); S.cardioEx=[];
-    await saveData(); showToast("Cardio session logged!"); renderCardioExList(); renderWeekStrip(); renderStreakBadge();
-  }catch(e){showToast("Error saving.");}
+    const saved=await addLog(entry);
+    S.cardioEx=[];
+    await saveData();
+    showToast(saved?"Cardio session logged!":"Saved on device — will sync when back online");
+    renderCardioExList(); renderWeekStrip(); renderStreakBadge();
+  }catch(e){console.error(e);showToast("Error saving.");}
 }
 
 // ── PLANK ─────────────────────────────────────────────────────────
@@ -1231,7 +1269,7 @@ function togglePlank(){
   if(plankRunning){
     clearInterval(plankInterval); plankRunning=false;
     document.getElementById("plank-start-btn").textContent="Resume";
-    if(plankSecs>S.plankPR){S.plankPR=plankSecs;saveData();document.getElementById("plank-pr").textContent="PR: "+fmtTime(S.plankPR)+" ??";}
+    if(plankSecs>S.plankPR){S.plankPR=plankSecs;saveData();document.getElementById("plank-pr").textContent="PR: "+fmtTime(S.plankPR);}
   } else {
     plankRunning=true; document.getElementById("plank-start-btn").textContent="Pause";
     plankInterval=setInterval(()=>{plankSecs++;document.getElementById("plank-display").textContent=fmtTime(plankSecs);},1000);
@@ -1295,9 +1333,9 @@ function startTimer(){
         if(timerRound>=cfg2.rounds){
           if(S.timerMode==="tabata"){
             timerCycle++; timerRound=0;
-            if(timerCycle>=cfg2.cycles){ timerPhase="done"; timerSecs=0; clearInterval(timerInterval); timerRunning=false; document.getElementById("timer-start-btn").textContent="Start"; showToast("Session complete! ??"); }
+            if(timerCycle>=cfg2.cycles){ timerPhase="done"; timerSecs=0; clearInterval(timerInterval); timerRunning=false; document.getElementById("timer-start-btn").textContent="Start"; showToast("Session complete!"); }
             else { timerPhase="cyclerest"; timerSecs=cfg2.cyclerest; timerTotalSecs=cfg2.cyclerest; }
-          } else { timerPhase="done"; timerSecs=0; clearInterval(timerInterval); timerRunning=false; document.getElementById("timer-start-btn").textContent="Start"; showToast("Session complete! ??"); }
+          } else { timerPhase="done"; timerSecs=0; clearInterval(timerInterval); timerRunning=false; document.getElementById("timer-start-btn").textContent="Start"; showToast("Session complete!"); }
         } else { timerPhase="work"; timerSecs=cfg2.work; timerTotalSecs=cfg2.work; }
       } else if(timerPhase==="cyclerest"){ timerPhase="work"; timerSecs=cfg2.work; timerTotalSecs=cfg2.work; }
     }
@@ -1507,7 +1545,7 @@ async function renderCrew(){
       <div style="font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:rgba(193,18,31,0.7);margin-bottom:3px;">${rank.universe} · ${uniqueDays} training days</div>
       <div style="font-size:17px;font-weight:800;color:var(--acc);">${rank.title}</div>
       <div style="font-size:11px;color:var(--text3);margin-top:3px;line-height:1.5;">${rank.sub}</div>
-      ${next?`<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:7px;"><span>${uniqueDays} days</span><span>${next.min} → ${next.title}</span></div><div class="rank-bar-bg"><div class="rank-bar-fill" style="width:${pct}%"></div></div>`:`<div style="font-size:11px;color:var(--acc);margin-top:6px;font-weight:700;">MAX RANK ACHIEVED ??</div>`}
+      ${next?`<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:7px;"><span>${uniqueDays} days</span><span>${next.min} → ${next.title}</span></div><div class="rank-bar-bg"><div class="rank-bar-fill" style="width:${pct}%"></div></div>`:`<div style="font-size:11px;color:var(--acc);margin-top:6px;font-weight:700;">MAX RANK ACHIEVED</div>`}
     </div>
   </div>`;
 
@@ -1527,7 +1565,7 @@ async function renderCrew(){
       return`<div class="${cls}">
         <div class="friend-av">${initials}</div>
         <div style="flex:1;min-width:0;">
-          <div style="font-size:14px;font-weight:700;color:var(--text);">${u.name||"Lifter"}${isTop?" ??":""}</div>
+          <div style="font-size:14px;font-weight:700;color:var(--text);">${u.name||"Lifter"}${isTop?" 👑":""}</div>
           <div style="font-size:11px;font-weight:700;color:${isTop?"var(--acc)":"var(--text3)"};">${fr.emoji} ${fr.title}</div>
           <div style="font-size:11px;color:var(--text3);">${u.sessions||0} training days</div>
         </div>
@@ -1544,7 +1582,7 @@ function renderAdminPanel(){
   const el=document.getElementById("admin-panel");
   if(!isAdmin){el.innerHTML="";return;}
   el.innerHTML=`<hr class="divider"><div class="admin-section">
-    <div class="admin-title">⚙️ Admin controls</div>
+    <div class="admin-title">Admin controls</div>
     <button class="code-btn" id="gen-code-btn">Generate invite code</button>
     <div id="gen-code-result" style="display:none;">
       <div class="admin-code" id="gen-code-val">—</div>
@@ -1679,7 +1717,6 @@ function showToast(msg){const t=document.getElementById("toast");t.textContent=m
 
 // ── WIRE UP BUTTONS ───────────────────────────────────────────────
 document.getElementById("login-btn").onclick=doLogin;
-// invite handled via doLogin
 document.getElementById("invite-input").oninput=e=>{e.target.value=e.target.value.toUpperCase();};
 document.getElementById("invite-logout").onclick=()=>{localStorage.removeItem("ascend_uid");location.reload();};
 document.getElementById("signout-btn").onclick=()=>{if(crewUnsubInterval)clearInterval(crewUnsubInterval);localStorage.removeItem("ascend_uid");location.reload();};
@@ -1805,7 +1842,55 @@ document.querySelectorAll(".nbtn").forEach(btn=>{
 // Close overlays on bg click
 document.querySelectorAll(".overlay").forEach(o=>o.addEventListener("click",e=>{if(e.target===o)o.classList.remove("open");}));
 
+// ── EXERCISE DATABASE ────────────────────────────────────────────
+const EX_DB={
+  Chest:[{name:"Bench Press",variants:["Barbell","Dumbbell","Smith Machine"]},{name:"Incline Bench Press",variants:["Barbell","Dumbbell","Smith Machine"]},{name:"Decline Bench Press",variants:["Barbell","Dumbbell"]},{name:"Chest Press Machine",variants:["Machine"]},{name:"Cable Fly",variants:["High to Low","Low to High","Mid"]},{name:"Pec Deck",variants:["Machine"]},{name:"Push Up",variants:["Bodyweight","Weighted"]},{name:"Dips",variants:["Bodyweight","Weighted"]}],
+  Back:[{name:"Deadlift",variants:["Barbell","Trap Bar","Sumo"]},{name:"Pull Up",variants:["Bodyweight","Weighted","Assisted"]},{name:"Lat Pulldown",variants:["Wide Grip","Close Grip","Reverse Grip"]},{name:"Barbell Row",variants:["Overhand","Underhand"]},{name:"Seated Cable Row",variants:["Wide Grip","Close Grip","V-Bar"]},{name:"T-Bar Row",variants:["Machine","Barbell"]},{name:"Dumbbell Row",variants:["Single Arm","Chest Supported"]},{name:"Face Pull",variants:["Cable","Band"]}],
+  Legs:[{name:"Squat",variants:["Barbell","Front","Goblet","Smith Machine"]},{name:"Leg Press",variants:["Machine"]},{name:"Romanian Deadlift",variants:["Barbell","Dumbbell"]},{name:"Leg Extension",variants:["Machine"]},{name:"Leg Curl",variants:["Seated","Lying"]},{name:"Lunges",variants:["Walking","Reverse","Bulgarian Split"]},{name:"Calf Raise",variants:["Standing","Seated"]},{name:"Hip Thrust",variants:["Barbell","Machine"]}],
+  Shoulders:[{name:"Overhead Press",variants:["Barbell","Dumbbell","Smith Machine"]},{name:"Lateral Raise",variants:["Dumbbell","Cable","Machine"]},{name:"Front Raise",variants:["Dumbbell","Cable","Plate"]},{name:"Rear Delt Fly",variants:["Dumbbell","Cable","Machine"]},{name:"Arnold Press",variants:["Dumbbell"]},{name:"Shrugs",variants:["Barbell","Dumbbell"]},{name:"Upright Row",variants:["Barbell","Cable"]}],
+  Arms:[{name:"Bicep Curl",variants:["Barbell","Dumbbell","Cable"]},{name:"Hammer Curl",variants:["Dumbbell","Cable","Rope"]},{name:"Preacher Curl",variants:["Barbell","Dumbbell","Machine"]},{name:"Tricep Pushdown",variants:["Rope","Bar","V-Bar"]},{name:"Skull Crusher",variants:["Barbell","Dumbbell","EZ Bar"]},{name:"Overhead Tricep Extension",variants:["Dumbbell","Cable"]},{name:"Close Grip Bench Press",variants:["Barbell","Smith Machine"]}]
+};
 
+// ── MUSCLE MAP (exercise name -> heatmap muscle key) ─────────────
+const MUSCLE_MAP={
+  "Bench Press":"chest","Incline Bench Press":"chest","Decline Bench Press":"chest","Chest Press Machine":"chest","Cable Fly":"chest","Pec Deck":"chest","Push Up":"chest","Dips":"triceps",
+  "Deadlift":"lower-back","Pull Up":"lats","Lat Pulldown":"lats","Barbell Row":"lats","Seated Cable Row":"lats","T-Bar Row":"lats","Dumbbell Row":"lats","Face Pull":"infraspinatus",
+  "Squat":"quads","Leg Press":"quads","Romanian Deadlift":"hamstrings","Leg Extension":"quads","Leg Curl":"hamstrings","Lunges":"quads","Calf Raise":"calves","Hip Thrust":"glutes",
+  "Overhead Press":"front-delt","Lateral Raise":"side-delt","Front Raise":"front-delt","Rear Delt Fly":"side-delt","Arnold Press":"front-delt","Shrugs":"traps","Upright Row":"traps",
+  "Bicep Curl":"biceps","Hammer Curl":"biceps","Preacher Curl":"biceps","Tricep Pushdown":"triceps","Skull Crusher":"triceps","Overhead Tricep Extension":"triceps","Close Grip Bench Press":"triceps"
+};
+const HM_LABELS={"chest":"Chest","abs":"Abs","obliques":"Obliques","front-delt":"Front Delt","side-delt":"Side Delt","biceps":"Biceps","triceps":"Triceps","forearms":"Forearms","quads":"Quads","hamstrings":"Hams","glutes":"Glutes","abductors":"Abductors","calves":"Calves","shins":"Shins","traps":"Traps","lats":"Lats","lower-back":"Low Back","infraspinatus":"Rear Delt"};
+
+// ── RANKS ──────────────────────────────────────────────────────────
+const RANKS=[
+  {min:0,title:"Peter Parker",universe:"Marvel",sub:"Just starting out. Every legend begins somewhere.",emoji:"🕷️"},
+  {min:5,title:"Spider-Man",universe:"Marvel",sub:"Building the habit. Keep swinging.",emoji:"🕸️"},
+  {min:10,title:"Winter Soldier",universe:"Marvel",sub:"Consistency is your weapon now.",emoji:"⚙️"},
+  {min:20,title:"Captain America",universe:"Marvel",sub:"Discipline over talent. You're a role model now.",emoji:"🛡️"},
+  {min:35,title:"Iron Man",universe:"Marvel",sub:"Engineering the best version of yourself.",emoji:"🤖"},
+  {min:50,title:"Thor",universe:"Marvel",sub:"Worthy. The bar answers to you.",emoji:"⚡"},
+  {min:75,title:"Hulk",universe:"Marvel",sub:"Strength beyond measure.",emoji:"💪"},
+  {min:100,title:"Batman",universe:"DC",sub:"Prepared for anything. Feared by plateaus.",emoji:"🦇"},
+  {min:130,title:"Flash",universe:"DC",sub:"Speed and consistency combined.",emoji:"⚡"},
+  {min:160,title:"Wonder Woman",universe:"DC",sub:"Warrior discipline. Unshakeable.",emoji:"⭐"},
+  {min:200,title:"Green Lantern",universe:"DC",sub:"Willpower made manifest.",emoji:"💚"},
+  {min:250,title:"Superman",universe:"DC",sub:"The pinnacle. Krypton would be proud.",emoji:"🦸"},
+];
+
+// ── TAUNTS ────────────────────────────────────────────────────────
+const TAUNTS=[
+  "Last time you did {w}kg. Beat it or explain yourself.",
+  "{w}kg was your number last session. No pressure.",
+  "You did {w}kg before. Comfort zones don't build muscle.",
+  "{w}kg. That's the bar you set. Literally.",
+];
+const PR_TAUNTS=[
+  "New personal best. Don't let it go to your head.",
+  "That's a PR. Your old self is somewhere feeling attacked.",
+  "Numbers don't lie. You just got stronger.",
+  "PR unlocked. The bar has been raised, literally.",
+  "That weight didn't stand a chance.",
+];
 </script>
 
 </body>
