@@ -294,16 +294,33 @@ textarea{-webkit-appearance:none;}
 
 <!-- LOGIN -->
 <div id="login-screen" style="display:none;">
-  <div style="text-align:center;margin-bottom:28px;">
+  <div style="text-align:center;margin-bottom:24px;">
     <svg width="72" height="72" viewBox="0 0 110 110" style="display:block;margin:0 auto 14px;"><rect width="110" height="110" rx="22" fill="#1A0608"/><polygon points="55,18 80,74 55,58 30,74" fill="#C1121F"/><polygon points="55,34 70,74 55,62 40,74" fill="#3D0608"/></svg>
     <div style="font-size:32px;font-weight:800;font-style:italic;color:#F0F0EE;letter-spacing:-0.03em;margin-bottom:4px;">Ascend</div>
     <div style="font-size:12px;color:#888880;letter-spacing:0.12em;text-transform:uppercase;">Track · Compete · Rank up</div>
   </div>
-  <div style="width:100%;">
-    <input id="login-name" type="text" placeholder="Your name" maxlength="30" style="width:100%;background:var(--bg3);border:0.5px solid var(--border2);border-radius:10px;color:var(--text);font-size:15px;padding:13px 14px;font-family:inherit;margin-bottom:10px;">
-    <input id="login-secret" type="password" placeholder="Invite code (leave blank if admin)" style="width:100%;background:var(--bg3);border:0.5px solid var(--border2);border-radius:10px;color:var(--text);font-size:15px;padding:13px 14px;font-family:inherit;margin-bottom:10px;">
-    <button id="login-btn" style="width:100%;background:var(--acc);color:#fff;border:none;border-radius:10px;padding:15px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;">Enter Ascend</button>
+
+  <div class="timer-mode-tabs" style="width:100%;margin-bottom:16px;">
+    <div class="tmode active" id="login-mode-login">Log in</div>
+    <div class="tmode" id="login-mode-create">Create account</div>
   </div>
+
+  <!-- LOG IN (existing account, any device) -->
+  <div id="login-pane-login" style="width:100%;">
+    <input id="li-username" type="text" placeholder="Username" maxlength="24" autocomplete="username" style="width:100%;background:var(--bg3);border:0.5px solid var(--border2);border-radius:10px;color:var(--text);font-size:15px;padding:13px 14px;font-family:inherit;margin-bottom:10px;">
+    <input id="li-pin" type="password" inputmode="numeric" placeholder="PIN" maxlength="8" autocomplete="current-password" style="width:100%;background:var(--bg3);border:0.5px solid var(--border2);border-radius:10px;color:var(--text);font-size:15px;padding:13px 14px;font-family:inherit;margin-bottom:10px;letter-spacing:0.2em;">
+    <button id="login-in-btn" style="width:100%;background:var(--acc);color:#fff;border:none;border-radius:10px;padding:15px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;">Enter Ascend</button>
+  </div>
+
+  <!-- CREATE ACCOUNT (new user) -->
+  <div id="login-pane-create" style="width:100%;display:none;">
+    <input id="login-name" type="text" placeholder="Your name" maxlength="30" style="width:100%;background:var(--bg3);border:0.5px solid var(--border2);border-radius:10px;color:var(--text);font-size:15px;padding:13px 14px;font-family:inherit;margin-bottom:10px;">
+    <input id="cr-username" type="text" placeholder="Choose a username" maxlength="24" autocomplete="username" style="width:100%;background:var(--bg3);border:0.5px solid var(--border2);border-radius:10px;color:var(--text);font-size:15px;padding:13px 14px;font-family:inherit;margin-bottom:10px;">
+    <input id="cr-pin" type="password" inputmode="numeric" placeholder="Choose a 4-8 digit PIN" maxlength="8" autocomplete="new-password" style="width:100%;background:var(--bg3);border:0.5px solid var(--border2);border-radius:10px;color:var(--text);font-size:15px;padding:13px 14px;font-family:inherit;margin-bottom:10px;letter-spacing:0.2em;">
+    <input id="login-secret" type="password" placeholder="Invite code (leave blank if admin)" style="width:100%;background:var(--bg3);border:0.5px solid var(--border2);border-radius:10px;color:var(--text);font-size:15px;padding:13px 14px;font-family:inherit;margin-bottom:10px;">
+    <button id="login-btn" style="width:100%;background:var(--acc);color:#fff;border:none;border-radius:10px;padding:15px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;">Create account</button>
+  </div>
+
   <div id="login-err" style="font-size:12px;color:#C1121F;text-align:center;margin-top:10px;display:none;"></div>
 </div>
 
@@ -563,6 +580,14 @@ textarea{-webkit-appearance:none;}
     <div class="handle"></div>
     <div class="mtitle">Your profile</div>
     <div id="profile-info" style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.8;"></div>
+    <div id="cross-device-section" style="display:none;background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--rad);padding:14px;margin-bottom:16px;">
+      <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px;">Set up cross-device login</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px;line-height:1.5;">Choose a username and PIN so you can log into this same account from your phone, laptop, or any other device.</div>
+      <input class="minput" id="cdl-username" placeholder="Choose a username" maxlength="24">
+      <input class="minput" id="cdl-pin" type="password" inputmode="numeric" placeholder="Choose a 4-8 digit PIN" maxlength="8" style="letter-spacing:0.2em;">
+      <div id="cdl-err" style="font-size:11px;color:#C1121F;margin-top:-4px;margin-bottom:8px;display:none;"></div>
+      <button class="mbtn" style="margin-top:0;" id="cdl-save-btn">Save</button>
+    </div>
     <button class="mbtn" style="background:var(--bg3);color:var(--text2);border:0.5px solid var(--border2);margin-bottom:8px;" id="signout-btn">Sign out</button>
     <button class="mcancel" id="close-profile-btn">Close</button>
   </div>
@@ -667,45 +692,95 @@ async function supa(method,table,body=null,params=null){
 
 function genUID(){return "u_"+Math.random().toString(36).slice(2,10)+Date.now().toString(36);}
 
+async function hashPin(pin){
+  const enc=new TextEncoder().encode("ascend_pin_v1_"+pin);
+  const buf=await crypto.subtle.digest("SHA-256",enc);
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+
+// Create a brand-new account (invite code or admin secret required).
 async function doLogin(){
   const name=document.getElementById("login-name").value.trim();
+  const username=document.getElementById("cr-username").value.trim().toLowerCase();
+  const pin=document.getElementById("cr-pin").value.trim();
   const secret=document.getElementById("login-secret").value.trim();
   const err=document.getElementById("login-err");
   err.style.display="none";
   if(!name||name.length<2){err.textContent="Enter your name (min 2 chars)";err.style.display="block";return;}
-  let uid=localStorage.getItem("ascend_uid");
+  if(!username||username.length<3||/\s/.test(username)){err.textContent="Choose a username (3+ characters, no spaces)";err.style.display="block";return;}
+  if(!pin||pin.length<4||!/^\d+$/.test(pin)){err.textContent="PIN must be 4-8 digits";err.style.display="block";return;}
+  if(!secret){err.textContent="Need an invite code to create an account";err.style.display="block";return;}
+
+  const taken=await supa("GET","users",null,{"username":"eq."+username}).catch(()=>null);
+  if(taken===null){err.textContent="Couldn't reach the server. Check your connection and try again.";err.style.display="block";return;}
+  if(taken.length){err.textContent="That username is taken — try another.";err.style.display="block";return;}
+
+  const pinHash=await hashPin(pin);
+  let uid=genUID();
   if(secret.toLowerCase()==="ascend_admin_2024"){
-    if(!uid)uid=ADMIN_UID;
+    uid=localStorage.getItem("ascend_uid")||ADMIN_UID;
     localStorage.setItem("ascend_uid",uid);
-    await _loginWithUID(uid,name,true,null,err);
-  }else if(secret){
+    await _createAccount(uid,name,username,pinHash,true,null,err);
+  }else{
     const codes=await supa("GET","invite_codes",null,{"code":"eq."+secret.toUpperCase(),"used":"eq.false"}).catch(()=>[]);
     if(!codes||!codes.length){err.textContent="Invalid or expired invite code.";err.style.display="block";return;}
     if(codes[0].expires_at&&new Date(codes[0].expires_at)<new Date()){err.textContent="Code expired.";err.style.display="block";return;}
-    if(!uid)uid=genUID();
     localStorage.setItem("ascend_uid",uid);
-    await _loginWithUID(uid,name,false,secret,err);
-  }else{
-    if(!uid){err.textContent="Need an invite code to join.";err.style.display="block";return;}
-    await _loginWithUID(uid,name,false,null,err);
+    await _createAccount(uid,name,username,pinHash,false,secret,err);
   }
 }
 
-async function _loginWithUID(uid,name,adminOverride,inviteCode,err){
+async function _createAccount(uid,name,username,pinHash,adminOverride,inviteCode,err){
   try{
-    const ex=await supa("GET","users",null,{"uid":"eq."+uid}).catch(()=>[]);
-    if(ex&&ex.length){
-      if(ex[0].banned){err.textContent="Account removed.";err.style.display="block";return;}
-      uProfile=ex[0];isAdmin=ex[0].is_admin||adminOverride||uid===ADMIN_UID;cUser={uid};
-    }else{
-      const isAdm=adminOverride||uid===ADMIN_UID;
-      const nu={uid,name,is_admin:isAdm,sessions:0,banned:false};
-      await supa("POST","users",nu).catch(()=>{});
-      uProfile=nu;isAdmin=isAdm;cUser={uid};
-      if(inviteCode)await supa("PATCH","invite_codes",{used:true,used_by:uid},{"code":"eq."+inviteCode}).catch(()=>{});
-    }
-    try{localStorage.setItem("ascend_profile_"+uid,JSON.stringify({name:uProfile.name,is_admin:isAdmin}));}catch(le){}
+    const isAdm=adminOverride||uid===ADMIN_UID;
+    const nu={uid,name,username,pin_hash:pinHash,is_admin:isAdm,sessions:0,banned:false};
+    await supa("POST","users",nu);
+    uProfile=nu;isAdmin=isAdm;cUser={uid};
+    if(inviteCode)await supa("PATCH","invite_codes",{used:true,used_by:uid},{"code":"eq."+inviteCode}).catch(()=>{});
+    try{localStorage.setItem("ascend_profile_"+uid,JSON.stringify({name:uProfile.name,is_admin:isAdmin,username:uProfile.username}));}catch(le){}
     await loadData();showApp();
+  }catch(e){err.textContent="Error creating account: "+e.message;err.style.display="block";}
+}
+
+// Log in to an existing account from any device, via username + PIN.
+async function doLoginExisting(){
+  const username=document.getElementById("li-username").value.trim().toLowerCase();
+  const pin=document.getElementById("li-pin").value.trim();
+  const err=document.getElementById("login-err");
+  err.style.display="none";
+  if(!username||!pin){err.textContent="Enter your username and PIN";err.style.display="block";return;}
+  try{
+    const rows=await supa("GET","users",null,{"username":"eq."+username});
+    if(!rows||!rows.length){err.textContent="No account found with that username.";err.style.display="block";return;}
+    const acct=rows[0];
+    if(acct.banned){err.textContent="Account removed.";err.style.display="block";return;}
+    if(!acct.pin_hash){err.textContent="This account hasn't set up a PIN yet — log in on its original device and set one up in your profile.";err.style.display="block";return;}
+    const pinHash=await hashPin(pin);
+    if(pinHash!==acct.pin_hash){err.textContent="Incorrect PIN.";err.style.display="block";return;}
+    localStorage.setItem("ascend_uid",acct.uid);
+    uProfile=acct;isAdmin=acct.is_admin||acct.uid===ADMIN_UID;cUser={uid:acct.uid};
+    try{localStorage.setItem("ascend_profile_"+acct.uid,JSON.stringify({name:acct.name,is_admin:isAdmin,username:acct.username}));}catch(le){}
+    await loadData();showApp();syncPendingLogs();
+  }catch(e){err.textContent="Error: "+e.message;err.style.display="block";}
+}
+
+// For accounts created before username/PIN existed — claim one without losing existing data.
+async function setupCrossDeviceLogin(){
+  const err=document.getElementById("cdl-err");
+  const username=document.getElementById("cdl-username").value.trim().toLowerCase();
+  const pin=document.getElementById("cdl-pin").value.trim();
+  err.style.display="none";
+  if(!username||username.length<3||/\s/.test(username)){err.textContent="Username must be 3+ characters, no spaces";err.style.display="block";return;}
+  if(!pin||pin.length<4||!/^\d+$/.test(pin)){err.textContent="PIN must be 4-8 digits";err.style.display="block";return;}
+  const taken=await supa("GET","users",null,{"username":"eq."+username}).catch(()=>null);
+  if(taken===null){err.textContent="Couldn't reach the server. Try again.";err.style.display="block";return;}
+  if(taken.length){err.textContent="That username is taken — try another.";err.style.display="block";return;}
+  try{
+    const pinHash=await hashPin(pin);
+    await supa("PATCH","users",{username,pin_hash:pinHash},{"uid":"eq."+cUser.uid});
+    uProfile={...uProfile,username};
+    showToast("Cross-device login set up!");
+    closeModal("profile-modal");
   }catch(e){err.textContent="Error: "+e.message;err.style.display="block";}
 }
 
@@ -814,7 +889,7 @@ function showApp(){
   const name=uProfile?.name||"Lifter";
   document.getElementById("user-nm").textContent=name.split(" ")[0];
   document.getElementById("user-av").textContent=name[0].toUpperCase();
-  document.getElementById("profile-info").innerHTML=`<strong style="color:var(--text);">${name}</strong><br><span style="font-size:11px;color:var(--text3);">ID: ${cUser.uid.slice(0,12)}...</span>`;
+  document.getElementById("profile-info").innerHTML=`<strong style="color:var(--text);">${name}</strong>${uProfile?.username?`<br><span style="font-size:11px;color:var(--text3);">@${uProfile.username}</span>`:""}<br><span style="font-size:11px;color:var(--text3);">ID: ${cUser.uid.slice(0,12)}...</span>`;
   if(!S.activeDay&&getDays().length)S.activeDay=getDays()[0];
   renderExSelect();renderSSExSelect();renderLog();renderTimerConfig();
   if(isAdmin){supa("GET","users",null,{"is_admin":"eq.true"}).then(async rows=>{for(const u of(rows||[])){if(u.uid!==cUser.uid)await supa("DELETE","users",null,{"uid":"eq."+u.uid}).catch(()=>{})}}).catch(()=>{});}
@@ -832,7 +907,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
     if(rows&&rows.length){
       if(rows[0].banned){ showLogin(); return; } // server explicitly confirms account removed — this is the only case that should force a fresh login
       uProfile=rows[0];isAdmin=rows[0].is_admin||uid===ADMIN_UID;cUser={uid};
-      try{localStorage.setItem("ascend_profile_"+uid,JSON.stringify({name:uProfile.name,is_admin:isAdmin}));}catch(le){}
+      try{localStorage.setItem("ascend_profile_"+uid,JSON.stringify({name:uProfile.name,is_admin:isAdmin,username:uProfile.username}));}catch(le){}
       await loadData();showApp();syncPendingLogs();return;
     }
     // Server responded successfully but found no such user at all.
@@ -849,7 +924,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
   if(cachedProfileRaw){
     try{
       const cp=JSON.parse(cachedProfileRaw);
-      uProfile={name:cp.name};isAdmin=cp.is_admin||uid===ADMIN_UID;cUser={uid};
+      uProfile={name:cp.name,username:cp.username};isAdmin=cp.is_admin||uid===ADMIN_UID;cUser={uid};
       await loadData();showApp();syncPendingLogs();
       if(networkFailed) showToast("Offline — showing your last saved data");
       return;
@@ -1645,11 +1720,32 @@ function showToast(msg){const t=document.getElementById("toast");t.textContent=m
 
 // ── WIRE UP BUTTONS ───────────────────────────────────────────────
 document.getElementById("login-btn").onclick=doLogin;
+document.getElementById("login-in-btn").onclick=doLoginExisting;
+document.getElementById("login-mode-login").onclick=()=>{
+  document.getElementById("login-mode-login").classList.add("active");
+  document.getElementById("login-mode-create").classList.remove("active");
+  document.getElementById("login-pane-login").style.display="block";
+  document.getElementById("login-pane-create").style.display="none";
+  document.getElementById("login-err").style.display="none";
+};
+document.getElementById("login-mode-create").onclick=()=>{
+  document.getElementById("login-mode-create").classList.add("active");
+  document.getElementById("login-mode-login").classList.remove("active");
+  document.getElementById("login-pane-create").style.display="block";
+  document.getElementById("login-pane-login").style.display="none";
+  document.getElementById("login-err").style.display="none";
+};
 document.getElementById("invite-input").oninput=e=>{e.target.value=e.target.value.toUpperCase();};
 document.getElementById("invite-logout").onclick=()=>{localStorage.removeItem("ascend_uid");location.reload();};
 document.getElementById("signout-btn").onclick=()=>{if(crewUnsubInterval)clearInterval(crewUnsubInterval);localStorage.removeItem("ascend_uid");location.reload();};
 document.getElementById("close-profile-btn").onclick=()=>closeModal("profile-modal");
-document.getElementById("profile-pill").onclick=()=>openModal("profile-modal");
+document.getElementById("profile-pill").onclick=()=>{
+  const name=uProfile?.name||"Lifter";
+  document.getElementById("profile-info").innerHTML=`<strong style="color:var(--text);">${name}</strong>${uProfile?.username?`<br><span style="font-size:11px;color:var(--text3);">@${uProfile.username}</span>`:""}<br><span style="font-size:11px;color:var(--text3);">ID: ${cUser.uid.slice(0,12)}...</span>`;
+  document.getElementById("cross-device-section").style.display=uProfile?.username?"none":"block";
+  openModal("profile-modal");
+};
+document.getElementById("cdl-save-btn").onclick=setupCrossDeviceLogin;
 document.getElementById("split-change-btn").onclick=()=>openModal("split-modal");
 document.getElementById("save-split-btn").onclick=saveSplit;
 document.getElementById("cancel-split-btn").onclick=()=>closeModal("split-modal");
