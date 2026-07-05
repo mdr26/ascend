@@ -379,6 +379,9 @@ textarea{-webkit-appearance:none;}
 
       <div id="taunt-area"></div>
       <div id="ex-list"></div>
+      <div id="save-template-row" style="display:none;margin-bottom:10px;">
+        <button id="save-template-btn" style="width:100%;background:none;border:0.5px dashed rgba(193,18,31,0.4);border-radius:8px;color:var(--acc);font-size:12px;font-weight:600;padding:9px;cursor:pointer;font-family:inherit;"></button>
+      </div>
 
       <div class="card">
         <div class="card-title">Add exercise</div>
@@ -1015,9 +1018,69 @@ function renderSplitUI(){
     const c=document.createElement("div");
     c.className="daychip"+(active===day?" active":"");
     c.textContent=day;
-    c.onclick=()=>{S.activeDay=day;S.currentEx=[];checkDuplicate();saveData();renderLog();};
+    c.onclick=()=>{
+      S.activeDay=day;
+      const tmpl=loadDayTemplate(day);
+      S.currentEx=tmpl?tmpl:[];
+      checkDuplicate();saveData();renderLog();
+      if(tmpl) showToast("Loaded your "+day+" exercises");
+    };
     el.appendChild(c);
   });
+}
+
+// Pick the variant to default to for a template exercise, matching normal add-exercise behavior.
+function pickVariantFor(name,variants){
+  const lv=S.lastVariants[name];
+  return lv&&variants.includes(lv)?lv:variants[0];
+}
+
+// Turn a saved template entry back into a real, loggable exercise with sets pre-filled
+// from the last weight used, so you're not re-typing numbers every time.
+function buildExerciseFromTemplate(t){
+  if(t.type==="superset"){
+    const av=pickVariantFor(t.exA.name,t.exA.variants), bv=pickVariantFor(t.exB.name,t.exB.variants);
+    return {type:"superset",
+      exA:{name:t.exA.name,variants:t.exA.variants,activeVariant:av,sets:[{reps:10,weight:S.lastWeights[t.exA.name+"|"+av]||0,done:false}]},
+      exB:{name:t.exB.name,variants:t.exB.variants,activeVariant:bv,sets:[{reps:10,weight:S.lastWeights[t.exB.name+"|"+bv]||0,done:false}]}};
+  }
+  const av=pickVariantFor(t.name,t.variants);
+  return {name:t.name,variants:t.variants,activeVariant:av,sets:[{reps:10,weight:S.lastWeights[t.name+"|"+av]||0,done:false}]};
+}
+
+function loadDayTemplate(day){
+  const sp=getSplit();
+  const tmpl=sp&&sp.templates&&sp.templates[day];
+  if(!tmpl||!tmpl.length) return null;
+  return tmpl.map(buildExerciseFromTemplate);
+}
+
+// Saves the exercise list currently on screen (names/variants only, not weights or reps)
+// as this day's template, so selecting the day chip auto-loads it from now on.
+async function saveDayTemplate(){
+  const day=getDay();
+  if(!day){showToast("Set up your split first");return;}
+  if(!S.currentEx.length){showToast("Add exercises first, then save as a template");return;}
+  const key=S.split;
+  if(!S.customSplits[key].templates) S.customSplits[key].templates={};
+  S.customSplits[key].templates[day]=S.currentEx.map(ex=>{
+    if(ex.type==="superset") return {type:"superset",exA:{name:ex.exA.name,variants:ex.exA.variants},exB:{name:ex.exB.name,variants:ex.exB.variants}};
+    return {name:ex.name,variants:ex.variants};
+  });
+  await saveData();
+  showToast("Saved as your "+day+" template");
+  renderSaveTemplateBtn();
+}
+
+function renderSaveTemplateBtn(){
+  const row=document.getElementById("save-template-row");
+  const btn=document.getElementById("save-template-btn");
+  const day=getDay();
+  if(!day||!S.currentEx.length){ row.style.display="none"; return; }
+  row.style.display="block";
+  const sp=getSplit();
+  const hasTemplate=sp&&sp.templates&&sp.templates[day]&&sp.templates[day].length;
+  btn.textContent=hasTemplate?`Update "${day}" template with this list`:`Save this as my "${day}" template`;
 }
 
 // ── DUPLICATE CHECK ───────────────────────────────────────────────
@@ -1077,7 +1140,11 @@ function makeExCard(ex, idx){
         <div class="ex-name-txt">${ex.name}</div>
         <div class="ex-badges">${lastBadge}${ormBadge}${suggestBadge}</div>
       </div>
-      <button class="rmex-btn" data-idx="${idx}" data-action="removex">Remove</button>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+        <button class="rmex-btn" data-idx="${idx}" data-action="moveup" title="Move up" ${idx===0?"disabled style=\"opacity:0.3;\"":""}>↑</button>
+        <button class="rmex-btn" data-idx="${idx}" data-action="movedown" title="Move down">↓</button>
+        <button class="rmex-btn" data-idx="${idx}" data-action="removex">Remove</button>
+      </div>
     </div>
     <div class="vrow">${variants}</div>
     <div class="set-hdr"><span>#</span><span>Reps</span><span>Kg</span><span>Status</span><span></span></div>
@@ -1091,9 +1158,10 @@ function renderExList(){
   if(!getSplit()){
     el.innerHTML=`<div style="background:var(--bg3);border:0.5px dashed rgba(193,18,31,0.4);border-radius:12px;padding:28px 20px;text-align:center;margin-bottom:12px;"><div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">No split set up yet</div><div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Create your custom split to start logging</div><button id="create-split-cta" style="background:var(--acc);color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;">Create my split</button></div>`;
     document.getElementById("create-split-cta").onclick=()=>openModal("split-modal");
+    document.getElementById("save-template-row").style.display="none";
     return;
   }
-  if(!S.currentEx.length){el.innerHTML="";return;}
+  if(!S.currentEx.length){el.innerHTML="";document.getElementById("save-template-row").style.display="none";return;}
 
   let html="";
   S.currentEx.forEach((ex,idx)=>{
@@ -1101,7 +1169,11 @@ function renderExList(){
       html+=`<div class="superset-block">
         <div class="superset-header">
           <span class="superset-label">Superset</span>
-          <button class="rmex-btn" data-idx="${idx}" data-action="removex" style="font-size:11px;">Remove</button>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button class="rmex-btn" data-idx="${idx}" data-action="moveup" title="Move up" style="font-size:11px;" ${idx===0?"disabled":""}>↑</button>
+            <button class="rmex-btn" data-idx="${idx}" data-action="movedown" title="Move down" style="font-size:11px;">↓</button>
+            <button class="rmex-btn" data-idx="${idx}" data-action="removex" style="font-size:11px;">Remove</button>
+          </div>
         </div>
         <div class="superset-inner">
           <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;">${ex.exA.name}</div>
@@ -1121,6 +1193,7 @@ function renderExList(){
   });
   el.innerHTML=html;
   wireExListEvents(el);
+  renderSaveTemplateBtn();
 }
 
 function wireExListEvents(el){
@@ -1130,6 +1203,8 @@ function wireExListEvents(el){
       const idx=+btn.dataset.idx, si=btn.dataset.si!==undefined?+btn.dataset.si:null;
       const action=btn.dataset.action, ssex=btn.dataset.ssex;
       if(action==="removex"){ S.currentEx.splice(idx,1); renderExList(); renderTaunt(); }
+      else if(action==="moveup"){ if(idx>0){ const tmp=S.currentEx[idx-1]; S.currentEx[idx-1]=S.currentEx[idx]; S.currentEx[idx]=tmp; renderExList(); } }
+      else if(action==="movedown"){ if(idx<S.currentEx.length-1){ const tmp=S.currentEx[idx+1]; S.currentEx[idx+1]=S.currentEx[idx]; S.currentEx[idx]=tmp; renderExList(); } }
       else if(action==="setvariant"){ S.currentEx[idx].activeVariant=btn.dataset.v; S.lastVariants[S.currentEx[idx].name]=btn.dataset.v; renderExList(); renderTaunt(); }
       else if(action==="setvariantss"){ S.currentEx[idx]["ex"+ssex].activeVariant=btn.dataset.v; renderExList(); }
       else if(action==="logsetsingle"){
@@ -1195,10 +1270,10 @@ function checkDayMismatch(dayLabel,exercises){
     if(ex.type==="superset"){ namesInSession.push(ex.exA.name,ex.exB.name); }
     else{ namesInSession.push(ex.name); }
   });
-  const recognized=namesInSession.filter(n=>MUSCLE_MAP[n]);
+  const recognized=namesInSession.filter(n=>lookupMuscle(n));
   if(!recognized.length) return true; // all custom exercises — nothing we can check against
 
-  const anyMatch=recognized.some(n=>expectedMuscles.has(MUSCLE_MAP[n]));
+  const anyMatch=recognized.some(n=>expectedMuscles.has(lookupMuscle(n)));
   if(anyMatch) return true;
 
   return confirm(`This is logged under "${dayLabel}" but the exercises you added don't look like ${labelWords.find(w=>DAY_KEYWORD_MUSCLES[w])} work. Log it anyway?`);
@@ -1496,7 +1571,7 @@ function renderHeatmap(){
   const muscleCount={};
   weekLogs.forEach(l=>l.exercises.forEach(e=>{
     const names=e.type==="superset"?[e.exA.name,e.exB.name]:[e.name];
-    names.forEach(n=>{const m=MUSCLE_MAP[n];if(m)muscleCount[m]=(muscleCount[m]||0)+1;});
+    names.forEach(n=>{const m=lookupMuscle(n);if(m)muscleCount[m]=(muscleCount[m]||0)+1;});
   }));
   const maxCount=Math.max(...Object.values(muscleCount),1);
   const getState=m=>{ const c=muscleCount[m]||0; if(c===0)return"rest"; if(c/maxCount>0.5)return"hard"; return"light"; };
@@ -1815,6 +1890,7 @@ document.getElementById("save-ss-btn").onclick=()=>{
 };
 document.getElementById("cancel-ss-btn").onclick=()=>closeModal("ss-modal");
 document.getElementById("log-workout-btn").onclick=logWorkout;
+document.getElementById("save-template-btn").onclick=saveDayTemplate;
 document.getElementById("add-cardio-btn").onclick=()=>{
   const sel=document.getElementById("cardio-ex-select"), opt=sel.options[sel.selectedIndex];
   const variants=(opt.dataset.variants||"Treadmill").split(",");
@@ -1911,8 +1987,18 @@ const MUSCLE_MAP={
   "Squat":"quads","Leg Press":"quads","Romanian Deadlift":"hamstrings","Leg Extension":"quads","Leg Curl":"hamstrings","Lunges":"quads","Calf Raise":"calves","Hip Thrust":"glutes",
   "Overhead Press":"front-delt","Lateral Raise":"side-delt","Front Raise":"front-delt","Rear Delt Fly":"side-delt","Arnold Press":"front-delt","Shrugs":"traps","Upright Row":"traps",
   "Bicep Curl":"biceps","Hammer Curl":"biceps","Preacher Curl":"biceps","Tricep Pushdown":"triceps","Skull Crusher":"triceps","Overhead Tricep Extension":"triceps","Close Grip Bench Press":"triceps",
-  "Crunch":"abs","Bicycle Crunch":"abs","Cable Crunch":"abs","Sit-up":"abs","Ab Rollout":"abs","Dragon Flag":"abs","Leg Raise":"abs","Russian Twist":"obliques"
+  "Crunch":"abs","Bicycle Crunch":"abs","Cable Crunch":"abs","Sit-up":"abs","Ab Rollout":"abs","Dragon Flag":"abs","Leg Raise":"abs","Russian Twist":"obliques",
+  // Extra real-world naming variants — these get matched case-insensitively, so any casing works.
+  "Incline DB Press":"chest","Flat DB Press":"chest","Incline Barbell Press":"chest","Decline Barbell Press":"chest","Incline Bar":"chest","Decline Bar":"chest",
+  "Wide Lat Pulldown":"lats","Close Grip Lat Pulldown":"lats","Straight Arm Pulldown":"lats","Chest Supported Row":"lats","DB Row":"lats","Cable Row":"lats",
+  "Ez Bar Curl":"biceps","Forearm Curl":"forearms","Rope Push Down":"triceps","Overhead Rope Extension":"triceps",
+  "Seated Press":"front-delt","Cable Lateral Raise":"side-delt","Cable Lat Raise":"side-delt","Lat Raises":"side-delt","Lat Raise":"side-delt"
 };
+// Look up a muscle group for an exercise name, ignoring case so real-world naming variants
+// ("lateral raise" vs "Lateral Raise") still register instead of silently failing.
+const MUSCLE_MAP_LC={};
+Object.keys(MUSCLE_MAP).forEach(k=>{ MUSCLE_MAP_LC[k.toLowerCase()]=MUSCLE_MAP[k]; });
+function lookupMuscle(name){ return name?MUSCLE_MAP_LC[name.toLowerCase()]:undefined; }
 const HM_LABELS={"chest":"Chest","abs":"Abs","obliques":"Obliques","front-delt":"Front Delt","side-delt":"Side Delt","biceps":"Biceps","triceps":"Triceps","forearms":"Forearms","quads":"Quads","hamstrings":"Hams","glutes":"Glutes","abductors":"Abductors","calves":"Calves","shins":"Shins","traps":"Traps","lats":"Lats","lower-back":"Low Back","infraspinatus":"Rear Delt"};
 
 // ── RANKS ──────────────────────────────────────────────────────────
