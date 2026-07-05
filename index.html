@@ -138,6 +138,8 @@ textarea{-webkit-appearance:none;}
 .timer-mode-tabs{display:flex;gap:6px;margin-bottom:14px;}
 .tmode{flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:700;border:0.5px solid var(--border2);background:var(--bg3);color:var(--text2);cursor:pointer;text-align:center;transition:all 0.15s;}
 .tmode.active{background:var(--acc);color:#fff;border-color:var(--acc);}
+.lmtab{flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:700;border:0.5px solid var(--border2);background:var(--bg3);color:var(--text2);cursor:pointer;text-align:center;transition:all 0.15s;}
+.lmtab.active{background:var(--acc);color:#fff;border-color:var(--acc);}
 .timer-display{border-radius:var(--rad-lg);padding:24px 20px;text-align:center;margin-bottom:14px;border:2px solid var(--border2);transition:border-color 0.4s,background 0.4s;position:relative;overflow:hidden;}
 .timer-display::before{content:'';position:absolute;inset:0;opacity:0.05;transition:background 0.4s;}
 .timer-phase{font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:6px;transition:color 0.4s;}
@@ -301,8 +303,8 @@ textarea{-webkit-appearance:none;}
   </div>
 
   <div class="timer-mode-tabs" style="width:100%;margin-bottom:16px;">
-    <div class="tmode active" id="login-mode-login">Log in</div>
-    <div class="tmode" id="login-mode-create">Create account</div>
+    <div class="lmtab active" id="login-mode-login">Log in</div>
+    <div class="lmtab" id="login-mode-create">Create account</div>
   </div>
 
   <!-- LOG IN (existing account, any device) -->
