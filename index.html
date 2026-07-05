@@ -316,10 +316,9 @@ textarea{-webkit-appearance:none;}
 
   <!-- CREATE ACCOUNT (new user) -->
   <div id="login-pane-create" style="width:100%;display:none;">
-    <input id="login-name" type="text" placeholder="Your name" maxlength="30" style="width:100%;background:var(--bg3);border:0.5px solid var(--border2);border-radius:10px;color:var(--text);font-size:15px;padding:13px 14px;font-family:inherit;margin-bottom:10px;">
     <input id="cr-username" type="text" placeholder="Choose a username" maxlength="24" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" style="width:100%;background:var(--bg3);border:0.5px solid var(--border2);border-radius:10px;color:var(--text);font-size:15px;padding:13px 14px;font-family:inherit;margin-bottom:10px;">
     <input id="cr-pin" type="password" inputmode="numeric" placeholder="Choose a 4-8 digit PIN" maxlength="8" autocomplete="new-password" style="width:100%;background:var(--bg3);border:0.5px solid var(--border2);border-radius:10px;color:var(--text);font-size:15px;padding:13px 14px;font-family:inherit;margin-bottom:10px;letter-spacing:0.2em;">
-    <input id="login-secret" type="password" placeholder="Invite code (leave blank if admin)" style="width:100%;background:var(--bg3);border:0.5px solid var(--border2);border-radius:10px;color:var(--text);font-size:15px;padding:13px 14px;font-family:inherit;margin-bottom:10px;">
+    <input id="login-secret" type="password" placeholder="Invite code (or admin passphrase)" style="width:100%;background:var(--bg3);border:0.5px solid var(--border2);border-radius:10px;color:var(--text);font-size:15px;padding:13px 14px;font-family:inherit;margin-bottom:10px;">
     <button id="login-btn" style="width:100%;background:var(--acc);color:#fff;border:none;border-radius:10px;padding:15px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;">Create account</button>
   </div>
 
@@ -702,13 +701,11 @@ async function hashPin(pin){
 
 // Create a brand-new account (invite code or admin secret required).
 async function doLogin(){
-  const name=document.getElementById("login-name").value.trim();
   const username=document.getElementById("cr-username").value.trim().toLowerCase();
   const pin=document.getElementById("cr-pin").value.trim();
   const secret=document.getElementById("login-secret").value.trim();
   const err=document.getElementById("login-err");
   err.style.display="none";
-  if(!name||name.length<2){err.textContent="Enter your name (min 2 chars)";err.style.display="block";return;}
   if(!username||username.length<3||/\s/.test(username)){err.textContent="Choose a username (3+ characters, no spaces)";err.style.display="block";return;}
   if(!pin||pin.length<4||!/^\d+$/.test(pin)){err.textContent="PIN must be 4-8 digits";err.style.display="block";return;}
   if(!secret){err.textContent="Need an invite code to create an account";err.style.display="block";return;}
@@ -717,6 +714,7 @@ async function doLogin(){
   if(taken===null){err.textContent="Couldn't reach the server. Check your connection and try again.";err.style.display="block";return;}
   if(taken.length){err.textContent="That username is taken — try another.";err.style.display="block";return;}
 
+  const name=username.charAt(0).toUpperCase()+username.slice(1); // used only for display, e.g. on the leaderboard
   const pinHash=await hashPin(pin);
   let uid=genUID();
   if(secret.toLowerCase()==="ascend_admin_2024"){
