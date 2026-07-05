@@ -370,6 +370,7 @@ textarea{-webkit-appearance:none;}
           <div class="ctab" data-cat="Legs">Legs</div>
           <div class="ctab" data-cat="Shoulders">Shoulders</div>
           <div class="ctab" data-cat="Arms">Arms</div>
+          <div class="ctab" data-cat="Abs">Abs</div>
         </div>
         <div class="add-ex-row">
           <select id="ex-select"></select>
@@ -474,11 +475,8 @@ textarea{-webkit-appearance:none;}
         </div>
       </div>
       <button class="logbtn" id="log-cardio-btn">Log Cardio Session</button>
-    </div>
 
-    <!-- ABS TAB -->
-    <div class="screen" id="screen-abs">
-      <div class="slabel">Plank timer</div>
+      <div class="slabel" style="margin-top:20px;">Plank timer</div>
       <div class="plank-timer">
         <div class="plank-time-big" id="plank-display">0:00</div>
         <div class="plank-pr-txt" id="plank-pr">PR: —</div>
@@ -487,26 +485,6 @@ textarea{-webkit-appearance:none;}
           <button class="plank-btn pb-reset" id="plank-reset-btn">Reset</button>
         </div>
       </div>
-
-      <div class="slabel">Abs exercises</div>
-      <div id="abs-ex-list"></div>
-      <div class="card">
-        <div class="card-title">Add abs exercise</div>
-        <div class="add-ex-row">
-          <select id="abs-ex-select">
-            <option data-variants="Bodyweight,Weighted">Crunch</option>
-            <option data-variants="Bodyweight,Hanging">Leg Raise</option>
-            <option data-variants="Bodyweight,Cable">Russian Twist</option>
-            <option data-variants="Bodyweight">Ab Rollout</option>
-            <option data-variants="Bodyweight">Bicycle Crunch</option>
-            <option data-variants="Cable,Machine">Cable Crunch</option>
-            <option data-variants="Bodyweight,Weighted">Sit-up</option>
-            <option data-variants="Bodyweight,Weighted">Dragon Flag</option>
-          </select>
-          <button id="add-abs-btn">Add</button>
-        </div>
-      </div>
-      <button class="logbtn" id="log-abs-btn">Log Abs Session</button>
     </div>
 
     <!-- PROGRESS TAB -->
@@ -567,10 +545,6 @@ textarea{-webkit-appearance:none;}
     <button class="nbtn" data-screen="cardio">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       Cardio
-    </button>
-    <button class="nbtn" data-screen="abs">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-      Abs
     </button>
     <button class="nbtn" data-screen="progress">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
@@ -641,6 +615,7 @@ textarea{-webkit-appearance:none;}
       <div class="ctab" data-cat="Legs">Legs</div>
       <div class="ctab" data-cat="Shoulders">Shoulders</div>
       <div class="ctab" data-cat="Arms">Arms</div>
+      <div class="ctab" data-cat="Abs">Abs</div>
     </div>
     <div style="margin-bottom:10px;">
       <div style="font-size:11px;color:var(--text3);margin-bottom:6px;">Exercise A</div>
@@ -887,7 +862,7 @@ let cUser=null, uProfile=null, isAdmin=false, crewUnsubInterval=null;
 let editSplitKey=null, editingSessionId=null;
 let S={
   split:null, customSplits:{}, activeDay:null,
-  currentEx:[], absEx:[], cardioEx:[],
+  currentEx:[], cardioEx:[],
   logs:[], lastVariants:{}, lastWeights:{},
   bwLog:[], plankPR:0, activeCat:"Chest", ssCat:"Chest",
   timerConfig:{prepare:5,work:35,rest:20,rounds:8,cycles:3,cyclerest:60},
@@ -1174,53 +1149,6 @@ function calcStreak(){
 function renderStreakBadge(){ document.getElementById("streak-badge").textContent=calcStreak(); }
 
 // ── ABS ───────────────────────────────────────────────────────────
-function renderAbsExList(){
-  const el=document.getElementById("abs-ex-list");
-  if(!S.absEx.length){el.innerHTML="";return;}
-  el.innerHTML=S.absEx.map((ex,idx)=>{
-    const v=ex.activeVariant||ex.variants[0];
-    const variants=ex.variants.map(vv=>`<span class="vchip${vv===v?" active":""}" data-absidx="${idx}" data-v="${vv}" data-action="absvariant">${vv}</span>`).join("");
-    const sets=ex.sets.map((s,si)=>`<div class="set-row">
-      <span class="snum">${si+1}</span>
-      <input type="number" inputmode="numeric" value="${s.reps}" data-absidx="${idx}" data-si="${si}" data-field="reps" min="1" max="999" style="background:var(--bg4);border:0.5px solid var(--border2);border-radius:6px;color:var(--text);font-size:14px;font-weight:600;padding:7px 6px;text-align:center;width:100%;font-family:inherit;">
-      <input type="number" inputmode="decimal" value="${s.weight}" data-absidx="${idx}" data-si="${si}" data-field="weight" min="0" step="0.5" style="background:var(--bg4);border:0.5px solid var(--border2);border-radius:6px;color:var(--text);font-size:14px;font-weight:600;padding:7px 6px;text-align:center;width:100%;font-family:inherit;">
-      <button class="lsb${s.done?" done":""}" data-absidx="${idx}" data-si="${si}" data-action="abslog">${s.done?"✓":"Log set"}</button>
-      <button class="del-set" data-absidx="${idx}" data-si="${si}" data-action="absdel">×</button>
-    </div>`).join("");
-    return `<div class="ex-block">
-      <div class="ex-top"><div class="ex-name-txt">${ex.name}</div><button class="rmex-btn" data-absidx="${idx}" data-action="absrm">Remove</button></div>
-      <div class="vrow">${variants}</div>
-      <div class="set-hdr"><span>#</span><span>Reps</span><span>Kg</span><span>Status</span><span></span></div>
-      ${sets}<button class="add-set-btn" data-absidx="${idx}" data-action="absadd">+ add set</button>
-    </div>`;
-  }).join("");
-  el.querySelectorAll("[data-action]").forEach(btn=>{
-    btn.onclick=()=>{
-      const idx=+btn.dataset.absidx, si=btn.dataset.si!==undefined?+btn.dataset.si:null, a=btn.dataset.action;
-      if(a==="absrm"){S.absEx.splice(idx,1);renderAbsExList();}
-      else if(a==="absvariant"){S.absEx[idx].activeVariant=btn.dataset.v;renderAbsExList();}
-      else if(a==="abslog"){S.absEx[idx].sets[si].done=!S.absEx[idx].sets[si].done;renderAbsExList();}
-      else if(a==="absdel"){S.absEx[idx].sets.splice(si,1);renderAbsExList();}
-      else if(a==="absadd"){const l=S.absEx[idx].sets.slice(-1)[0]||{reps:15,weight:0};S.absEx[idx].sets.push({reps:l.reps,weight:l.weight,done:false});renderAbsExList();}
-    };
-  });
-  el.querySelectorAll("input").forEach(inp=>{
-    inp.onchange=()=>{S.absEx[+inp.dataset.absidx].sets[+inp.dataset.si][inp.dataset.field]=parseFloat(inp.value)||0;};
-  });
-}
-
-async function logAbsWorkout(){
-  if(!S.absEx.length){showToast("Add at least one exercise");return;}
-  const entry={date:today(),split:"Abs",day:"Abs",exercises:JSON.parse(JSON.stringify(S.absEx)),type:"abs"};
-  try{
-    const saved=await addLog(entry);
-    S.absEx=[];
-    await saveData();
-    showToast(saved?"Abs session logged!":"Saved on device — will sync when back online");
-    renderAbsExList(); renderWeekStrip(); renderStreakBadge();
-  }catch(e){console.error(e);showToast("Error saving.");}
-}
-
 // ── CARDIO ────────────────────────────────────────────────────────
 function renderCardioExList(){
   const el=document.getElementById("cardio-ex-list");
@@ -1755,13 +1683,6 @@ document.getElementById("save-ss-btn").onclick=()=>{
 };
 document.getElementById("cancel-ss-btn").onclick=()=>closeModal("ss-modal");
 document.getElementById("log-workout-btn").onclick=logWorkout;
-document.getElementById("add-abs-btn").onclick=()=>{
-  const sel=document.getElementById("abs-ex-select"), opt=sel.options[sel.selectedIndex];
-  const variants=(opt.dataset.variants||"Bodyweight").split(",");
-  S.absEx.push({name:opt.textContent||opt.text,variants,activeVariant:variants[0],sets:[{reps:15,weight:0,done:false}]});
-  renderAbsExList();
-};
-document.getElementById("log-abs-btn").onclick=logAbsWorkout;
 document.getElementById("add-cardio-btn").onclick=()=>{
   const sel=document.getElementById("cardio-ex-select"), opt=sel.options[sel.selectedIndex];
   const variants=(opt.dataset.variants||"Treadmill").split(",");
@@ -1833,8 +1754,7 @@ document.querySelectorAll(".nbtn").forEach(btn=>{
     document.querySelectorAll(".nbtn").forEach(b=>b.classList.remove("active")); btn.classList.add("active");
     showScreen(btn.dataset.screen);
     if(btn.dataset.screen==="progress") renderProgress();
-    if(btn.dataset.screen==="abs"){renderAbsExList();document.getElementById("plank-pr").textContent="PR: "+(S.plankPR?fmtTime(S.plankPR):"—");}
-    if(btn.dataset.screen==="cardio") renderCardioExList();
+    if(btn.dataset.screen==="cardio"){renderCardioExList();document.getElementById("plank-pr").textContent="PR: "+(S.plankPR?fmtTime(S.plankPR):"—");}
     if(btn.dataset.screen==="crew") renderCrew();
   };
 });
@@ -1848,7 +1768,8 @@ const EX_DB={
   Back:[{name:"Deadlift",variants:["Barbell","Trap Bar","Sumo"]},{name:"Pull Up",variants:["Bodyweight","Weighted","Assisted"]},{name:"Lat Pulldown",variants:["Wide Grip","Close Grip","Reverse Grip"]},{name:"Barbell Row",variants:["Overhand","Underhand"]},{name:"Seated Cable Row",variants:["Wide Grip","Close Grip","V-Bar"]},{name:"T-Bar Row",variants:["Machine","Barbell"]},{name:"Dumbbell Row",variants:["Single Arm","Chest Supported"]},{name:"Face Pull",variants:["Cable","Band"]}],
   Legs:[{name:"Squat",variants:["Barbell","Front","Goblet","Smith Machine"]},{name:"Leg Press",variants:["Machine"]},{name:"Romanian Deadlift",variants:["Barbell","Dumbbell"]},{name:"Leg Extension",variants:["Machine"]},{name:"Leg Curl",variants:["Seated","Lying"]},{name:"Lunges",variants:["Walking","Reverse","Bulgarian Split"]},{name:"Calf Raise",variants:["Standing","Seated"]},{name:"Hip Thrust",variants:["Barbell","Machine"]}],
   Shoulders:[{name:"Overhead Press",variants:["Barbell","Dumbbell","Smith Machine"]},{name:"Lateral Raise",variants:["Dumbbell","Cable","Machine"]},{name:"Front Raise",variants:["Dumbbell","Cable","Plate"]},{name:"Rear Delt Fly",variants:["Dumbbell","Cable","Machine"]},{name:"Arnold Press",variants:["Dumbbell"]},{name:"Shrugs",variants:["Barbell","Dumbbell"]},{name:"Upright Row",variants:["Barbell","Cable"]}],
-  Arms:[{name:"Bicep Curl",variants:["Barbell","Dumbbell","Cable"]},{name:"Hammer Curl",variants:["Dumbbell","Cable","Rope"]},{name:"Preacher Curl",variants:["Barbell","Dumbbell","Machine"]},{name:"Tricep Pushdown",variants:["Rope","Bar","V-Bar"]},{name:"Skull Crusher",variants:["Barbell","Dumbbell","EZ Bar"]},{name:"Overhead Tricep Extension",variants:["Dumbbell","Cable"]},{name:"Close Grip Bench Press",variants:["Barbell","Smith Machine"]}]
+  Arms:[{name:"Bicep Curl",variants:["Barbell","Dumbbell","Cable"]},{name:"Hammer Curl",variants:["Dumbbell","Cable","Rope"]},{name:"Preacher Curl",variants:["Barbell","Dumbbell","Machine"]},{name:"Tricep Pushdown",variants:["Rope","Bar","V-Bar"]},{name:"Skull Crusher",variants:["Barbell","Dumbbell","EZ Bar"]},{name:"Overhead Tricep Extension",variants:["Dumbbell","Cable"]},{name:"Close Grip Bench Press",variants:["Barbell","Smith Machine"]}],
+  Abs:[{name:"Crunch",variants:["Bodyweight","Weighted"]},{name:"Leg Raise",variants:["Bodyweight","Hanging"]},{name:"Russian Twist",variants:["Bodyweight","Cable"]},{name:"Ab Rollout",variants:["Bodyweight"]},{name:"Bicycle Crunch",variants:["Bodyweight"]},{name:"Cable Crunch",variants:["Cable","Machine"]},{name:"Sit-up",variants:["Bodyweight","Weighted"]},{name:"Dragon Flag",variants:["Bodyweight"]}]
 };
 
 // ── MUSCLE MAP (exercise name -> heatmap muscle key) ─────────────
@@ -1857,7 +1778,8 @@ const MUSCLE_MAP={
   "Deadlift":"lower-back","Pull Up":"lats","Lat Pulldown":"lats","Barbell Row":"lats","Seated Cable Row":"lats","T-Bar Row":"lats","Dumbbell Row":"lats","Face Pull":"infraspinatus",
   "Squat":"quads","Leg Press":"quads","Romanian Deadlift":"hamstrings","Leg Extension":"quads","Leg Curl":"hamstrings","Lunges":"quads","Calf Raise":"calves","Hip Thrust":"glutes",
   "Overhead Press":"front-delt","Lateral Raise":"side-delt","Front Raise":"front-delt","Rear Delt Fly":"side-delt","Arnold Press":"front-delt","Shrugs":"traps","Upright Row":"traps",
-  "Bicep Curl":"biceps","Hammer Curl":"biceps","Preacher Curl":"biceps","Tricep Pushdown":"triceps","Skull Crusher":"triceps","Overhead Tricep Extension":"triceps","Close Grip Bench Press":"triceps"
+  "Bicep Curl":"biceps","Hammer Curl":"biceps","Preacher Curl":"biceps","Tricep Pushdown":"triceps","Skull Crusher":"triceps","Overhead Tricep Extension":"triceps","Close Grip Bench Press":"triceps",
+  "Crunch":"abs","Bicycle Crunch":"abs","Cable Crunch":"abs","Sit-up":"abs","Ab Rollout":"abs","Dragon Flag":"abs","Leg Raise":"abs","Russian Twist":"obliques"
 };
 const HM_LABELS={"chest":"Chest","abs":"Abs","obliques":"Obliques","front-delt":"Front Delt","side-delt":"Side Delt","biceps":"Biceps","triceps":"Triceps","forearms":"Forearms","quads":"Quads","hamstrings":"Hams","glutes":"Glutes","abductors":"Abductors","calves":"Calves","shins":"Shins","traps":"Traps","lats":"Lats","lower-back":"Low Back","infraspinatus":"Rear Delt"};
 
