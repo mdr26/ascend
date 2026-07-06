@@ -1512,21 +1512,34 @@ function renderHistoryGrouped(){
   const container=document.getElementById("history-container");
   const logs=S.logs;
   if(!logs.length){container.innerHTML="<div class='empty'>No sessions yet. Get to work.</div>";return;}
+
+  // Compute each session's stats once, so both the group summary and the individual cards reuse them.
+  const withStats=logs.map(l=>{
+    const vol=l.exercises.reduce((a,e)=>{if(e.type==="superset")return a+[...e.exA.sets,...e.exB.sets].reduce((b,s)=>b+(s.reps||0)*(s.weight||0),0);return a+(e.sets||[]).reduce((b,s)=>b+(s.reps||0)*(s.weight||0),0);},0);
+    const setsCount=l.exercises.reduce((a,e)=>a+(e.type==="superset"?e.exA.sets.length+e.exB.sets.length:e.sets?.length||0),0);
+    return {...l,_vol:vol,_sets:setsCount};
+  });
+
   const groups={};
-  logs.forEach(l=>{const g=getDateGroup(l.date);if(!groups[g])groups[g]=[];groups[g].push(l);});
-  container.innerHTML=Object.entries(groups).map(([group,sessions])=>`
+  withStats.forEach(l=>{const g=getDateGroup(l.date);if(!groups[g])groups[g]=[];groups[g].push(l);});
+
+  container.innerHTML=Object.entries(groups).map(([group,sessions])=>{
+    const totalVol=sessions.reduce((a,l)=>a+l._vol,0);
+    const totalSets=sessions.reduce((a,l)=>a+l._sets,0);
+    const bits=[`${sessions.length} session${sessions.length===1?"":"s"}`];
+    if(totalSets) bits.push(`${totalSets} sets`);
+    if(totalVol>0) bits.push(`${Math.round(totalVol).toLocaleString()}kg`);
+    return `
     <div class="hist-group">
-      <div class="hist-group-label">${group}</div>
+      <div class="hist-group-label"><span>${group}</span><span style="flex:none;color:var(--text3);font-weight:600;font-size:10px;text-transform:none;letter-spacing:0;">${bits.join(" · ")}</span></div>
       ${sessions.map(l=>{
-        const vol=l.exercises.reduce((a,e)=>{if(e.type==="superset")return a+[...e.exA.sets,...e.exB.sets].reduce((b,s)=>b+(s.reps||0)*(s.weight||0),0);return a+(e.sets||[]).reduce((b,s)=>b+(s.reps||0)*(s.weight||0),0);},0);
         const exNames=l.exercises.map(e=>e.type==="superset"?e.exA.name+"+"+e.exB.name:e.name);
-        const setsCount=l.exercises.reduce((a,e)=>a+(e.type==="superset"?e.exA.sets.length+e.exB.sets.length:e.sets?.length||0),0);
         return`<div class="hist-session">
           <div class="hist-session-top">
             <div>
               <div class="hist-session-day">${l.day}</div>
               <div class="hist-session-split">${l.split}</div>
-              <div class="hist-session-meta">${setsCount} sets${vol>0?" · "+Math.round(vol).toLocaleString()+"kg":""}</div>
+              <div class="hist-session-meta">${l._sets} sets${l._vol>0?" · "+Math.round(l._vol).toLocaleString()+"kg":""}</div>
             </div>
             <div class="hist-session-actions">
               <button class="hist-act-btn" data-id="${l.id}" data-action="edit-session">Edit</button>
@@ -1536,7 +1549,8 @@ function renderHistoryGrouped(){
           <div class="hist-exercises">${exNames.map(n=>`<span class="hist-ex-chip">${n}</span>`).join("")}</div>
         </div>`;
       }).join("")}
-    </div>`).join("");
+    </div>`;
+  }).join("");
   container.querySelectorAll("[data-action]").forEach(btn=>{
     btn.onclick=()=>{
       if(btn.dataset.action==="del-session") deleteSession(btn.dataset.id);
