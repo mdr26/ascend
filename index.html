@@ -1521,8 +1521,8 @@ function renderProgress(){
   }catch(e){
     console.error("PR/Strength progress render failed:",e);
     showErrorBanner("PR/Strength render failed: "+e.message);
-    document.getElementById("pr-list").innerHTML="<div class='empty'>Couldn't load PRs — check console for details</div>";
-    document.getElementById("vol-bars").innerHTML="<div class='empty'>Couldn't load progress — check console for details</div>";
+    document.getElementById("pr-list").innerHTML=`<div class='empty' style='color:#ff8a8a;font-family:monospace;font-size:11px;text-align:left;'>ERROR: ${e.message}<br><br>${(e.stack||"").split("\n").slice(0,3).join("<br>")}</div>`;
+    document.getElementById("vol-bars").innerHTML="<div class='empty'>(see error above)</div>";
   }
 
   // History grouped
