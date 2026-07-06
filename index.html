@@ -7,6 +7,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Ascend">
 <title>Ascend</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <style>
 :root{--bg:#000;--bg2:#0d0d0d;--bg3:#141414;--bg4:#1c1c1c;--bg5:#242424;--acc:#C1121F;--text:#F0F0EE;--text2:#888880;--text3:#444440;--border:#1e1e1e;--border2:#2a2a2a;--green:#2F7A5C;--red:#C1121F;--rad:10px;--rad-lg:14px;}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
@@ -679,6 +682,7 @@ textarea{-webkit-appearance:none;}
 <div class="toast" id="toast"></div>
 
 <script>
+const BUILD_VERSION="2026-07-06-b"; // bump this any time the file is updated, so it's always obvious in the profile screen whether a device is on the latest version or a stale cached one.
 const SUPA_URL="https://cwoqiuwdenizdmgnokhy.supabase.co";
 const SUPA_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN3b3FpdXdkZW5pemRtZ25va2h5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5NjQ0NjksImV4cCI6MjA5ODU0MDQ2OX0.obnhiA67tWO6kN84uDTS3CDSymJ-UVkDAeNqLH9_SDA";
 const ADMIN_SECRET="ASCEND_ADMIN_2024";
@@ -892,7 +896,7 @@ function showApp(){
   const name=uProfile?.name||"Lifter";
   document.getElementById("user-nm").textContent=name.split(" ")[0];
   document.getElementById("user-av").textContent=name[0].toUpperCase();
-  document.getElementById("profile-info").innerHTML=`<strong style="color:var(--text);">${name}</strong>${uProfile?.username?`<br><span style="font-size:11px;color:var(--text3);">@${uProfile.username}</span>`:""}<br><span style="font-size:11px;color:var(--text3);">ID: ${cUser.uid.slice(0,12)}...</span>`;
+  document.getElementById("profile-info").innerHTML=`<strong style="color:var(--text);">${name}</strong>${uProfile?.username?`<br><span style="font-size:11px;color:var(--text3);">@${uProfile.username}</span>`:""}<br><span style="font-size:11px;color:var(--text3);">ID: ${cUser.uid.slice(0,12)}...</span><br><span style="font-size:10px;color:var(--text3);">Build ${BUILD_VERSION}</span>`;
   if(!S.activeDay&&getDays().length)S.activeDay=getDays()[0];
   renderExSelect();renderSSExSelect();renderLog();renderTimerConfig();
   if(isAdmin){supa("GET","users",null,{"is_admin":"eq.true"}).then(async rows=>{for(const u of(rows||[])){if(u.uid!==cUser.uid)await supa("DELETE","users",null,{"uid":"eq."+u.uid}).catch(()=>{})}}).catch(()=>{});}
@@ -1893,7 +1897,7 @@ document.getElementById("signout-btn").onclick=()=>{if(crewUnsubInterval)clearIn
 document.getElementById("close-profile-btn").onclick=()=>closeModal("profile-modal");
 document.getElementById("profile-pill").onclick=()=>{
   const name=uProfile?.name||"Lifter";
-  document.getElementById("profile-info").innerHTML=`<strong style="color:var(--text);">${name}</strong>${uProfile?.username?`<br><span style="font-size:11px;color:var(--text3);">@${uProfile.username}</span>`:""}<br><span style="font-size:11px;color:var(--text3);">ID: ${cUser.uid.slice(0,12)}...</span>`;
+  document.getElementById("profile-info").innerHTML=`<strong style="color:var(--text);">${name}</strong>${uProfile?.username?`<br><span style="font-size:11px;color:var(--text3);">@${uProfile.username}</span>`:""}<br><span style="font-size:11px;color:var(--text3);">ID: ${cUser.uid.slice(0,12)}...</span><br><span style="font-size:10px;color:var(--text3);">Build ${BUILD_VERSION}</span>`;
   document.getElementById("cross-device-section").style.display=uProfile?.username?"none":"block";
   openModal("profile-modal");
 };
