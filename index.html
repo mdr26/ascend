@@ -540,7 +540,7 @@ textarea{-webkit-appearance:none;}
       <div class="slabel">Personal records</div>
       <div class="card"><div id="pr-list"></div></div>
 
-      <div class="slabel">Volume by exercise</div>
+      <div class="slabel">Strength progress</div>
       <div class="card"><div id="vol-bars"></div></div>
 
       <div class="slabel">Session history</div>
@@ -1294,23 +1294,23 @@ async function logWorkout(){
     } else {
       saved=await addLog(entry);
     }
-    let prEx=null, prWeight=0;
+    const prList=[];
     exercises.forEach(ex=>{
       const sets=ex.type==="superset"?[...ex.exA.sets,...ex.exB.sets]:ex.sets;
       const exName=ex.type==="superset"?ex.exA.name:ex.name;
       const v=ex.type==="superset"?(ex.exA.activeVariant||ex.exA.variants[0]):(ex.activeVariant||ex.variants[0]);
       const maxW=Math.max(...sets.map(s=>s.weight||0));
       const prev=S.lastWeights[(ex.type==="superset"?ex.exA.name:ex.name)+"|"+v]||0;
-      if(maxW>0){ if(maxW>prev){prEx=exName+" ("+v+")";prWeight=maxW;} S.lastWeights[(ex.type==="superset"?ex.exA.name:ex.name)+"|"+v]=maxW; S.lastVariants[ex.type==="superset"?ex.exA.name:ex.name]=v; }
+      if(maxW>0){ if(maxW>prev){prList.push({ex:exName+" ("+v+")",weight:maxW});} S.lastWeights[(ex.type==="superset"?ex.exA.name:ex.name)+"|"+v]=maxW; S.lastVariants[ex.type==="superset"?ex.exA.name:ex.name]=v; }
       if(ex.type==="superset"){
         const vB=ex.exB.activeVariant||ex.exB.variants[0], maxWB=Math.max(...ex.exB.sets.map(s=>s.weight||0));
         const prevB=S.lastWeights[ex.exB.name+"|"+vB]||0;
-        if(maxWB>0){ if(maxWB>prevB&&!prEx){prEx=ex.exB.name+" ("+vB+")";prWeight=maxWB;} S.lastWeights[ex.exB.name+"|"+vB]=maxWB; S.lastVariants[ex.exB.name]=vB; }
+        if(maxWB>0){ if(maxWB>prevB){prList.push({ex:ex.exB.name+" ("+vB+")",weight:maxWB});} S.lastWeights[ex.exB.name+"|"+vB]=maxWB; S.lastVariants[ex.exB.name]=vB; }
       }
     });
     S.currentEx=[];
     await saveData();
-    if(prEx) showPR(prEx,prWeight);
+    if(prList.length) showPRQueue(prList);
     else if(!saved) showToast("Saved on device — will sync when back online");
     else showToast("Workout logged. Beast.");
     renderLog();
@@ -1482,27 +1482,34 @@ function renderProgress(){
     return`<div class="bw-item"><span style="color:var(--text3);">${e.d}</span><span style="font-weight:700;">${e.w}kg</span>${diff!==null?`<span style="font-size:11px;font-weight:600;color:${diff>0?"var(--acc)":"var(--green)"};">${diff>0?"+":""}${diff}kg</span>`:""}</div>`;
   }).join("");
 
-  // PRs
-  const ormMap={};
-  logs.filter(l=>l.type==="lift").forEach(l=>l.exercises.forEach(e=>{
-    const sets=e.type==="superset"?e.exA.sets:e.sets||[];
-    const name=e.type==="superset"?e.exA.name:e.name;
-    sets.forEach(s=>{if(s.weight&&s.reps){const o=Math.round(s.weight*(1+s.reps/30));if(!ormMap[name]||o>ormMap[name].orm){ormMap[name]={orm:o,weight:s.weight,reps:s.reps};}}});
-  }));
-  const prEl=document.getElementById("pr-list");
-  const pe=Object.entries(ormMap).sort((a,b)=>b[1].orm-a[1].orm).slice(0,12);
-  prEl.innerHTML=!pe.length?"<div class='empty'>Log workouts to see your PRs</div>":pe.map(([n,v])=>`<div class="pr-row"><span class="pr-name">${n}</span><div style="text-align:right;"><div class="pr-val">${v.orm}kg</div><div class="pr-sub">${v.weight}kg × ${v.reps} reps</div></div></div>`).join("");
+  // Build a full weight/reps/date history per exercise, correctly covering BOTH sides of
+  // supersets (previously only exA was ever tracked — exB's numbers were silently ignored).
+  const exHistory={};
+  logs.filter(l=>l.type==="lift").forEach(l=>{
+    const pairs=l.exercises.map(e=>e.type==="superset"?[[e.exA.name,e.exA.sets],[e.exB.name,e.exB.sets]]:[[e.name,e.sets||[]]]).flat();
+    pairs.forEach(([name,sets])=>{
+      if(!exHistory[name]) exHistory[name]=[];
+      (sets||[]).forEach(s=>{ if(s.weight>0) exHistory[name].push({weight:s.weight,reps:s.reps||0,date:l.date}); });
+    });
+  });
 
-  // Vol bars
-  const volByEx={};
-  logs.forEach(l=>l.exercises.forEach(e=>{
-    const getVol=(sets)=>(sets||[]).reduce((a,s)=>a+(s.reps||0)*(s.weight||0),0);
-    if(e.type==="superset"){volByEx[e.exA.name]=(volByEx[e.exA.name]||0)+getVol(e.exA.sets);volByEx[e.exB.name]=(volByEx[e.exB.name]||0)+getVol(e.exB.sets);}
-    else{volByEx[e.name]=(volByEx[e.name]||0)+getVol(e.sets);}
-  }));
-  const sv=Object.entries(volByEx).sort((a,b)=>b[1]-a[1]).slice(0,8);
-  const mx=sv[0]?sv[0][1]:1;
-  document.getElementById("vol-bars").innerHTML=!sv.length?"<div class='empty'>No data yet</div>":sv.map(([n,v])=>`<div class="prog-row"><div class="prog-label"><span>${n}</span><span>${Math.round(v).toLocaleString()}kg</span></div><div class="prog-bg"><div class="prog-fill" style="width:${Math.round(v/mx*100)}%"></div></div></div>`).join("");
+  const exStats=Object.entries(exHistory).map(([name,entries])=>{
+    // Real PR: heaviest weight you've actually lifted, tie-broken by more reps then most recent.
+    const maxEntry=entries.reduce((best,e)=>(e.weight>best.weight||(e.weight===best.weight&&e.reps>best.reps))?e:best,entries[0]);
+    const firstEntry=entries.reduce((earliest,e)=>e.date<earliest.date?e:earliest,entries[0]);
+    const pct=(firstEntry.weight>0&&maxEntry.weight>firstEntry.weight)?Math.round((maxEntry.weight-firstEntry.weight)/firstEntry.weight*100):null;
+    return {name,maxEntry,firstEntry,pct};
+  });
+
+  // Personal Records: the actual heaviest weight ever lifted per exercise — no formula, no estimate.
+  const prEl=document.getElementById("pr-list");
+  const topPR=exStats.slice().sort((a,b)=>b.maxEntry.weight-a.maxEntry.weight).slice(0,12);
+  prEl.innerHTML=!topPR.length?"<div class='empty'>Log workouts to see your PRs</div>":topPR.map(r=>`<div class="pr-row"><span class="pr-name">${r.name}</span><div style="text-align:right;"><div class="pr-val">${r.maxEntry.weight}kg</div><div class="pr-sub">${r.maxEntry.reps} reps · ${r.maxEntry.date}</div></div></div>`).join("");
+
+  // Strength Progress: first weight you ever logged vs your current best — the real,
+  // actionable number (are you actually getting stronger), replacing raw lifetime tonnage.
+  const progressRows=exStats.filter(r=>r.pct!==null&&r.pct>0).sort((a,b)=>b.pct-a.pct).slice(0,8);
+  document.getElementById("vol-bars").innerHTML=!progressRows.length?"<div class='empty'>Log the same exercise more than once to see your progress</div>":progressRows.map(r=>`<div class="prog-row"><div class="prog-label"><span>${r.name}</span><span style="color:var(--green);">+${r.pct}%</span></div><div style="font-size:11px;color:var(--text3);margin-bottom:5px;">${r.firstEntry.weight}kg → ${r.maxEntry.weight}kg</div><div class="prog-bg"><div class="prog-fill" style="width:${Math.min(100,r.pct)}%;background:var(--green);"></div></div></div>`).join("");
 
   // History grouped
   renderHistoryGrouped();
@@ -1804,10 +1811,17 @@ async function saveSplit(){
 }
 
 // ── PR ────────────────────────────────────────────────────────────
-function showPR(exName,weight){
+let prQueue=[];
+function showPRQueue(list){
+  prQueue=list.slice(1); // remaining ones get shown as the person taps through
+  const first=list[0];
+  const suffix=list.length>1?` (1 of ${list.length})`:"";
+  showPR(first.ex,first.weight,suffix);
+}
+function showPR(exName,weight,suffix=""){
   document.getElementById("pr-ex-name").textContent=exName;
   document.getElementById("pr-weight-val").textContent=weight+"kg";
-  document.getElementById("pr-msg").textContent=PR_TAUNTS[Math.floor(Math.random()*PR_TAUNTS.length)];
+  document.getElementById("pr-msg").textContent=PR_TAUNTS[Math.floor(Math.random()*PR_TAUNTS.length)]+suffix;
   document.getElementById("pr-overlay").style.display="flex";
   launchConfetti();
 }
@@ -1925,6 +1939,11 @@ document.getElementById("log-bw-btn").onclick=async()=>{
 document.getElementById("close-pr-btn").onclick=()=>{
   document.getElementById("pr-overlay").style.display="none";
   const c=document.getElementById("confetti-canvas"),ctx=c.getContext("2d");ctx.clearRect(0,0,c.width,c.height);
+  if(prQueue.length){
+    const next=prQueue.shift();
+    const remaining=prQueue.length;
+    setTimeout(()=>showPR(next.ex,next.weight,remaining?` (${remaining} more)`:""),300);
+  }
 };
 document.getElementById("cancel-edit-btn").onclick=()=>{closeModal("edit-session-modal");editingSessionId=null;S.currentEx=[];renderExList();};
 document.getElementById("save-edit-btn").onclick=()=>{closeModal("edit-session-modal");logWorkout();};
