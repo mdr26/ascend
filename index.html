@@ -682,7 +682,7 @@ textarea{-webkit-appearance:none;}
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_VERSION="2026-07-06-b"; // bump this any time the file is updated, so it's always obvious in the profile screen whether a device is on the latest version or a stale cached one.
+const BUILD_VERSION="2026-07-06-c"; // bump this any time the file is updated, so it's always obvious in the profile screen whether a device is on the latest version or a stale cached one.
 const SUPA_URL="https://cwoqiuwdenizdmgnokhy.supabase.co";
 const SUPA_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN3b3FpdXdkZW5pemRtZ25va2h5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5NjQ0NjksImV4cCI6MjA5ODU0MDQ2OX0.obnhiA67tWO6kN84uDTS3CDSymJ-UVkDAeNqLH9_SDA";
 const ADMIN_SECRET="ASCEND_ADMIN_2024";
@@ -1034,6 +1034,49 @@ function renderSplitUI(){
 }
 
 // Pick the variant to default to for a template exercise, matching normal add-exercise behavior.
+// The last-used weight is normally cached in S.lastWeights for speed, but that cache only
+// updates when a workout is completed through the app itself — so it can silently miss real
+// history (e.g. data inserted directly, or a sync that didn't complete). Fall back to scanning
+// actual logged sets directly so suggestions stay correct regardless of how the data got there.
+function resolveLastWeight(name,variant){
+  const cached=S.lastWeights[name+"|"+variant];
+  if(cached) return cached;
+  let found=0,foundDate=null;
+  S.logs.forEach(l=>{
+    if(l.type!=="lift") return;
+    (l.exercises||[]).forEach(e=>{
+      const check=exObj=>{
+        if(!exObj) return;
+        const v=exObj.activeVariant||(exObj.variants&&exObj.variants[0]);
+        if(exObj.name===name&&v===variant){
+          (exObj.sets||[]).forEach(s=>{ if(s.weight>0&&(!foundDate||l.date>=foundDate)){ found=s.weight; foundDate=l.date; } });
+        }
+      };
+      if(e.type==="superset"){ check(e.exA); check(e.exB); } else { check(e); }
+    });
+  });
+  return found;
+}
+
+// True all-time best (for PR detection) — different question from resolveLastWeight
+// ("what did I last use," for suggestions). Comparing against "last used" would wrongly
+// call a lighter-than-your-actual-best weight a "PR" just because it beat a recent light day.
+function resolveMaxWeight(name,variant){
+  let max=0;
+  S.logs.forEach(l=>{
+    if(l.type!=="lift") return;
+    (l.exercises||[]).forEach(e=>{
+      const check=exObj=>{
+        if(!exObj) return;
+        const v=exObj.activeVariant||(exObj.variants&&exObj.variants[0]);
+        if(exObj.name===name&&v===variant){ (exObj.sets||[]).forEach(s=>{ if(s.weight>max) max=s.weight; }); }
+      };
+      if(e.type==="superset"){ check(e.exA); check(e.exB); } else { check(e); }
+    });
+  });
+  return max;
+}
+
 function pickVariantFor(name,variants){
   const lv=S.lastVariants[name];
   return lv&&variants.includes(lv)?lv:variants[0];
@@ -1044,12 +1087,16 @@ function pickVariantFor(name,variants){
 function buildExerciseFromTemplate(t){
   if(t.type==="superset"){
     const av=pickVariantFor(t.exA.name,t.exA.variants), bv=pickVariantFor(t.exB.name,t.exB.variants);
+    const wA=resolveLastWeight(t.exA.name,av), wB=resolveLastWeight(t.exB.name,bv);
+    const countA=t.exA.sets||1, countB=t.exB.sets||1;
     return {type:"superset",
-      exA:{name:t.exA.name,variants:t.exA.variants,activeVariant:av,category:t.exA.category,sets:[{reps:10,weight:S.lastWeights[t.exA.name+"|"+av]||0,done:false}]},
-      exB:{name:t.exB.name,variants:t.exB.variants,activeVariant:bv,category:t.exB.category,sets:[{reps:10,weight:S.lastWeights[t.exB.name+"|"+bv]||0,done:false}]}};
+      exA:{name:t.exA.name,variants:t.exA.variants,activeVariant:av,category:t.exA.category,sets:Array.from({length:countA},()=>({reps:10,weight:wA,done:false}))},
+      exB:{name:t.exB.name,variants:t.exB.variants,activeVariant:bv,category:t.exB.category,sets:Array.from({length:countB},()=>({reps:10,weight:wB,done:false}))}};
   }
   const av=pickVariantFor(t.name,t.variants);
-  return {name:t.name,variants:t.variants,activeVariant:av,category:t.category,sets:[{reps:10,weight:S.lastWeights[t.name+"|"+av]||0,done:false}]};
+  const w=resolveLastWeight(t.name,av);
+  const count=t.sets||1;
+  return {name:t.name,variants:t.variants,activeVariant:av,category:t.category,sets:Array.from({length:count},()=>({reps:10,weight:w,done:false}))};
 }
 
 function loadDayTemplate(day){
@@ -1059,8 +1106,9 @@ function loadDayTemplate(day){
   return tmpl.map(buildExerciseFromTemplate);
 }
 
-// Saves the exercise list currently on screen (names/variants/category, not weights or reps)
-// as this day's template, so selecting the day chip auto-loads it from now on.
+// Saves the exercise list currently on screen (names/variants/category + how many sets you had,
+// not the actual weights or reps) as this day's template, so selecting the day chip auto-loads
+// it — including the right number of set rows — from now on.
 async function saveDayTemplate(){
   const day=getDay();
   if(!day){showToast("Set up your split first");return;}
@@ -1068,8 +1116,8 @@ async function saveDayTemplate(){
   const key=S.split;
   if(!S.customSplits[key].templates) S.customSplits[key].templates={};
   S.customSplits[key].templates[day]=S.currentEx.map(ex=>{
-    if(ex.type==="superset") return {type:"superset",exA:{name:ex.exA.name,variants:ex.exA.variants,category:ex.exA.category},exB:{name:ex.exB.name,variants:ex.exB.variants,category:ex.exB.category}};
-    return {name:ex.name,variants:ex.variants,category:ex.category};
+    if(ex.type==="superset") return {type:"superset",exA:{name:ex.exA.name,variants:ex.exA.variants,category:ex.exA.category,sets:ex.exA.sets.length},exB:{name:ex.exB.name,variants:ex.exB.variants,category:ex.exB.category,sets:ex.exB.sets.length}};
+    return {name:ex.name,variants:ex.variants,category:ex.category,sets:ex.sets.length};
   });
   await saveData();
   showToast("Saved as your "+day+" template");
@@ -1130,7 +1178,7 @@ function makeSetRows(sets, idx, isSuperset=false, ssIdx=null){
 
 function makeExCard(ex, idx){
   const v=ex.activeVariant||ex.variants[0];
-  const lw=S.lastWeights[ex.name+"|"+v];
+  const lw=resolveLastWeight(ex.name,v);
   const best=ex.sets.reduce((b,s)=>s.weight>b.weight?s:b,{reps:0,weight:0});
   const orm=best.weight>0?Math.round(best.weight*(1+best.reps/30)):0;
   const suggest=lw?(lw+(2.5)).toFixed(1):null;
@@ -1241,7 +1289,7 @@ function renderTaunt(){
   const ex=S.currentEx.find(e=>e.type!=="superset");
   if(!ex){el.innerHTML="";return;}
   const v=ex.activeVariant||ex.variants[0];
-  const lw=S.lastWeights[ex.name+"|"+v], cw=ex.sets[0]?ex.sets[0].weight:0;
+  const lw=resolveLastWeight(ex.name,v), cw=ex.sets[0]?ex.sets[0].weight:0;
   if(!lw){el.innerHTML="";return;}
   const msg=cw>lw?PR_TAUNTS[Math.floor(Math.random()*PR_TAUNTS.length)]:TAUNTS[Math.floor(Math.random()*TAUNTS.length)].replace(/{w}/g,lw);
   el.innerHTML=`<div class="taunt">${msg}</div>`;
@@ -1289,6 +1337,21 @@ async function logWorkout(){
   const exercises=JSON.parse(JSON.stringify(S.currentEx));
   if(!checkDayMismatch(day,exercises)) return;
   const entry={date:today(),split:getSplit()?.name||"Workout",day,exercises,type:"lift"};
+
+  // Snapshot each exercise's true best BEFORE this session is added to history — addLog()
+  // updates S.logs immediately, so scanning history afterward would compare today against itself.
+  const prevBestMap={};
+  exercises.forEach(ex=>{
+    if(ex.type==="superset"){
+      const vA=ex.exA.activeVariant||ex.exA.variants[0], vB=ex.exB.activeVariant||ex.exB.variants[0];
+      prevBestMap[ex.exA.name+"|"+vA]=resolveMaxWeight(ex.exA.name,vA);
+      prevBestMap[ex.exB.name+"|"+vB]=resolveMaxWeight(ex.exB.name,vB);
+    } else {
+      const v=ex.activeVariant||ex.variants[0];
+      prevBestMap[ex.name+"|"+v]=resolveMaxWeight(ex.name,v);
+    }
+  });
+
   let saved=true;
   try{
     if(editingSessionId){
@@ -1304,11 +1367,11 @@ async function logWorkout(){
       const exName=ex.type==="superset"?ex.exA.name:ex.name;
       const v=ex.type==="superset"?(ex.exA.activeVariant||ex.exA.variants[0]):(ex.activeVariant||ex.variants[0]);
       const maxW=Math.max(...sets.map(s=>s.weight||0));
-      const prev=S.lastWeights[(ex.type==="superset"?ex.exA.name:ex.name)+"|"+v]||0;
+      const prev=prevBestMap[(ex.type==="superset"?ex.exA.name:ex.name)+"|"+v]||0;
       if(maxW>0){ if(maxW>prev){prList.push({ex:exName+" ("+v+")",weight:maxW});} S.lastWeights[(ex.type==="superset"?ex.exA.name:ex.name)+"|"+v]=maxW; S.lastVariants[ex.type==="superset"?ex.exA.name:ex.name]=v; }
       if(ex.type==="superset"){
         const vB=ex.exB.activeVariant||ex.exB.variants[0], maxWB=Math.max(...ex.exB.sets.map(s=>s.weight||0));
-        const prevB=S.lastWeights[ex.exB.name+"|"+vB]||0;
+        const prevB=prevBestMap[ex.exB.name+"|"+vB]||0;
         if(maxWB>0){ if(maxWB>prevB){prList.push({ex:ex.exB.name+" ("+vB+")",weight:maxWB});} S.lastWeights[ex.exB.name+"|"+vB]=maxWB; S.lastVariants[ex.exB.name]=vB; }
       }
     });
@@ -1920,7 +1983,7 @@ document.getElementById("add-ex-btn").onclick=()=>{
   const opt=sel.options[sel.selectedIndex];
   const variants=(opt.dataset.variants||"Barbell").split(",");
   const lv=S.lastVariants[val], av=lv&&variants.includes(lv)?lv:variants[0];
-  const lw=S.lastWeights[val+"|"+av]||0;
+  const lw=resolveLastWeight(val,av);
   S.currentEx.push({name:val,variants,activeVariant:av,category:S.activeCat,sets:[{reps:10,weight:lw,done:false}]});
   renderExList(); renderTaunt();
 };
