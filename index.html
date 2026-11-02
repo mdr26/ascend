@@ -692,9 +692,19 @@ async function doEnter(){
 async function _createAccount(uid,name,adminOverride,inviteCode,err){
   try{
     const isAdm=adminOverride||uid===ADMIN_UID;
-    const nu={uid,name,is_admin:isAdm,sessions:0,banned:false};
-    await supa("POST","users",nu);
-    uProfile=nu;isAdmin=isAdm;cUser={uid};
+    // A row for this uid can already exist — most commonly the fixed admin account being
+    // re-entered from a device/browser that has no local ascend_uid saved. Sign into it
+    // instead of trying (and failing, on a unique-constraint error) to insert a duplicate.
+    const existing=await supa("GET","users",null,{"uid":"eq."+uid}).catch(()=>null);
+    if(existing&&existing.length){
+      const acct=existing[0];
+      if(acct.banned){err.textContent="Account removed.";err.style.display="block";return;}
+      uProfile=acct;isAdmin=acct.is_admin||isAdm;cUser={uid};
+    }else{
+      const nu={uid,name,is_admin:isAdm,sessions:0,banned:false};
+      await supa("POST","users",nu);
+      uProfile=nu;isAdmin=isAdm;cUser={uid};
+    }
     if(inviteCode)await supa("PATCH","invite_codes",{used:true,used_by:uid},{"code":"eq."+inviteCode}).catch(()=>{});
     try{localStorage.setItem("ascend_profile_"+uid,JSON.stringify({name:uProfile.name,is_admin:isAdmin}));}catch(le){}
     await loadData();showApp();
