@@ -10,15 +10,19 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#000;--bg2:#0d0d0d;--bg3:#141414;--bg4:#1c1c1c;--bg5:#242424;--acc:#C1121F;--text:#F0F0EE;--text2:#888880;--text3:#444440;--border:#1e1e1e;--border2:#2a2a2a;--green:#2F7A5C;--red:#C1121F;--rad:10px;--rad-lg:14px;}
+:root{--bg:#0A0A0A;--bg2:#0d0d0d;--bg3:#141414;--bg4:#1c1c1c;--bg5:#242424;--acc:#FF2D95;--acc2:#007BA7;--text:#F0F0EE;--text2:#888880;--text3:#444440;--border:#1e1e1e;--border2:#2a2a2a;--green:#2F7A5C;--red:#FF2D95;--rad:10px;--rad-lg:14px;--font-display:'Oswald',-apple-system,sans-serif;}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,'Helvetica Neue',sans-serif;overscroll-behavior:none;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,'Helvetica Neue',sans-serif;overscroll-behavior:none;}
 body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;}
 
 /* LOADING */
-#loading-screen{position:fixed;inset:0;background:#000;z-index:9999;display:flex;align-items:center;justify-content:center;max-width:430px;margin:0 auto;}
-.cin-scanline{position:absolute;left:0;right:0;height:1px;background:rgba(193,18,31,0.25);animation:scanline 2.5s linear infinite;pointer-events:none;}
+#loading-screen{position:fixed;inset:0;background:#000;z-index:9999;display:flex;align-items:center;justify-content:center;max-width:430px;margin:0 auto;transition:opacity 0.4s ease-out;}
+#loading-screen.fading{opacity:0;pointer-events:none;}
+.cin-scanline{position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,rgba(255,45,149,0.3),rgba(0,123,167,0.3));animation:scanline 2.5s linear infinite;pointer-events:none;}
 @keyframes scanline{0%{top:0;}100%{top:100%;}}
 .cin-line{opacity:0;text-transform:uppercase;margin-bottom:14px;animation:cinIn 0.7s ease-out forwards;}
 @keyframes cinIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
@@ -36,7 +40,7 @@ body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;}
 #app{display:none;flex-direction:column;height:100%;}
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:52px 18px 14px;background:var(--bg);border-bottom:0.5px solid var(--border);position:sticky;top:0;z-index:50;}
 .topbar-left{display:flex;align-items:center;gap:9px;}
-.topbar-left span{font-size:22px;font-weight:800;letter-spacing:-0.03em;color:var(--acc);font-style:italic;}
+.topbar-left span{font-size:22px;font-weight:800;letter-spacing:-0.03em;color:var(--acc);font-style:italic;font-family:var(--font-display);}
 .topbar-right{display:flex;align-items:center;gap:8px;}
 .streak-badge{background:var(--bg3);border:0.5px solid var(--border2);border-radius:99px;padding:5px 10px;font-size:12px;color:var(--acc);font-weight:700;}
 .user-pill{background:var(--bg3);border:0.5px solid var(--border2);border-radius:99px;padding:5px 12px;font-size:12px;color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:6px;}
@@ -69,7 +73,7 @@ textarea{-webkit-appearance:none;}
 /* WEEK STRIP */
 .week-strip{display:flex;gap:5px;margin-bottom:16px;}
 .wday{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border-radius:8px;border:0.5px solid var(--border);background:var(--bg2);}
-.wday.trained{border-color:var(--acc);background:rgba(193,18,31,0.07);}
+.wday.trained{border-color:var(--acc);background:rgba(255,45,149,0.07);}
 .wday.today{border-color:var(--acc);}
 .wday .wl{font-size:10px;font-weight:700;color:var(--text3);}
 .wday .wn{font-size:13px;font-weight:700;color:var(--text2);}
@@ -79,7 +83,7 @@ textarea{-webkit-appearance:none;}
 
 /* SPLIT */
 .split-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-.split-name-txt{font-size:16px;font-weight:800;color:var(--text);}
+.split-name-txt{font-size:16px;font-weight:800;color:var(--text);font-family:var(--font-display);}
 .split-change{font-size:12px;color:var(--acc);cursor:pointer;font-weight:600;}
 .day-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;scrollbar-width:none;}
 .day-row::-webkit-scrollbar{display:none;}
@@ -92,7 +96,7 @@ textarea{-webkit-appearance:none;}
 .ex-name-txt{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.01em;}
 .ex-badges{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:3px;}
 .badge-last{font-size:10px;color:var(--text3);background:var(--bg4);border:0.5px solid var(--border2);border-radius:5px;padding:2px 7px;white-space:nowrap;}
-.badge-1rm{font-size:10px;color:var(--acc);font-weight:700;background:rgba(193,18,31,0.12);border-radius:5px;padding:2px 7px;white-space:nowrap;}
+.badge-1rm{font-size:10px;color:var(--acc);font-weight:700;background:rgba(255,45,149,0.12);border-radius:5px;padding:2px 7px;white-space:nowrap;}
 .badge-suggest{font-size:10px;color:#4CAF82;font-weight:700;background:rgba(47,122,92,0.15);border-radius:5px;padding:2px 7px;white-space:nowrap;cursor:pointer;}
 .vrow{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;}
 .vchip{font-size:11px;padding:4px 10px;border-radius:6px;border:0.5px solid var(--border2);background:var(--bg4);color:var(--text2);cursor:pointer;font-weight:500;transition:all 0.12s;}
@@ -110,7 +114,7 @@ textarea{-webkit-appearance:none;}
 
 /* SUPERSET */
 .superset-block{border:0.5px solid var(--border2);border-radius:var(--rad);margin-bottom:8px;overflow:hidden;}
-.superset-header{background:rgba(193,18,31,0.08);border-bottom:0.5px solid var(--border2);padding:8px 14px;display:flex;align-items:center;justify-content:space-between;}
+.superset-header{background:rgba(255,45,149,0.08);border-bottom:0.5px solid var(--border2);padding:8px 14px;display:flex;align-items:center;justify-content:space-between;}
 .superset-label{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--acc);}
 .superset-inner{padding:10px 14px;}
 .superset-divider{height:0.5px;background:var(--border2);margin:10px 0;}
@@ -124,12 +128,12 @@ textarea{-webkit-appearance:none;}
 .add-ex-row select{flex:1;background:var(--bg3);border:0.5px solid var(--border2);border-radius:8px;color:var(--text);font-size:13px;padding:9px 12px;font-family:inherit;}
 .add-ex-row select option{background:#141414;}
 .add-ex-row button{background:var(--bg3);border:0.5px solid var(--border2);border-radius:8px;color:var(--acc);font-size:13px;font-weight:700;padding:9px 14px;cursor:pointer;font-family:inherit;}
-.add-ss-btn{width:100%;background:none;border:0.5px dashed rgba(193,18,31,0.4);border-radius:8px;color:var(--acc);font-size:12px;font-weight:600;padding:9px;cursor:pointer;font-family:inherit;margin-bottom:8px;transition:all 0.12s;}
+.add-ss-btn{width:100%;background:none;border:0.5px dashed rgba(255,45,149,0.4);border-radius:8px;color:var(--acc);font-size:12px;font-weight:600;padding:9px;cursor:pointer;font-family:inherit;margin-bottom:8px;transition:all 0.12s;}
 .taunt{background:var(--bg3);border-left:3px solid var(--acc);border-radius:0 8px 8px 0;padding:10px 14px;margin-bottom:14px;font-size:13px;color:var(--text2);font-style:italic;line-height:1.5;}
 .taunt strong{color:var(--acc);font-style:normal;}
 
 /* DUPLICATE WARNING */
-.dup-warning{background:rgba(193,18,31,0.08);border:0.5px solid rgba(193,18,31,0.3);border-radius:var(--rad);padding:12px 14px;margin-bottom:12px;display:none;}
+.dup-warning{background:rgba(255,45,149,0.08);border:0.5px solid rgba(255,45,149,0.3);border-radius:var(--rad);padding:12px 14px;margin-bottom:12px;display:none;}
 .dup-warning p{font-size:13px;color:var(--text2);margin-bottom:10px;line-height:1.5;}
 .dup-warning strong{color:var(--acc);}
 .dup-btns{display:flex;gap:8px;}
@@ -146,7 +150,7 @@ textarea{-webkit-appearance:none;}
 .timer-display{border-radius:var(--rad-lg);padding:24px 20px;text-align:center;margin-bottom:14px;border:2px solid var(--border2);transition:border-color 0.4s,background 0.4s;position:relative;overflow:hidden;}
 .timer-display::before{content:'';position:absolute;inset:0;opacity:0.05;transition:background 0.4s;}
 .timer-phase{font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:6px;transition:color 0.4s;}
-.timer-time{font-size:64px;font-weight:800;letter-spacing:-0.04em;color:var(--text);font-variant-numeric:tabular-nums;line-height:1;}
+.timer-time{font-size:64px;font-weight:800;letter-spacing:-0.04em;color:var(--text);font-variant-numeric:tabular-nums;line-height:1;font-family:var(--font-display);}
 .timer-sub{font-size:12px;color:var(--text3);margin-top:8px;}
 .timer-ring{position:absolute;bottom:0;left:0;right:0;height:3px;border-radius:0;transition:background 0.4s,width 0.1s linear;}
 .timer-controls{display:flex;gap:8px;justify-content:center;margin-bottom:14px;}
@@ -170,7 +174,7 @@ textarea{-webkit-appearance:none;}
 
 /* PLANK */
 .plank-timer{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--rad-lg);padding:24px 20px;text-align:center;margin-bottom:12px;}
-.plank-time-big{font-size:56px;font-weight:800;color:var(--acc);font-variant-numeric:tabular-nums;letter-spacing:-0.04em;}
+.plank-time-big{font-size:56px;font-weight:800;color:var(--acc);font-variant-numeric:tabular-nums;letter-spacing:-0.04em;font-family:var(--font-display);}
 .plank-pr-txt{font-size:12px;color:var(--text3);margin-top:6px;}
 .plank-btns{display:flex;gap:8px;justify-content:center;margin-top:16px;}
 .plank-btn{padding:11px 28px;border-radius:8px;font-size:14px;font-weight:700;border:none;cursor:pointer;font-family:inherit;}
@@ -181,7 +185,7 @@ textarea{-webkit-appearance:none;}
 .stat-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:16px;}
 .scard{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--rad);padding:12px 14px;}
 .slb{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:5px;}
-.sval{font-size:26px;font-weight:800;color:var(--text);letter-spacing:-0.02em;}
+.sval{font-size:26px;font-weight:800;color:var(--text);letter-spacing:-0.02em;font-family:var(--font-display);}
 .sunit{font-size:12px;color:var(--text3);font-weight:400;}
 .prog-row{margin-bottom:12px;}
 .prog-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;}
@@ -222,7 +226,7 @@ textarea{-webkit-appearance:none;}
 .rank-card{border-radius:var(--rad-lg);padding:16px;margin-bottom:10px;border:0.5px solid var(--border2);background:var(--bg2);display:flex;align-items:center;gap:14px;}
 .rank-card.top{border-color:var(--acc);}
 .rank-shield{width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:24px;background:var(--bg3);border:0.5px solid var(--border2);}
-.rank-card.top .rank-shield{background:rgba(193,18,31,0.1);border-color:var(--acc);}
+.rank-card.top .rank-shield{background:rgba(255,45,149,0.1);border-color:var(--acc);}
 .rank-bar-bg{background:var(--bg3);border-radius:99px;height:4px;margin-top:5px;}
 .rank-bar-fill{height:100%;background:var(--acc);border-radius:99px;}
 .friend-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--rad-lg);padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
@@ -235,9 +239,9 @@ textarea{-webkit-appearance:none;}
 
 /* HEATMAP */
 .heatmap-wrap{background:#000;border-radius:var(--rad-lg);padding:14px 10px;border:0.5px solid var(--border);position:relative;overflow:hidden;margin-bottom:10px;}
-.hm-scan{position:absolute;left:0;right:0;height:1px;background:rgba(193,18,31,0.12);animation:hmscan 4s linear infinite;pointer-events:none;}
+.hm-scan{position:absolute;left:0;right:0;height:1px;background:rgba(255,45,149,0.12);animation:hmscan 4s linear infinite;pointer-events:none;}
 @keyframes hmscan{0%{top:0;}100%{top:100%;}}
-.hm-corner{position:absolute;width:8px;height:8px;border-color:#C1121F;border-style:solid;opacity:0.35;}
+.hm-corner{position:absolute;width:8px;height:8px;border-color:#FF2D95;border-style:solid;opacity:0.35;}
 .hm-tl{top:5px;left:5px;border-width:1px 0 0 1px;}
 .hm-tr{top:5px;right:5px;border-width:1px 1px 0 0;}
 .hm-bl{bottom:5px;left:5px;border-width:0 0 1px 1px;}
@@ -250,18 +254,18 @@ textarea{-webkit-appearance:none;}
 .hm-dot{width:6px;height:6px;border-radius:50%;}
 .hm-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;}
 .hm-mc{background:#080808;border:0.5px solid #141414;border-radius:5px;padding:5px 4px;cursor:pointer;}
-.hm-mc.hard{border-color:#C1121F;}
-.hm-mc.light{border-color:#4a0a0a;}
+.hm-mc.hard{border-color:#FF2D95;}
+.hm-mc.light{border-color:#4a0a24;}
 .hm-mc-name{font-size:8px;font-weight:700;letter-spacing:0.04em;color:#333;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .hm-mc.hard .hm-mc-name{color:#ccc;}
-.hm-mc.light .hm-mc-name{color:#7a3333;}
+.hm-mc.light .hm-mc-name{color:#7a3350;}
 .hm-bar{height:2px;border-radius:99px;background:#111;margin-top:3px;}
 .hm-fill{height:100%;border-radius:99px;transition:width 0.3s,background 0.3s;}
 
 /* ADMIN */
-.admin-section{background:rgba(193,18,31,0.05);border:0.5px solid rgba(193,18,31,0.25);border-radius:var(--rad-lg);padding:14px 16px;margin-bottom:10px;}
+.admin-section{background:rgba(255,45,149,0.05);border:0.5px solid rgba(255,45,149,0.25);border-radius:var(--rad-lg);padding:14px 16px;margin-bottom:10px;}
 .admin-title{font-size:11px;font-weight:700;color:var(--acc);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;}
-.admin-code{font-size:28px;font-weight:800;letter-spacing:0.16em;color:var(--acc);text-align:center;padding:12px;background:var(--bg3);border-radius:8px;margin-bottom:8px;}
+.admin-code{font-size:28px;font-weight:800;letter-spacing:0.16em;color:var(--acc);text-align:center;padding:12px;background:var(--bg3);border-radius:8px;margin-bottom:8px;font-family:var(--font-display);}
 .code-btn{width:100%;background:var(--bg3);border:0.5px solid var(--border2);border-radius:8px;color:var(--text2);font-size:13px;padding:10px;font-family:inherit;cursor:pointer;margin-bottom:6px;}
 .user-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--border);}
 .user-row-av{width:32px;height:32px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text2);flex-shrink:0;}
@@ -276,7 +280,7 @@ textarea{-webkit-appearance:none;}
 .overlay.open{display:flex;}
 .sheet{background:var(--bg2);border-top:0.5px solid var(--border2);border-radius:18px 18px 0 0;padding:20px 18px 48px;width:100%;max-height:90vh;overflow-y:auto;}
 .handle{width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 18px;}
-.mtitle{font-size:16px;font-weight:800;color:var(--text);margin-bottom:16px;letter-spacing:-0.01em;}
+.mtitle{font-size:16px;font-weight:800;color:var(--text);margin-bottom:16px;letter-spacing:-0.01em;font-family:var(--font-display);}
 
 /* PR OVERLAY */
 #pr-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.95);flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;max-width:430px;margin:0 auto;}
@@ -300,8 +304,8 @@ textarea{-webkit-appearance:none;}
 <!-- LOGIN -->
 <div id="login-screen" style="display:none;">
   <div style="text-align:center;margin-bottom:24px;">
-    <svg width="72" height="72" viewBox="0 0 110 110" style="display:block;margin:0 auto 14px;"><rect width="110" height="110" rx="22" fill="#1A0608"/><polygon points="55,18 80,74 55,58 30,74" fill="#C1121F"/><polygon points="55,34 70,74 55,62 40,74" fill="#3D0608"/></svg>
-    <div style="font-size:32px;font-weight:800;font-style:italic;color:#F0F0EE;letter-spacing:-0.03em;margin-bottom:4px;">Ascend</div>
+    <svg width="72" height="72" viewBox="0 0 110 110" style="display:block;margin:0 auto 14px;"><rect width="110" height="110" rx="22" fill="#1A0612"/><polygon points="55,18 80,74 55,58 30,74" fill="#FF2D95"/><polygon points="55,34 70,74 55,62 40,74" fill="#4D0A35"/></svg>
+    <div style="font-family:var(--font-display);font-size:32px;font-weight:800;font-style:italic;color:#F0F0EE;letter-spacing:-0.03em;margin-bottom:4px;text-shadow:0 0 18px rgba(255,45,149,0.35),0 0 32px rgba(0,123,167,0.2);">Ascend</div>
     <div style="font-size:12px;color:#888880;letter-spacing:0.12em;text-transform:uppercase;">Track · Compete · Rank up</div>
   </div>
 
@@ -325,13 +329,13 @@ textarea{-webkit-appearance:none;}
     <button id="login-btn" style="width:100%;background:var(--acc);color:#fff;border:none;border-radius:10px;padding:15px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;">Create account</button>
   </div>
 
-  <div id="login-err" style="font-size:12px;color:#C1121F;text-align:center;margin-top:10px;display:none;"></div>
+  <div id="login-err" style="font-size:12px;color:#FF2D95;text-align:center;margin-top:10px;display:none;"></div>
 </div>
 
 <!-- INVITE -->
 <div id="invite-screen">
   <div style="width:100%;max-width:340px;text-align:center;">
-    <svg width="52" height="52" viewBox="0 0 110 110" style="display:block;margin:0 auto 20px;"><rect x="0" y="0" width="110" height="110" rx="24" fill="#1A0608"/><polygon points="55,18 78,72 55,60 32,72" fill="#C1121F"/><polygon points="55,34 70,72 55,64 40,72" fill="#3D0608"/></svg>
+    <svg width="52" height="52" viewBox="0 0 110 110" style="display:block;margin:0 auto 20px;"><rect x="0" y="0" width="110" height="110" rx="24" fill="#1A0612"/><polygon points="55,18 78,72 55,60 32,72" fill="#FF2D95"/><polygon points="55,34 70,72 55,64 40,72" fill="#4D0A35"/></svg>
     <div style="font-size:22px;font-weight:800;color:var(--text);margin-bottom:8px;text-align:left;">Enter invite code</div>
     <div style="font-size:13px;color:var(--text3);margin-bottom:24px;line-height:1.5;text-align:left;">Ascend is invite-only. Ask the admin for a code to join.</div>
     <input class="invite-input" id="invite-input" placeholder="XXXXXX" maxlength="6">
@@ -345,7 +349,7 @@ textarea{-webkit-appearance:none;}
 <div id="app">
   <div class="topbar">
     <div class="topbar-left">
-      <svg width="26" height="26" viewBox="0 0 110 110"><rect x="0" y="0" width="110" height="110" rx="20" fill="#1A0608"/><polygon points="55,18 78,72 55,60 32,72" fill="#C1121F"/><polygon points="55,34 70,72 55,64 40,72" fill="#3D0608"/></svg>
+      <svg width="26" height="26" viewBox="0 0 110 110"><rect x="0" y="0" width="110" height="110" rx="20" fill="#1A0612"/><polygon points="55,18 78,72 55,60 32,72" fill="#FF2D95"/><polygon points="55,34 70,72 55,64 40,72" fill="#4D0A35"/></svg>
       <span>Ascend</span>
     </div>
     <div class="topbar-right">
@@ -383,7 +387,7 @@ textarea{-webkit-appearance:none;}
       <div id="taunt-area"></div>
       <div id="ex-list"></div>
       <div id="save-template-row" style="display:none;margin-bottom:10px;">
-        <button id="save-template-btn" style="width:100%;background:none;border:0.5px dashed rgba(193,18,31,0.4);border-radius:8px;color:var(--acc);font-size:12px;font-weight:600;padding:9px;cursor:pointer;font-family:inherit;"></button>
+        <button id="save-template-btn" style="width:100%;background:none;border:0.5px dashed rgba(255,45,149,0.4);border-radius:8px;color:var(--acc);font-size:12px;font-weight:600;padding:9px;cursor:pointer;font-family:inherit;"></button>
       </div>
 
       <div class="card">
@@ -524,8 +528,8 @@ textarea{-webkit-appearance:none;}
         <div class="hm-sub" id="hm-week-label">This week</div>
         <div class="hm-bodies" id="hm-bodies"></div>
         <div class="hm-legend">
-          <div class="hm-li"><div class="hm-dot" style="background:#C1121F;"></div>Hard</div>
-          <div class="hm-li"><div class="hm-dot" style="background:#5a1a1a;"></div>Light</div>
+          <div class="hm-li"><div class="hm-dot" style="background:#FF2D95;"></div>Hard</div>
+          <div class="hm-li"><div class="hm-dot" style="background:#5a1a3a;"></div>Light</div>
           <div class="hm-li"><div class="hm-dot" style="background:#1a1a1a;border:0.5px solid #333;"></div>Rest</div>
         </div>
         <div class="hm-grid" id="hm-grid"></div>
@@ -592,7 +596,7 @@ textarea{-webkit-appearance:none;}
       <div style="font-size:11px;color:var(--text3);margin-bottom:10px;line-height:1.5;">Choose a username and PIN so you can log into this same account from your phone, laptop, or any other device.</div>
       <input class="minput" id="cdl-username" placeholder="Choose a username" maxlength="24" autocapitalize="off" autocorrect="off" spellcheck="false">
       <input class="minput" id="cdl-pin" type="password" inputmode="numeric" placeholder="Choose a 4-8 digit PIN" maxlength="8" style="letter-spacing:0.2em;">
-      <div id="cdl-err" style="font-size:11px;color:#C1121F;margin-top:-4px;margin-bottom:8px;display:none;"></div>
+      <div id="cdl-err" style="font-size:11px;color:#FF2D95;margin-top:-4px;margin-bottom:8px;display:none;"></div>
       <button class="mbtn" style="margin-top:0;" id="cdl-save-btn">Save</button>
     </div>
     <button class="mbtn" style="background:var(--bg3);color:var(--text2);border:0.5px solid var(--border2);margin-bottom:8px;" id="signout-btn">Sign out</button>
@@ -667,15 +671,15 @@ textarea{-webkit-appearance:none;}
 <div id="pr-overlay">
   <div style="position:relative;z-index:1000;">
     <div style="font-size:64px;margin-bottom:8px;animation:prBounce 0.5s ease-out;">🏆</div>
-    <div style="font-size:32px;font-weight:800;color:#C1121F;letter-spacing:-0.02em;margin-bottom:6px;animation:prSlide 0.4s ease-out 0.2s both;">NEW PR!</div>
+    <div style="font-size:32px;font-weight:800;color:#FF2D95;letter-spacing:-0.02em;margin-bottom:6px;animation:prSlide 0.4s ease-out 0.2s both;">NEW PR!</div>
     <div style="font-size:18px;font-weight:700;color:#F0F0EE;margin-bottom:4px;animation:prSlide 0.4s ease-out 0.3s both;" id="pr-ex-name"></div>
     <div style="font-size:13px;color:#666;margin-bottom:24px;font-style:italic;animation:prSlide 0.4s ease-out 0.4s both;" id="pr-msg"></div>
     <div style="background:#0d0d0d;border:0.5px solid #222;border-radius:12px;padding:16px 32px;margin-bottom:24px;display:inline-block;animation:prSlide 0.4s ease-out 0.5s both;">
       <div style="font-size:10px;color:#333;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:4px;">New weight</div>
-      <div style="font-size:42px;font-weight:800;color:#C1121F;letter-spacing:-0.03em;" id="pr-weight-val"></div>
+      <div style="font-size:42px;font-weight:800;color:#FF2D95;letter-spacing:-0.03em;" id="pr-weight-val"></div>
     </div>
     <br>
-    <button id="close-pr-btn" style="background:#C1121F;color:#fff;border:none;border-radius:10px;padding:14px 44px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:0.03em;animation:prSlide 0.4s ease-out 0.6s both;">Let's go!</button>
+    <button id="close-pr-btn" style="background:#FF2D95;color:#fff;border:none;border-radius:10px;padding:14px 44px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:0.03em;animation:prSlide 0.4s ease-out 0.6s both;">Let's go!</button>
   </div>
 </div>
 
@@ -885,7 +889,12 @@ async function deleteLog(id){
   if(!id.startsWith("local_"))await supa("DELETE","logs",null,{"id":"eq."+id}).catch(()=>{});
 }
 
-function hideLoading(){document.getElementById("loading-screen").style.display="none";}
+function hideLoading(){
+  const el=document.getElementById("loading-screen");
+  if(el.style.display==="none") return;
+  el.classList.add("fading");
+  setTimeout(()=>{el.style.display="none";},400);
+}
 function showLogin(){hideLoading();document.getElementById("login-screen").style.display="flex";document.getElementById("invite-screen").style.display="none";document.getElementById("app").style.display="none";}
 function showInvite(){hideLoading();document.getElementById("login-screen").style.display="none";document.getElementById("invite-screen").style.display="flex";document.getElementById("app").style.display="none";}
 function showApp(){
@@ -953,9 +962,9 @@ let S={
 
 // ── CINEMATIC LOADER ──────────────────────────────────────────────
 const CIN=[
-  [{t:"In a world",s:"13px",c:"#C1121F",w:"700",d:0},{t:"where gains are earned, not given",s:"10px",c:"#555",w:"400",d:600},{t:"ASCEND",s:"32px",c:"#C1121F",w:"800",d:1300},{t:"Track. Compete. Rank up.",s:"10px",c:"#444",w:"400",d:2000}],
-  [{t:"Every rep.",s:"13px",c:"#C1121F",w:"700",d:0},{t:"Every set.",s:"13px",c:"#555",w:"400",d:500},{t:"Every PR.",s:"13px",c:"#C1121F",w:"700",d:1000},{t:"ASCEND",s:"32px",c:"#C1121F",w:"800",d:1600}],
-  [{t:"Peter Parker logged in.",s:"11px",c:"#555",w:"400",d:0},{t:"Loading your glory...",s:"11px",c:"#555",w:"400",d:700},{t:"ASCEND",s:"32px",c:"#C1121F",w:"800",d:1400},{t:"The bar is waiting.",s:"10px",c:"#444",w:"400",d:2100}],
+  [{t:"In a world",s:"13px",c:"#FF2D95",w:"700",d:0},{t:"where gains are earned, not given",s:"10px",c:"#555",w:"400",d:600},{t:"ASCEND",s:"32px",c:"#FF2D95",w:"800",d:1300,big:true},{t:"Track. Compete. Rank up.",s:"10px",c:"#007BA7",w:"400",d:2000}],
+  [{t:"Every rep.",s:"13px",c:"#FF2D95",w:"700",d:0},{t:"Every set.",s:"13px",c:"#007BA7",w:"400",d:500},{t:"Every PR.",s:"13px",c:"#FF2D95",w:"700",d:1000},{t:"ASCEND",s:"32px",c:"#FF2D95",w:"800",d:1600,big:true}],
+  [{t:"Peter Parker logged in.",s:"11px",c:"#555",w:"400",d:0},{t:"Loading your glory...",s:"11px",c:"#007BA7",w:"400",d:700},{t:"ASCEND",s:"32px",c:"#FF2D95",w:"800",d:1400,big:true},{t:"The bar is waiting.",s:"10px",c:"#444",w:"400",d:2100}],
 ];
 (()=>{
   const stage=document.getElementById("cin-stage");
@@ -963,7 +972,8 @@ const CIN=[
   seq.forEach(l=>{
     const d=document.createElement("div");
     d.className="cin-line";
-    d.style.cssText=`font-size:${l.s};color:${l.c};font-weight:${l.w};letter-spacing:0.14em;text-transform:uppercase;margin-bottom:14px;animation-delay:${l.d}ms;`;
+    const glow=l.big?"text-shadow:0 0 18px rgba(255,45,149,0.45),0 0 36px rgba(0,123,167,0.25);":"";
+    d.style.cssText=`font-family:var(--font-display);font-size:${l.s};color:${l.c};font-weight:${l.w};letter-spacing:0.14em;text-transform:uppercase;margin-bottom:14px;animation-delay:${l.d}ms;${glow}`;
     d.textContent=l.t; stage.appendChild(d);
   });
 })();
@@ -1208,7 +1218,7 @@ function makeExCard(ex, idx){
 function renderExList(){
   const el=document.getElementById("ex-list");
   if(!getSplit()){
-    el.innerHTML=`<div style="background:var(--bg3);border:0.5px dashed rgba(193,18,31,0.4);border-radius:12px;padding:28px 20px;text-align:center;margin-bottom:12px;"><div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">No split set up yet</div><div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Create your custom split to start logging</div><button id="create-split-cta" style="background:var(--acc);color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;">Create my split</button></div>`;
+    el.innerHTML=`<div style="background:var(--bg3);border:0.5px dashed rgba(255,45,149,0.4);border-radius:12px;padding:28px 20px;text-align:center;margin-bottom:12px;"><div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">No split set up yet</div><div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Create your custom split to start logging</div><button id="create-split-cta" style="background:var(--acc);color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;">Create my split</button></div>`;
     document.getElementById("create-split-cta").onclick=()=>openModal("split-modal");
     document.getElementById("save-template-row").style.display="none";
     return;
@@ -1389,13 +1399,24 @@ async function logWorkout(){
 function renderLog(){
   renderWeekStrip(); renderSplitUI(); renderExList(); renderTaunt(); renderStreakBadge(); checkDuplicate();
 }
+// Walks dates day-by-day from today (or yesterday, if today hasn't been logged yet) and stops
+// at the first actual gap. The old version compared each date only to "today" with a threshold
+// that grew alongside the streak itself (diff<=streak+1), so once the streak got long enough a
+// single skipped day no longer broke it — e.g. today+2-days-ago+4-days-ago (missing day 1 and 3)
+// came out as a streak of 3. This version requires each date to be exactly one day before the last.
 function calcStreak(){
   const dates=[...new Set(S.logs.map(l=>l.date))].sort((a,b)=>b.localeCompare(a));
   if(!dates.length) return 0;
-  let streak=0; const t=today();
-  for(let i=0;i<dates.length;i++){
-    const diff=Math.round((new Date(t)-new Date(dates[i]))/86400000);
-    if(diff<=streak+1) streak++; else break;
+  const t=today();
+  const stepBack=d=>fmtDate(new Date(new Date(d+"T00:00:00").getTime()-86400000));
+  const yesterday=stepBack(t);
+  let streak, expected, idx;
+  if(dates[0]===t){ streak=1; expected=stepBack(t); idx=1; }
+  else if(dates[0]===yesterday){ streak=1; expected=stepBack(yesterday); idx=1; }
+  else return 0;
+  for(;idx<dates.length;idx++){
+    if(dates[idx]===expected){ streak++; expected=stepBack(expected); }
+    else break;
   }
   return streak;
 }
@@ -1461,7 +1482,7 @@ function resetPlank(){ clearInterval(plankInterval); plankRunning=false; plankSe
 // ── INTERVAL TIMER ────────────────────────────────────────────────
 let timerInterval=null, timerRunning=false;
 let timerPhase="idle", timerRound=0, timerCycle=0, timerSecs=0, timerTotalSecs=0;
-const PHASE_COLORS={prepare:{ring:"#FFB800",text:"#FFB800",label:"PREPARE"},work:{ring:"#C1121F",text:"#C1121F",label:"WORK"},rest:{ring:"#2F7A5C",text:"#4CAF82",label:"REST"},cyclerest:{ring:"#7B68EE",text:"#9E94FF",label:"CYCLE REST"},done:{ring:"#C1121F",text:"#C1121F",label:"DONE"}};
+const PHASE_COLORS={prepare:{ring:"#FFB800",text:"#FFB800",label:"PREPARE"},work:{ring:"#FF2D95",text:"#FF2D95",label:"WORK"},rest:{ring:"#2F7A5C",text:"#4CAF82",label:"REST"},cyclerest:{ring:"#7B68EE",text:"#9E94FF",label:"CYCLE REST"},done:{ring:"#FF2D95",text:"#FF2D95",label:"DONE"}};
 
 function renderTimerConfig(){
   const cfg=S.timerConfig;
@@ -1678,12 +1699,12 @@ function renderHeatmap(){
   const getState=m=>{ const c=muscleCount[m]||0; if(c===0)return"rest"; if(c/maxCount>0.5)return"hard"; return"light"; };
 
   // Build SVG bodies
-  const F={hard:"#C1121F",light:"#5a1a1a",rest:"#0d0d0d"};
+  const F={hard:"#FF2D95",light:"#5a1a3a",rest:"#0d0d0d"};
   const getF=m=>F[getState(m)];
 
   document.getElementById("hm-bodies").innerHTML=`
   <svg width="130" height="260" viewBox="0 0 130 260">
-    <text x="65" y="10" text-anchor="middle" fill="#C1121F" font-size="7" font-family="-apple-system,sans-serif" letter-spacing="0.15em" opacity="0.6">FRONT</text>
+    <text x="65" y="10" text-anchor="middle" fill="#FF2D95" font-size="7" font-family="-apple-system,sans-serif" letter-spacing="0.15em" opacity="0.6">FRONT</text>
     <ellipse cx="65" cy="25" rx="11" ry="12" fill="#0d0d0d" stroke="#1a1a1a" stroke-width="0.5"/>
     <path d="M54 37 Q65 33 76 37 L78 43 Q65 45 52 43 Z" fill="#0d0d0d" stroke="#1a1a1a" stroke-width="0.3"/>
     <path d="M42 50 Q53 44 65 43 Q77 44 88 50 L87 67 Q65 71 43 67 Z" fill="#111" stroke="#1a1a1a" stroke-width="0.3"/>
@@ -1712,7 +1733,7 @@ function renderHeatmap(){
     <line x1="67" y1="76" x2="67" y2="100" stroke="#0a0a0a" stroke-width="1.5"/>
   </svg>
   <svg width="130" height="260" viewBox="0 0 130 260">
-    <text x="65" y="10" text-anchor="middle" fill="#C1121F" font-size="7" font-family="-apple-system,sans-serif" letter-spacing="0.15em" opacity="0.6">BACK</text>
+    <text x="65" y="10" text-anchor="middle" fill="#FF2D95" font-size="7" font-family="-apple-system,sans-serif" letter-spacing="0.15em" opacity="0.6">BACK</text>
     <ellipse cx="65" cy="25" rx="11" ry="12" fill="#0d0d0d" stroke="#1a1a1a" stroke-width="0.5"/>
     <path d="M54 37 Q65 33 76 37 L78 43 Q65 42 52 43 Z" fill="${getF("traps")}" stroke="none"/>
     <path d="M43 49 Q53 43 65 42 Q77 43 87 49 L86 62 Q65 66 44 62 Z" fill="${getF("traps")}" stroke="none"/>
@@ -1741,7 +1762,7 @@ function renderHeatmap(){
   document.getElementById("hm-grid").innerHTML=uniqueMuscles.map(m=>{
     const s=getState(m), lbl=HM_LABELS[m]||m;
     const w=s==="hard"?"90%":s==="light"?"45%":"0%";
-    const bc=s==="hard"?"#C1121F":"#5a1a1a";
+    const bc=s==="hard"?"#FF2D95":"#5a1a3a";
     return`<div class="hm-mc ${s}"><div class="hm-mc-name">${lbl}</div><div class="hm-bar"><div class="hm-fill" style="width:${w};background:${bc};"></div></div></div>`;
   }).join("");
 }
@@ -1757,7 +1778,7 @@ async function renderCrew(){
   document.getElementById("my-rank-card").innerHTML=`<div class="rank-card top">
     <div class="rank-shield">${rank.emoji}</div>
     <div style="flex:1;min-width:0;">
-      <div style="font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:rgba(193,18,31,0.7);margin-bottom:3px;">${rank.universe} · ${uniqueDays} training days</div>
+      <div style="font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:rgba(255,45,149,0.7);margin-bottom:3px;">${rank.universe} · ${uniqueDays} training days</div>
       <div style="font-size:17px;font-weight:800;color:var(--acc);">${rank.title}</div>
       <div style="font-size:11px;color:var(--text3);margin-top:3px;line-height:1.5;">${rank.sub}</div>
       ${next?`<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:7px;"><span>${uniqueDays} days</span><span>${next.min} → ${next.title}</span></div><div class="rank-bar-bg"><div class="rank-bar-fill" style="width:${pct}%"></div></div>`:`<div style="font-size:11px;color:var(--acc);margin-top:6px;font-weight:700;">MAX RANK ACHIEVED</div>`}
@@ -1828,7 +1849,7 @@ function renderAdminPanel(){
         <div style="font-size:11px;color:var(--text3);">${u.sessions||0} days</div>
       </div>
       <button class="ban-btn" data-uid="${u.uid}" data-name="${u.name||"user"}"
-        style="background:rgba(193,18,31,0.12);border:0.5px solid rgba(193,18,31,0.35);border-radius:6px;color:var(--red,#C1121F);font-size:11px;padding:5px 12px;cursor:pointer;font-family:inherit;">Remove</button>
+        style="background:rgba(255,45,149,0.12);border:0.5px solid rgba(255,45,149,0.35);border-radius:6px;color:var(--red,#FF2D95);font-size:11px;padding:5px 12px;cursor:pointer;font-family:inherit;">Remove</button>
     </div>`).join(""):"<div style='font-size:12px;color:var(--text3);padding:8px 0;'>No other users yet.</div>";
     el2.querySelectorAll(".ban-btn").forEach(b=>b.onclick=async()=>{
       if(!confirm("Remove "+b.dataset.name+"? They won't be able to log in again.")) return;
@@ -1909,7 +1930,7 @@ function launchConfetti(){
   const canvas=document.getElementById("confetti-canvas");
   canvas.width=window.innerWidth; canvas.height=window.innerHeight;
   const ctx=canvas.getContext("2d");
-  const pieces=[], colors=["#C1121F","#FF4500","#FFD700","#FF6B6B","#fff","#FF8C00"];
+  const pieces=[], colors=["#FF2D95","#FF4500","#FFD700","#FF6B6B","#fff","#FF8C00"];
   for(let i=0;i<150;i++) pieces.push({x:Math.random()*canvas.width,y:-20-Math.random()*100,w:8+Math.random()*8,h:4+Math.random()*4,color:colors[Math.floor(Math.random()*colors.length)],rot:Math.random()*360,rs:(Math.random()-.5)*8,sx:(Math.random()-.5)*4,sy:3+Math.random()*5});
   let frame;
   function draw(){
