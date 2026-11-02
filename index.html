@@ -398,109 +398,23 @@ textarea{-webkit-appearance:none;}
       <button class="logbtn" id="log-workout-btn">Log Workout</button>
     </div>
 
-    <!-- CARDIO & TIMERS TAB -->
+    <!-- CARDIO TAB -->
     <div class="screen" id="screen-cardio">
-      <div class="slabel">Interval timer</div>
-      <div class="timer-mode-tabs">
-        <div class="tmode active" data-mode="rounds" id="tmode-rounds">Rounds only</div>
-        <div class="tmode" data-mode="tabata" id="tmode-tabata">Rounds + Cycles</div>
-      </div>
+      <div class="slabel">What did you do?</div>
+      <div class="cat-tabs" id="cardio-types" style="flex-wrap:wrap;"></div>
 
-      <div class="timer-display" id="timer-display">
-        <div class="timer-phase" id="timer-phase" style="color:var(--text3);">READY</div>
-        <div class="timer-time" id="timer-time">0:00</div>
-        <div class="timer-sub" id="timer-sub">Configure below and press Start</div>
-        <div class="timer-ring" id="timer-ring" style="width:100%;background:var(--border);"></div>
+      <div class="slabel">How long?</div>
+      <div class="cat-tabs" id="cardio-mins-chips" style="flex-wrap:wrap;"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div><div class="card-title" style="margin-bottom:6px;">Minutes</div><input class="minput" id="cardio-mins" type="number" inputmode="numeric" value="20" min="1"></div>
+        <div><div class="card-title" style="margin-bottom:6px;">Distance km (optional)</div><input class="minput" id="cardio-km" type="number" inputmode="decimal" step="0.1" placeholder="0"></div>
       </div>
+      <button class="logbtn" id="log-cardio-btn" style="margin-top:0;">Log Cardio</button>
 
-      <div class="phase-indicator" id="phase-indicator"></div>
-
-      <div class="timer-controls">
-        <button class="tc-btn tc-start" id="timer-start-btn">Start</button>
-        <button class="tc-btn tc-reset" id="timer-reset-btn">Reset</button>
-      </div>
-
-      <div class="timer-config" id="timer-config">
-        <div class="tc-row">
-          <div class="tc-label">Prepare<small>Before you start</small></div>
-          <div class="tc-val">
-            <button class="tc-arrow" data-field="prepare" data-dir="-1">−</button>
-            <div class="tc-num" id="val-prepare">5</div>
-            <button class="tc-arrow" data-field="prepare" data-dir="1">+</button>
-          </div>
-        </div>
-        <div class="tc-row">
-          <div class="tc-label">Work<small>Exercise duration</small></div>
-          <div class="tc-val">
-            <button class="tc-arrow" data-field="work" data-dir="-1">−</button>
-            <div class="tc-num" id="val-work">35</div>
-            <button class="tc-arrow" data-field="work" data-dir="1">+</button>
-          </div>
-        </div>
-        <div class="tc-row">
-          <div class="tc-label">Rest<small>Rest between rounds</small></div>
-          <div class="tc-val">
-            <button class="tc-arrow" data-field="rest" data-dir="-1">−</button>
-            <div class="tc-num" id="val-rest">20</div>
-            <button class="tc-arrow" data-field="rest" data-dir="1">+</button>
-          </div>
-        </div>
-        <div class="tc-row">
-          <div class="tc-label">Rounds<small>Work + Rest per cycle</small></div>
-          <div class="tc-val">
-            <button class="tc-arrow" data-field="rounds" data-dir="-1">−</button>
-            <div class="tc-num" id="val-rounds">8</div>
-            <button class="tc-arrow" data-field="rounds" data-dir="1">+</button>
-          </div>
-        </div>
-        <div class="cycles-section" id="cycles-section">
-          <div class="tc-row">
-            <div class="tc-label">Cycles<small>Number of cycles</small></div>
-            <div class="tc-val">
-              <button class="tc-arrow" data-field="cycles" data-dir="-1">−</button>
-              <div class="tc-num" id="val-cycles">3</div>
-              <button class="tc-arrow" data-field="cycles" data-dir="1">+</button>
-            </div>
-          </div>
-          <div class="tc-row">
-            <div class="tc-label">Rest between cycles<small>Recovery interval</small></div>
-            <div class="tc-val">
-              <button class="tc-arrow" data-field="cyclerest" data-dir="-1">−</button>
-              <div class="tc-num" id="val-cyclerest">60</div>
-              <button class="tc-arrow" data-field="cyclerest" data-dir="1">+</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="slabel" style="margin-top:20px;">Cardio log</div>
-      <div id="cardio-ex-list"></div>
-      <div class="card">
-        <div class="card-title">Add cardio exercise</div>
-        <div class="add-ex-row">
-          <select id="cardio-ex-select">
-            <option data-variants="Treadmill,Outdoor,Track" data-cardio="1">Run</option>
-            <option data-variants="Stationary,Outdoor,Air Bike" data-cardio="1">Cycling</option>
-            <option data-variants="Machine" data-cardio="1">Rowing</option>
-            <option data-variants="Single,Double" data-cardio="1">Jump Rope</option>
-            <option data-variants="Incline,Flat" data-cardio="1">Treadmill Walk</option>
-            <option data-variants="Machine" data-cardio="1">Stair Climber</option>
-            <option data-variants="Bodyweight" data-cardio="1">HIIT Circuit</option>
-          </select>
-          <button id="add-cardio-btn">Add</button>
-        </div>
-      </div>
-      <button class="logbtn" id="log-cardio-btn">Log Cardio Session</button>
-
-      <div class="slabel" style="margin-top:20px;">Plank timer</div>
-      <div class="plank-timer">
-        <div class="plank-time-big" id="plank-display">0:00</div>
-        <div class="plank-pr-txt" id="plank-pr">PR: —</div>
-        <div class="plank-btns">
-          <button class="plank-btn pb-start" id="plank-start-btn">Start</button>
-          <button class="plank-btn pb-reset" id="plank-reset-btn">Reset</button>
-        </div>
-      </div>
+      <div class="slabel">This week</div>
+      <div class="stat-grid" id="cardio-stats" style="grid-template-columns:repeat(3,minmax(0,1fr));"></div>
+      <div class="slabel">Recent</div>
+      <div class="card" style="padding:4px 16px;"><div id="cardio-recent"></div></div>
     </div>
 
     <!-- PROGRESS TAB -->
@@ -825,11 +739,15 @@ async function deleteLog(id){
   if(!id.startsWith("local_"))await supa("DELETE","logs",null,{"id":"eq."+id}).catch(()=>{});
 }
 
+// The splash always plays for at least 5 seconds, even if data loads faster.
+const LOAD_START=Date.now(), LOAD_MIN_MS=5000;
+let hideScheduled=false;
 function hideLoading(){
   const el=document.getElementById("loading-screen");
-  if(el.style.display==="none") return;
-  el.classList.add("fading");
-  setTimeout(()=>{el.style.display="none";},400);
+  if(el.style.display==="none"||hideScheduled) return;
+  hideScheduled=true;
+  const wait=Math.max(0,LOAD_MIN_MS-(Date.now()-LOAD_START));
+  setTimeout(()=>{ el.classList.add("fading"); setTimeout(()=>{el.style.display="none";},400); },wait);
 }
 function showLogin(){hideLoading();document.getElementById("login-screen").style.display="flex";document.getElementById("app").style.display="none";}
 function showApp(){
@@ -841,7 +759,7 @@ function showApp(){
   document.getElementById("user-av").textContent=name[0].toUpperCase();
   document.getElementById("profile-info").innerHTML=`<strong style="color:var(--text);">${name}</strong><br><span style="font-size:11px;color:var(--text3);">ID: ${cUser.uid.slice(0,12)}...</span><br><span style="font-size:10px;color:var(--text3);">Build ${BUILD_VERSION}</span>`;
   if(!S.activeDay&&getDays().length)S.activeDay=getDays()[0];
-  renderExSelect();renderSSExSelect();renderLog();renderTimerConfig();
+  renderExSelect();renderSSExSelect();renderLog();
   if(isAdmin){supa("GET","users",null,{"is_admin":"eq.true"}).then(async rows=>{for(const u of(rows||[])){if(u.uid!==cUser.uid)await supa("DELETE","users",null,{"uid":"eq."+u.uid}).catch(()=>{})}}).catch(()=>{});}
 }
 
@@ -947,12 +865,12 @@ const CIN=[
     const d=document.createElement("div");
     d.className="cin-line";
     const glow=l.big?"text-shadow:0 0 18px rgba(230,36,41,0.45),0 0 36px rgba(47,111,208,0.25);":"";
-    d.style.cssText=`font-family:var(--font-display);font-size:${l.s};color:${l.c};font-weight:${l.w};letter-spacing:0.14em;text-transform:uppercase;margin-bottom:14px;animation-delay:${l.d}ms;${glow}`;
+    d.style.cssText=`font-family:var(--font-display);font-size:${l.s};color:${l.c};font-weight:${l.w};letter-spacing:0.14em;text-transform:uppercase;margin-bottom:14px;animation-delay:${Math.round(l.d*1.7)}ms;${glow}`;
     d.textContent=l.t; stage.appendChild(d);
   });
 })();
 
-setTimeout(()=>{ if(document.getElementById("loading-screen").style.display!=="none") showLogin(); },6000);
+setTimeout(()=>{ if(document.getElementById("loading-screen").style.display!=="none") showLogin(); },7000);
 
 window.addEventListener("online",()=>{ if(cUser) syncPendingLogs(); });
 
@@ -1398,129 +1316,50 @@ function renderStreakBadge(){ document.getElementById("streak-badge").textConten
 
 // ── ABS ───────────────────────────────────────────────────────────
 // ── CARDIO ────────────────────────────────────────────────────────
-function renderCardioExList(){
-  const el=document.getElementById("cardio-ex-list");
-  if(!S.cardioEx.length){el.innerHTML="";return;}
-  el.innerHTML=S.cardioEx.map((ex,idx)=>{
-    const v=ex.activeVariant||ex.variants[0];
-    const variants=ex.variants.map(vv=>`<span class="vchip${vv===v?" active":""}" data-cidx="${idx}" data-v="${vv}" data-action="cv">${vv}</span>`).join("");
-    return `<div class="ex-block">
-      <div class="ex-top"><div class="ex-name-txt">${ex.name}</div><button class="rmex-btn" data-cidx="${idx}" data-action="crm">Remove</button></div>
-      <div class="vrow">${variants}</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
-        <div><div style="font-size:10px;color:var(--text3);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:4px;">Duration (min)</div>
-          <input type="number" inputmode="numeric" value="${ex.mins||20}" data-cidx="${idx}" data-field="mins" style="background:var(--bg4);border:0.5px solid var(--border2);border-radius:6px;color:var(--text);font-size:16px;font-weight:700;padding:9px 10px;text-align:center;width:100%;font-family:inherit;"></div>
-        <div><div style="font-size:10px;color:var(--text3);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:4px;">Distance (km)</div>
-          <input type="number" inputmode="decimal" value="${ex.km||0}" data-cidx="${idx}" data-field="km" step="0.1" style="background:var(--bg4);border:0.5px solid var(--border2);border-radius:6px;color:var(--text);font-size:16px;font-weight:700;padding:9px 10px;text-align:center;width:100%;font-family:inherit;"></div>
-      </div>
-    </div>`;
+// Deliberately simple: pick an activity, pick minutes, optionally add km, log. One tap.
+const CARDIO_TYPES=["Run","Cycling","Rowing","Jump Rope","Walk","Stairs","HIIT"];
+const CARDIO_QUICK_MINS=[10,20,30,45,60];
+let cardioPick="Run";
+
+function cardioLogs(){ return S.logs.filter(l=>l.type==="cardio"); }
+function cardioEntry(l){ const e=(l.exercises||[])[0]||{}; return {name:e.name||"Cardio",mins:e.mins||0,km:e.km||0}; }
+
+function renderCardio(){
+  document.getElementById("cardio-types").innerHTML=CARDIO_TYPES.map(t=>`<div class="ctab${t===cardioPick?" active":""}" data-t="${t}">${t}</div>`).join("");
+  document.getElementById("cardio-types").querySelectorAll(".ctab").forEach(c=>c.onclick=()=>{cardioPick=c.dataset.t;renderCardio();});
+  const cur=parseFloat(document.getElementById("cardio-mins").value)||0;
+  document.getElementById("cardio-mins-chips").innerHTML=CARDIO_QUICK_MINS.map(m=>`<div class="ctab${m===cur?" active":""}" data-m="${m}">${m} min</div>`).join("");
+  document.getElementById("cardio-mins-chips").querySelectorAll(".ctab").forEach(c=>c.onclick=()=>{document.getElementById("cardio-mins").value=c.dataset.m;renderCardio();});
+
+  const week=cardioLogs().filter(l=>(new Date()-new Date(l.date))/86400000<=7);
+  const totalMin=week.reduce((a,l)=>a+cardioEntry(l).mins,0), totalKm=week.reduce((a,l)=>a+cardioEntry(l).km,0);
+  document.getElementById("cardio-stats").innerHTML=[{l:"Sessions",v:week.length},{l:"Minutes",v:Math.round(totalMin)},{l:"Distance (km)",v:totalKm.toFixed(1)}].map(x=>`<div class="scard"><div class="slb">${x.l}</div><div class="sval">${x.v}</div></div>`).join("");
+
+  const recent=cardioLogs().slice(0,6);
+  const el=document.getElementById("cardio-recent");
+  el.innerHTML=!recent.length?"<div class='empty' style='padding:16px 0;font-size:12px;'>No cardio logged yet</div>":recent.map(l=>{
+    const e=cardioEntry(l);
+    return `<div class="bw-item"><span style="color:var(--text);font-weight:600;">${e.name}</span><span style="color:var(--text3);font-size:12px;">${e.mins} min${e.km?" · "+e.km+" km":""} · ${l.date}</span><button class="hist-act-btn" data-id="${l.id}">Delete</button></div>`;
   }).join("");
-  el.querySelectorAll("[data-action]").forEach(btn=>{
-    btn.onclick=()=>{
-      const idx=+btn.dataset.cidx, a=btn.dataset.action;
-      if(a==="crm"){S.cardioEx.splice(idx,1);renderCardioExList();}
-      else if(a==="cv"){S.cardioEx[idx].activeVariant=btn.dataset.v;renderCardioExList();}
-    };
-  });
-  el.querySelectorAll("input").forEach(inp=>{
-    inp.onchange=()=>{S.cardioEx[+inp.dataset.cidx][inp.dataset.field]=parseFloat(inp.value)||0;};
+  el.querySelectorAll("[data-id]").forEach(b=>b.onclick=async()=>{
+    if(!confirm("Delete this cardio session?")) return;
+    await deleteLog(b.dataset.id); await saveData(); renderCardio(); renderWeekStrip(); renderStreakBadge();
   });
 }
 
 async function logCardioSession(){
-  if(!S.cardioEx.length){showToast("Add at least one exercise");return;}
-  const entry={date:today(),split:"Cardio",day:"Cardio",exercises:JSON.parse(JSON.stringify(S.cardioEx)),type:"cardio"};
+  const mins=parseFloat(document.getElementById("cardio-mins").value)||0;
+  const km=parseFloat(document.getElementById("cardio-km").value)||0;
+  if(mins<=0){showToast("Enter how many minutes");return;}
+  const entry={date:today(),split:"Cardio",day:"Cardio",exercises:[{name:cardioPick,variants:["Cardio"],activeVariant:"Cardio",mins,km}],type:"cardio"};
   try{
     const saved=await addLog(entry);
-    S.cardioEx=[];
     await saveData();
-    showToast(saved?"Cardio session logged!":"Saved on device — will sync when back online");
-    renderCardioExList(); renderWeekStrip(); renderStreakBadge();
+    document.getElementById("cardio-km").value="";
+    showToast(saved?"Cardio logged!":"Saved on device — will sync when back online");
+    renderCardio(); renderWeekStrip(); renderStreakBadge();
   }catch(e){console.error(e);showToast("Error saving.");}
 }
-
-// ── PLANK ─────────────────────────────────────────────────────────
-let plankInterval=null, plankSecs=0, plankRunning=false;
-function togglePlank(){
-  if(plankRunning){
-    clearInterval(plankInterval); plankRunning=false;
-    document.getElementById("plank-start-btn").textContent="Resume";
-    if(plankSecs>S.plankPR){S.plankPR=plankSecs;saveData();document.getElementById("plank-pr").textContent="PR: "+fmtTime(S.plankPR);}
-  } else {
-    plankRunning=true; document.getElementById("plank-start-btn").textContent="Pause";
-    plankInterval=setInterval(()=>{plankSecs++;document.getElementById("plank-display").textContent=fmtTime(plankSecs);},1000);
-  }
-}
-function resetPlank(){ clearInterval(plankInterval); plankRunning=false; plankSecs=0; document.getElementById("plank-display").textContent="0:00"; document.getElementById("plank-start-btn").textContent="Start"; }
-
-// ── INTERVAL TIMER ────────────────────────────────────────────────
-let timerInterval=null, timerRunning=false;
-let timerPhase="idle", timerRound=0, timerCycle=0, timerSecs=0, timerTotalSecs=0;
-const PHASE_COLORS={prepare:{ring:"#FFB800",text:"#FFB800",label:"PREPARE"},work:{ring:"#E62429",text:"#E62429",label:"WORK"},rest:{ring:"#2F7A5C",text:"#4CAF82",label:"REST"},cyclerest:{ring:"#7B68EE",text:"#9E94FF",label:"CYCLE REST"},done:{ring:"#E62429",text:"#E62429",label:"DONE"}};
-
-function renderTimerConfig(){
-  const cfg=S.timerConfig;
-  ["prepare","work","rest","rounds","cycles","cyclerest"].forEach(f=>{
-    const el=document.getElementById("val-"+f);
-    if(el) el.textContent=cfg[f];
-  });
-}
-
-function updateTimerDisplay(){
-  const disp=document.getElementById("timer-display");
-  const ring=document.getElementById("timer-ring");
-  const phaseEl=document.getElementById("timer-phase");
-  const timeEl=document.getElementById("timer-time");
-  const subEl=document.getElementById("timer-sub");
-  const cfg=S.timerConfig;
-  const pc=PHASE_COLORS[timerPhase]||PHASE_COLORS.prepare;
-  disp.style.borderColor=pc.ring;
-  ring.style.background=pc.ring;
-  phaseEl.style.color=pc.text;
-  phaseEl.textContent=pc.label;
-  timeEl.textContent=fmtTime(timerSecs);
-  const totalRounds=cfg.rounds*(S.timerMode==="tabata"?cfg.cycles:1);
-  const roundsDone=S.timerMode==="tabata"?timerCycle*cfg.rounds+timerRound:timerRound;
-  subEl.textContent=timerPhase==="idle"?"Configure below and press Start":timerPhase==="done"?"Session complete!":S.timerMode==="tabata"?`Cycle ${timerCycle+1}/${cfg.cycles} · Round ${timerRound+1}/${cfg.rounds}`:`Round ${timerRound+1}/${cfg.rounds}`;
-  const pct=timerTotalSecs>0?timerSecs/timerTotalSecs*100:100;
-  ring.style.width=pct+"%";
-  updatePhaseIndicator(roundsDone,totalRounds);
-}
-
-function updatePhaseIndicator(done,total){
-  const el=document.getElementById("phase-indicator");
-  const show=Math.min(total,12);
-  el.innerHTML=Array.from({length:show},(_,i)=>`<div class="phase-dot${i<done?" active":""}"></div>`).join("");
-}
-
-function startTimer(){
-  if(timerRunning){clearInterval(timerInterval);timerRunning=false;document.getElementById("timer-start-btn").textContent="Resume";return;}
-  const cfg=S.timerConfig;
-  if(timerPhase==="idle"||timerPhase==="done"){ timerPhase="prepare"; timerSecs=cfg.prepare; timerTotalSecs=cfg.prepare; timerRound=0; timerCycle=0; }
-  timerRunning=true; document.getElementById("timer-start-btn").textContent="Pause";
-  timerInterval=setInterval(()=>{
-    timerSecs--;
-    if(timerSecs<0){
-      const cfg2=S.timerConfig;
-      if(timerPhase==="prepare"){ timerPhase="work"; timerSecs=cfg2.work; timerTotalSecs=cfg2.work; }
-      else if(timerPhase==="work"){ timerPhase="rest"; timerSecs=cfg2.rest; timerTotalSecs=cfg2.rest; }
-      else if(timerPhase==="rest"){
-        timerRound++;
-        if(timerRound>=cfg2.rounds){
-          if(S.timerMode==="tabata"){
-            timerCycle++; timerRound=0;
-            if(timerCycle>=cfg2.cycles){ timerPhase="done"; timerSecs=0; clearInterval(timerInterval); timerRunning=false; document.getElementById("timer-start-btn").textContent="Start"; showToast("Session complete!"); }
-            else { timerPhase="cyclerest"; timerSecs=cfg2.cyclerest; timerTotalSecs=cfg2.cyclerest; }
-          } else { timerPhase="done"; timerSecs=0; clearInterval(timerInterval); timerRunning=false; document.getElementById("timer-start-btn").textContent="Start"; showToast("Session complete!"); }
-        } else { timerPhase="work"; timerSecs=cfg2.work; timerTotalSecs=cfg2.work; }
-      } else if(timerPhase==="cyclerest"){ timerPhase="work"; timerSecs=cfg2.work; timerTotalSecs=cfg2.work; }
-    }
-    updateTimerDisplay();
-  },1000);
-  updateTimerDisplay();
-}
-
-function resetTimer(){ clearInterval(timerInterval); timerRunning=false; timerPhase="idle"; timerRound=0; timerCycle=0; timerSecs=0; timerTotalSecs=0; document.getElementById("timer-start-btn").textContent="Start"; document.getElementById("timer-phase").textContent="READY"; document.getElementById("timer-phase").style.color="var(--text3)"; document.getElementById("timer-time").textContent="0:00"; document.getElementById("timer-sub").textContent="Configure below and press Start"; document.getElementById("timer-ring").style.background="var(--border)"; document.getElementById("timer-ring").style.width="100%"; document.getElementById("phase-indicator").innerHTML=""; document.getElementById("timer-display").style.borderColor="var(--border2)"; }
 
 // ── PROGRESS ──────────────────────────────────────────────────────
 function renderProgress(){
@@ -1975,15 +1814,7 @@ document.getElementById("save-ss-btn").onclick=()=>{
 document.getElementById("cancel-ss-btn").onclick=()=>closeModal("ss-modal");
 document.getElementById("log-workout-btn").onclick=logWorkout;
 document.getElementById("save-template-btn").onclick=saveDayTemplate;
-document.getElementById("add-cardio-btn").onclick=()=>{
-  const sel=document.getElementById("cardio-ex-select"), opt=sel.options[sel.selectedIndex];
-  const variants=(opt.dataset.variants||"Treadmill").split(",");
-  S.cardioEx.push({name:opt.textContent||opt.text,variants,activeVariant:variants[0],mins:20,km:0});
-  renderCardioExList();
-};
 document.getElementById("log-cardio-btn").onclick=logCardioSession;
-document.getElementById("plank-start-btn").onclick=togglePlank;
-document.getElementById("plank-reset-btn").onclick=resetPlank;
 document.getElementById("log-bw-btn").onclick=async()=>{
   const v=parseFloat(document.getElementById("bw-input").value);
   if(!v||v<20||v>300){showToast("Enter a valid weight");return;}
@@ -2003,31 +1834,6 @@ document.getElementById("close-pr-btn").onclick=()=>{
 };
 document.getElementById("cancel-edit-btn").onclick=()=>{closeModal("edit-session-modal");editingSessionId=null;S.currentEx=[];renderExList();};
 document.getElementById("save-edit-btn").onclick=()=>{closeModal("edit-session-modal");logWorkout();};
-
-// Timer config arrows
-document.querySelectorAll(".tc-arrow").forEach(btn=>{
-  btn.onclick=()=>{
-    const field=btn.dataset.field, dir=+btn.dataset.dir;
-    const steps={prepare:5,work:5,rest:5,rounds:1,cycles:1,cyclerest:15};
-    const mins={prepare:0,work:5,rest:5,rounds:1,cycles:1,cyclerest:15};
-    const maxs={prepare:30,work:300,rest:300,rounds:20,cycles:10,cyclerest:300};
-    S.timerConfig[field]=Math.max(mins[field],Math.min(maxs[field],S.timerConfig[field]+dir*steps[field]));
-    document.getElementById("val-"+field).textContent=S.timerConfig[field];
-    saveData();
-  };
-});
-
-// Timer mode tabs
-document.querySelectorAll(".tmode").forEach(t=>{
-  t.onclick=()=>{
-    document.querySelectorAll(".tmode").forEach(x=>x.classList.remove("active")); t.classList.add("active");
-    S.timerMode=t.dataset.mode;
-    document.getElementById("cycles-section").classList.toggle("visible",S.timerMode==="tabata");
-    resetTimer();
-  };
-});
-document.getElementById("timer-start-btn").onclick=startTimer;
-document.getElementById("timer-reset-btn").onclick=resetTimer;
 
 // SS cat tabs
 document.querySelectorAll("#ss-cat-tabs .ctab").forEach(t=>{
@@ -2051,7 +1857,7 @@ document.querySelectorAll(".nbtn").forEach(btn=>{
     document.querySelectorAll(".nbtn").forEach(b=>b.classList.remove("active")); btn.classList.add("active");
     showScreen(btn.dataset.screen);
     if(btn.dataset.screen==="progress") renderProgress();
-    if(btn.dataset.screen==="cardio"){renderCardioExList();document.getElementById("plank-pr").textContent="PR: "+(S.plankPR?fmtTime(S.plankPR):"—");}
+    if(btn.dataset.screen==="cardio") renderCardio();
     if(btn.dataset.screen==="crew") renderCrew();
   };
 });
